@@ -48,6 +48,26 @@ A strong public entry exists: **GuardRail Buyer** (github.com/mubudot/guardrail-
 
 Its weakness: Nexconn is a bolt-on to a PayPal project. **Our edge: chat *is* our product.**
 
+## 4a. The wider landscape (research, Nov 2)
+
+Many sources are vendor marketing; treat their numbers as claims.
+
+| Category | Who | What they do | What's missing compared with us |
+|---|---|---|---|
+| Translated marketplace chat | Alibaba (Alibaba Translate) | Translates buyer–seller messages, reportedly billions a week | Translation only: no meaning check, no agreed terms, no dispute evidence |
+| | eBay (Microsoft Translator), Etsy | Translate **listings** and search | Chat translation unconfirmed (eBay) or absent (Etsy) |
+| Translated support chat | Unbabel inside Zendesk / Intercom | Near real-time support chat translation, AI + human editors, paid | Only customer ↔ agent; the agent never sees the original buyer–seller conversation |
+| India | Meesho; ONDC Saarthi + Bhashini; Sarvam | Hindi/English support voice bot; multilingual shopping app screens; Indic translation engine (Swiggy on Sarvam's Indus) | None translate conversations between buyers and sellers |
+| Scam detection | Sardine, marketplace safety guidance | Moving the deal off-platform (WhatsApp, payment links) is the main sign of a purchase scam; catch it in chat, not afterwards | Confirms our scam shield targets the right signal |
+
+**What this means for us:**
+1. **Translated chat alone is not new.** Pitch Meaning Guard, the Deal Card and dispute evidence first; translation is the baseline.
+2. **Our line for the write-up:** support tools translate the customer ↔ agent conversation; our agent gets the original buyer–seller conversation in both languages plus the frozen Deal Card.
+3. **Evidence for Meaning Guard, used honestly:** a 2021 study (Melbourne, Facebook, Twitter) found major commercial MT systems fail many numerical tests; a 2025 study found LLMs do worst on large-unit numbers, the category closest to lakh/crore. No rigorous lakh/crore study exists. We may say "research shows translation systems make number errors"; we may **not** claim a lakh/crore error rate (H-03 still decides, D-013).
+4. **H-03 suggestion:** test Sarvam or Bhashini alongside a general LLM — both are built for Indian languages and may handle Hinglish better. Switching provider is a `DECISION` (D-005 allows any provider via env).
+
+Sources: [Alibaba Cloud](https://www.alibabacloud.com/blog/601042) · [Microsoft × eBay](https://microsoft.com/en-us/translator/blog/2017/05/03/microsoft-translator-helps-ebays-global-customers-buy-and-sell-products-in-20-languages) · [Etsy](https://www.ecommercebytes.com/?p=7299) · [Unbabel for Zendesk](https://www.zendesk.co.uk/apps/chat/183919/unbabel-for-zendesk-chat) · [Unbabel × Intercom](https://unbabel.com/intercom-integrations-for-translation-how-unbabel-delivers-seamless-multilingual-customer-support/) · [Meesho](https://inc42.com/buzz/meesho-launches-genai-powered-voice-bot-for-post-order-queries) · [ONDC Saarthi](https://indianstartupnews.com/news/indian-govt-backed-ondc-introduces-saarthi-reference-app-for-businesses-to-create-multilingual-buyer-apps-7061146) · [Sarvam](https://sarvam.ai) · [Swiggy × Sarvam](https://yourstory.com/2026/03/swiggy-partners-with-sarvam-for-voice-led-multi-lingual-services) · [Sardine](https://www.sardine.ai/learn/off-platform-payment-abuse) · [Numerical MT testing, 2021](https://arxiv.org/abs/2107.08357v1) · [Numerical translation with LLMs, 2025](https://arxiv.org/abs/2501.04927) · [IndicTrans2 issue #87](https://github.com/ai4bharat/indictrans2/issues/87)
+
 ## 5. How we map to the rubric
 
 | Score | What judges ask | What we do |
