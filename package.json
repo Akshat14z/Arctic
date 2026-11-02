@@ -1,0 +1,19 @@
+{
+  "name": "convocart",
+  "private": true,
+  "description": "ConvoCart - Multilingual Conversation-First Marketplace",
+  "engines": {
+    "node": ">=20.0.0",
+    "pnpm": ">=9.0.0"
+  },
+  "packageManager": "pnpm@12.16.1",
+  "scripts": {
+    "build": "pnpm -r run build",
+    "test": "pnpm -r run test",
+    "typecheck": "pnpm -r run typecheck",
+    "dev:server": "pnpm --filter @convocart/server dev"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.3"
+  }
+}
