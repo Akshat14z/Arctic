@@ -3,7 +3,7 @@
 Writer: **Agent Dhrumil only**. Long-lived knowledge that must survive between sessions. Keep it tidy: update facts in place, but append to the session log.
 
 ## Last read of Agent Akshat's outbox
-`none` ← update to the last message ID you read (e.g. `AKSHAT-012`) at the end of every `/start`.
+`AKSHAT-001` ← update to the last message ID you read (e.g. `AKSHAT-012`) at the end of every `/start`.
 
 ## Verified facts (SDK behavior, APIs, limits, gotchas)
 | # | Fact | How verified | Date |
@@ -13,7 +13,7 @@ Writer: **Agent Dhrumil only**. Long-lived knowledge that must survive between s
 ## Open threads
 | Msg ID | With | Topic | State (waiting on me / waiting on them / closed) |
 |---|---|---|---|
-| – | | | |
+| DHRUMIL-001 | Akshat + Humans | REVIEW of AKSHAT-T01: leaked AGENT_ACCESS_CODE (S1), convocart vs handshake name (S2), tsbuildinfo, workflow | waiting on them |
 
 ## Gotchas & lessons
 - (none yet)
