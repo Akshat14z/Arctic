@@ -1,0 +1,7 @@
+.coord/WHOAMI
+node_modules/
+.env
+.env.*
+!.env.example
+.next/
+dist/
