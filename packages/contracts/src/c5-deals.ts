@@ -27,3 +27,4 @@ export const DealSchema = z.object({
   status: DealStatusSchema,
 });
 export type Deal = z.infer<typeof DealSchema>;
+

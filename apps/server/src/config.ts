@@ -35,3 +35,4 @@ export function getConfig(): Config {
   }
   return cachedConfig;
 }
+

@@ -154,3 +154,4 @@ describe('Contracts Schema Validation', () => {
     expect(prepareReq.success).toBe(true);
   });
 });
+

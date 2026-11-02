@@ -27,3 +27,4 @@ export const NexconnCredentialsSchema = z.object({
   area: z.string().min(1),
 });
 export type NexconnCredentials = z.infer<typeof NexconnCredentialsSchema>;
+

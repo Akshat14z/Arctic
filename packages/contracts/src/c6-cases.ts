@@ -60,3 +60,4 @@ export const CaseSummarySchema = z.object({
   deal: DealSchema.optional(),
 });
 export type CaseSummary = z.infer<typeof CaseSummarySchema>;
+

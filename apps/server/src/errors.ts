@@ -84,3 +84,4 @@ export function errorHandler(
   };
   reply.status(500).send(payload);
 }
+
