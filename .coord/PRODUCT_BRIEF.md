@@ -2,6 +2,29 @@
 
 Owner: **humans only**. Both agents read this before making any product, UX, copy or docs decision.
 
+## 0. Positioning — the USP (read this first)
+
+> **"Same deal, in both languages."**
+> Translation apps help you talk. Handshake makes sure you agreed to the same thing, and proves it if you didn't.
+
+Every competitor (§4a) translates **words**. Handshake guarantees **shared meaning**, as one chain no one else has:
+
+| Stage | Feature | Promise |
+|---|---|---|
+| Before sending | **Meaning Guard** + **Tone Guard** | "What you say is what they read, and how you meant it" |
+| Agreeing | **Deal Card** → **Handshake Seal** (QR receipt) | "What you agreed is written down, and anyone can verify it" |
+| When it goes wrong | **Three languages, one room** + **Show me what they saw** | "Disputes are settled on evidence, by an agent who doesn't need to speak either language" |
+| Over time | **Kept-deal score** | "Reputation comes from deals kept, not stars" |
+| Growth | **WhatsApp-group launcher** | "Paste a link where your buyers already are" |
+
+**The pitch line, used everywhere** (README, write-up, video, landing page): *Same deal, in both languages.*
+
+**Signature demo moments:** "2 lakh" → "₹2,00,000 (≈ $2,400)" before it's sent · a Hindi seller, a Japanese buyer and an English-only agent in one chat · the agent's "Show me what they saw" view · scanning the Handshake Seal.
+
+**Never lead with** translation itself (Alibaba already does it), scam detection (generic), or any error rate we haven't measured.
+
+Feature tiers and the kill rule: D-020 and BACKLOG.
+
 ## 1. The insight (our 30% innovation score rests on this)
 
 Translation in commerce doesn't just make chat easier — **it creates disputes.** "₹2 lakh" can be rendered as "2 lakh" or "200 rupees". "Next Friday" means different dates in different timezones. A seller's "approximately new" becomes "new". Then both sides believe they agreed to different things, and a support agent has to work out who said what, in which language.
@@ -10,6 +33,8 @@ Handshake makes the chat itself the trust layer:
 - **Meaning Guard** catches or clarifies risky content (numbers, currencies, units, ambiguity) *before* it is sent.
 - **Deal Card** turns the negotiation into structured terms both sides agree to in their own language.
 - **Scam shield** flags off-platform payment, gift cards, and similar patterns.
+- **Tone Guard** warns when a message may come across ruder or pushier in the other language than the sender meant (e.g. Hindi haggling read literally in Japanese).
+- **Handshake Seal** turns an agreed Deal Card into a receipt with a QR code that anyone can verify on our site, e.g. at pickup.
 - **Dispatch center** gives a human agent the bilingual transcript, the frozen deal card and an AI summary, so disputes are resolved on evidence.
 
 ⚠️ **Honesty caveat:** we have not yet proven that modern AI translation gets "2 lakh" wrong often. Task H-03 tests this. If errors are rare, we pitch Meaning Guard as *clarity* (always show both sides the same normalized amount, e.g. "₹2,00,000 ≈ $2,400") rather than *error catching* (DECISIONS D-013). **Never claim an error rate we haven't measured** in UI copy, docs or the video.
@@ -33,8 +58,9 @@ Handshake makes the chat itself the trust layer:
 2. The seller types "2 lakh" → Meaning Guard shows the normalized amount before sending.
 3. The Deal Card appears and both sides agree in their own language.
 4. Later, the buyer says the item is different and taps **Get help**.
-5. In seconds, an agent who speaks the right languages sees the case with the frozen Deal Card (snapshot taken when the case opened, C6) and resolves it in a 3-way chat.
+5. In seconds, an **English-only agent** opens the case: the frozen Deal Card (snapshot taken when the case opened, C6), the AI summary, and **"Show me what they saw"** — the exact text each side had on screen. Three people read one chat in three languages, and the agent resolves it.
 6. The seller tries "send money on WhatsApp" → the scam shield fires.
+7. (If built) The buyer shows the **Handshake Seal** QR at pickup; scanning it shows the verified deal.
 
 One story covers all three track requirements. The seeded demo data (AKSHAT-T13) must reproduce it exactly.
 

@@ -23,6 +23,7 @@ type Role = "user" | "agent";           // any "user" can buy and sell
 type User = {
   id: string; displayName: string; language: LangCode;
   role: Role; isDemo: boolean; agentLanguages?: LangCode[]; // agents only
+  keptDeals?: { kept: number; total: number };             // D-026, present when total >= 1
 };
 ```
 
@@ -38,11 +39,12 @@ The Nexconn user id **equals** our `User.id` (to be verified in AKSHAT-T02 — `
 | `PATCH /api/me` | `{ displayName?, language? }` | `{ user }` | |
 | `GET /api/listings?q=&cursor=` | – | `{ items: Listing[], nextCursor? }` | |
 | `POST /api/listings` | `{ title, description, price: Money, imageUrl? }` | `{ listing }` | Title/description stored in author's language + translated on read |
-| `GET /api/listings/:id?lang=` | – | `{ listing }` | Fields translated into `lang` |
+| `GET /api/listings/:id?lang=` | – | `{ listing }` | Fields translated into `lang`. **Public, no auth** (D-025) |
 | `POST /api/chats` | `{ listingId }` | `{ channelId, channelType: "direct", seller: User, listing }` | Idempotent: same buyer+listing → same chat |
 | `GET /api/chats` | – | `{ items: ChatSummary[] }` | For the inbox view |
 | `POST /api/messages/prepare` | `{ channelId, text, senderLang }` | `PreparedMessage` (see C4) | Translation + Meaning Guard. **Called before every send.** |
 | `POST /api/deals/extract` | `{ channelId }` | `{ deal: Deal \| null }` | Phase 2 |
+| `GET /api/seals/:code?lang=` | – | `{ deal, sealedAt, buyer: { displayName }, seller: { displayName } }` | **Public, no auth.** 404 if unknown (D-023) |
 | `POST /api/cases` | `{ channelId, reason: CaseReason, note? }` | `{ case: Case }` | Escalation. Creates the 3-way group. |
 | `GET /api/agent/queue` | – | `{ items: Case[] }` | Agents only |
 | `POST /api/cases/:id/claim` | – | `{ case }` | Agents only. 409 if already claimed. |
@@ -74,7 +76,7 @@ type PreparedMessage = {
 };
 
 type GuardIssue = {
-  kind: "number_format" | "currency" | "date" | "unit" | "ambiguity" | "scam_signal";
+  kind: "number_format" | "currency" | "date" | "unit" | "ambiguity" | "scam_signal" | "tone"; // tone: never blocking (D-024)
   span: string;                 // the original fragment, e.g. "2 lakh"
   explanation: Partial<Record<LangCode, string>>; // shown to sender in their language
   suggestion?: string;          // e.g. "₹2,00,000 (≈ $2,400)"
@@ -93,6 +95,7 @@ type Deal = {
   delivery?: { method: "pickup" | "shipping"; date?: string };
   conditions: Partial<Record<LangCode, string[]>>;
   agreedBy: { buyer?: string; seller?: string };  // ISO timestamps
+  sealCode?: string;                              // set when both agreed (D-023); public page /seal/<code>
   status: "proposed" | "agreed" | "disputed";
 };
 ```
@@ -109,7 +112,10 @@ type Case = {
   slaDueAt: string;
   dealSnapshot?: Deal;          // latest agreed Deal, frozen when the case opens (D-018)
 };
-type TranscriptLine = { at: string; from: string; orig: { lang: LangCode; text: string }; tr: Partial<Record<LangCode, string>> };
+type TranscriptLine = {
+  at: string; from: string; orig: { lang: LangCode; text: string }; tr: Partial<Record<LangCode, string>>;
+  shownTo: Record<string, { lang: LangCode; text: string; translated: boolean }>; // userId → what that member's screen showed (D-022)
+};
 type CaseSummary = { lang: LangCode; text: string; keyFacts: string[]; deal?: Deal };
 ```
 

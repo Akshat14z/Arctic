@@ -164,6 +164,15 @@ sequenceDiagram
 ### 4.5 Scam shield (Phase 2)
 Two checks: in `/prepare` (sender sees a warning before sending) and in the webhook (catches messages that skipped `/prepare`). On a hit, the server posts `system/scam_warning` into the channel. ⚠️ UNVERIFIED: server-side message send.
 
+### 4.5a USP features (D-020 to D-027)
+- **Three languages, one room (D-021):** `/prepare` looks up every member of the channel and translates into each language. In a case group that's buyer + seller + agent. Agents get the summary in their language too.
+- **Show me what they saw (D-022):** when the server stores a transcript line, it computes `shownTo` per member by applying the C4 render rule (`tr[memberLang] ?? orig.text`, `translated` = whether a translation existed). Same rule as the client, so it's exactly what each screen showed. The agent console toggles between "in my language" and "what each side saw".
+- **Handshake Seal (D-023):** when the second side agrees, the server sets a random unguessable `sealCode` (e.g. 12+ url-safe chars) on the deal. `/seal/<code>` is a public web page that calls `GET /api/seals/:code` and shows the deal in the viewer's language with a QR code of its own URL. Verification = the lookup succeeds on our domain. No buyer/seller ids or contact details are exposed, only display names.
+- **Tone Guard (D-024):** same LLM call as Meaning Guard; returns `kind: "tone"` issues with a softer suggestion. Never blocking.
+- **WhatsApp-group launcher (D-025):** listing pages are public. Share button uses the native share sheet / `wa.me` link with the listing URL. A visitor without a session gets the name + language sheet, then lands back on the listing.
+- **Kept-deal score (D-026):** computed on read from `deals` and `cases`; no new table.
+- **Voice notes (D-027, stretch):** only after the SDK spike confirms voice messages. Not designed further until then.
+
 ### 4.6 Judge sandbox (Phase 3)
 `/try` → **Try as buyer / seller / agent** → `POST /api/demo/session {as}` signs in as one of a **fixed set of `demo_` users** with seeded listings, the scripted "2 lakh" conversation and an open case. The sandbox **never creates a new Nexconn user per click** (D-015), so it can't inflate the active-user count judges look at.
 
@@ -178,9 +187,9 @@ Two checks: in `/prepare` (sender sees a warning before sending) and in the webh
 | `listings` | `id`, `sellerId`, `title`, `description`, `lang`, `price` (amount, currency), `imageUrl` | stored in the author's language |
 | `listing_translations` | `listingId`, `lang`, `title`, `description` | cache for translated reads |
 | `chats` | `channelId`, `listingId`, `buyerId`, `sellerId`, `createdAt` | unique (`buyerId`, `listingId`) → idempotent |
-| `deals` | `id`, `channelId`, `listingId`, `payload` (Deal JSON), `status`, `agreedBy` | |
+| `deals` | `id`, `channelId`, `listingId`, `payload` (Deal JSON), `status`, `agreedBy`, `sealCode` (unique, nullable) | `sealCode` set when both agreed (D-023) |
 | `cases` | `id`, `channelId`, `groupChannelId`, `buyerId`, `sellerId`, `agentId`, `reason`, `status`, `dealSnapshot` (Deal JSON), timestamps, `slaDueAt`, `resolution` | `dealSnapshot` is frozen when the case opens |
-| `transcript_lines` | `nexconnMessageId` (unique), `channelId`, `at`, `fromId`, `origLang`, `origText`, `tr` (JSON) | unique id de-duplicates webhook retries and the local-dev relay |
+| `transcript_lines` | `nexconnMessageId` (unique), `channelId`, `at`, `fromId`, `origLang`, `origText`, `tr` (JSON), `shownTo` (JSON, D-022) | unique id de-duplicates webhook retries and the local-dev relay |
 | `webhook_nonces` | `nonce` (unique), `receivedAt` | single-use nonces; prune older than the time window |
 
 Traction export (AKSHAT-T14) = counts from these tables **where `isDemo = false`**.
@@ -235,3 +244,5 @@ Traction export (AKSHAT-T14) = counts from these tables **where `isDemo = false`
 | 4 | Can the server send a system message into a channel? | AKSHAT-T02 | system events rendered from `/api/cases/:id` state instead of messages |
 | 5 | Must direct channels be created server-side? | AKSHAT-T02 / DHRUMIL-T02 | web creates on first send |
 | 6 | Two browsers chat live via the Web SDK by Nov 4? | DHRUMIL-T02 | pivot to Chat UI components (D-012) |
+| 7 | Does the Web SDK support voice messages? | DHRUMIL-T02 | voice notes cut (D-027) |
+| 8 | Is `extra` big enough for 3 translations (case groups)? | AKSHAT-T02 | only the recipient languages that fit; server transcript holds the rest |
