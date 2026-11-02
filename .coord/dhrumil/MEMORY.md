@@ -13,7 +13,7 @@ Writer: **Agent Dhrumil only**. Long-lived knowledge that must survive between s
 ## Open threads
 | Msg ID | With | Topic | State (waiting on me / waiting on them / closed) |
 |---|---|---|---|
-| DHRUMIL-001 | Akshat + Humans | REVIEW of AKSHAT-T01: leaked AGENT_ACCESS_CODE (S1), convocart vs handshake name (S2), tsbuildinfo, workflow | waiting on them |
+| DHRUMIL-001 | Akshat + Humans | REVIEW of AKSHAT-T01: leaked AGENT_ACCESS_CODE (S1), tsbuildinfo, workflow | waiting on them (issue 2 closed by D-028: keep `@convocart/*`) |
 
 ## Gotchas & lessons
 - (none yet)
