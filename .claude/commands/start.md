@@ -8,7 +8,7 @@ Run the Handshake start-of-session ritual. Do every step, in order, and do not w
 2. Read `.coord/WHOAMI`. If it is missing or not exactly `dhrumil` or `akshat`, STOP and ask the human. That value is "me" (`.coord/<me>/` is your folder); the other name is "other".
 3. Read `CLAUDE.md`, `.coord/PROTOCOL.md`, and `.coord/<me>/ROLE.md` if you haven't in this session.
 4. Read `.coord/<me>/MEMORY.md` and `.coord/<me>/STATUS.md`.
-5. Read `.coord/DECISIONS.md`, `.coord/BACKLOG.md` and `.coord/CONTRACTS.md`. Note any contract section whose status changed since your memory says you last looked.
+5. Read `.coord/DECISIONS.md`, `.coord/BACKLOG.md`, `.coord/CONTRACTS.md`, `.coord/PRODUCT_BRIEF.md`, `.coord/ARCHITECTURE.md` and `.coord/PRIMER.md`. Note any contract section whose status changed since your memory says you last looked.
 6. Read `.coord/<other>/OUTBOX.md`. Find every message **after** the "Last read" ID in your MEMORY. For each new message addressed to you, classify it: needs reply, needs work, FYI.
 7. Read `.coord/<other>/STATUS.md` to see what the other agent is doing and whether they're blocked on you.
 8. Report to the human in this format:

@@ -9,6 +9,7 @@ This file is loaded at the start of every Claude Code session. Follow it exactly
 1. Read `.coord/WHOAMI`. It is a local, gitignored file containing exactly `dhrumil` or `akshat`.
 2. If it is missing or contains anything else: **STOP** and ask your human which agent you are. Never guess.
 3. Read your role file: `.coord/dhrumil/ROLE.md` or `.coord/akshat/ROLE.md`.
+   Before any product, UX, copy or docs decision, read `.coord/PRODUCT_BRIEF.md`. Before any Nexconn work, read `.coord/PRIMER.md`. For how the pieces connect, read `.coord/ARCHITECTURE.md`.
 4. Run the start ritual: `/start` (see `.claude/commands/start.md`).
 
 There are two agents, each driven by a different human on a different machine. Everything you need to know about the other agent comes from the files in `.coord/`, synced through git. You cannot talk to the other agent any other way.
@@ -26,8 +27,10 @@ Buyers and sellers who speak different languages trade through 1:1 chat. Every m
 - Event: **Nexconn Build Challenge 2026**, track: **Marketplace & Support**.
 - Track requirements: buyer-seller 1-on-1 chat · human agent dispatch center · multi-language translated chat.
 - **Chat SDK or Chat UI is required.** Call SDK is optional and is **cut** (see DECISIONS D-009).
-- Deadline: Nov 22, 23:59 AoE. **Our internal deadline is Nov 21.**
-- Submission: write-up PDF + App Key · demo video · runnable app link · public GitHub repo · optional traction proof.
+- Deadline: Nov 22, 23:59 AoE (= Mon Nov 23, 5:29 PM IST). **Our internal deadline is Nov 21.**
+- Only the **team leader** on Reskilll selects the track and submits (H-08).
+- Submission: write-up PDF + App Key · demo video · runnable app link · public GitHub repo · optional traction proof. The write-up must **name the features that use the Nexconn SDK** and say **what existed before vs. was built during the challenge** (everything was built during it).
+- **Judges measure traction as active users on our Nexconn app.** Never register throwaway users on it (D-015).
 - Scoring:
   - **50% Completeness & UX** — it works from start to end and is easy to use.
   - **30% Innovation & scenario value** — a new idea that solves a real communication problem.
@@ -37,7 +40,7 @@ Buyers and sellers who speak different languages trade through 1:1 chat. Every m
 
 These five steps must work flawlessly on the deployed app at all times after Nov 9:
 
-1. Sign in within seconds (guest or Google, no forms beyond name + language).
+1. Sign in within seconds (guest, no forms beyond name + language; Google is cut, D-014).
 2. Post a listing, or browse listings.
 3. Open a 1:1 chat with the seller; each side reads in their own language and can tap to see the original.
 4. Either party taps **Get help** → a case appears in the agent dispatch console.
@@ -74,7 +77,7 @@ Full details: `.coord/dhrumil/ROLE.md`, `.coord/akshat/ROLE.md`.
 | `.coord/CONTRACTS.md` | **Akshat** | Single source of truth for interfaces |
 | `.coord/dhrumil/**` | **Dhrumil** | Dhrumil's memory, status, outbox, role |
 | `.coord/akshat/**` | **Akshat** | Akshat's memory, status, outbox, role |
-| `CLAUDE.md`, `.coord/DECISIONS.md`, `.coord/BACKLOG.md`, `.coord/PROTOCOL.md`, `.claude/commands/**` | **Humans only** | Agents propose changes via `DECISION` messages |
+| `CLAUDE.md`, `SETUP.md`, `.coord/DECISIONS.md`, `.coord/BACKLOG.md`, `.coord/PROTOCOL.md`, `.coord/PRODUCT_BRIEF.md`, `.coord/PRIMER.md`, `.coord/ARCHITECTURE.md`, `.claude/commands/**` | **Humans only** | Agents propose changes via `DECISION` messages |
 | `.coord/WHOAMI` | Local, gitignored | Never commit |
 
 If a file isn't covered here, it doesn't exist yet: ask your human before creating it outside your owned paths.
@@ -100,7 +103,7 @@ Read `.coord/PROTOCOL.md` for the full rules. The short version:
 3. **TypeScript strict** everywhere. Shared types come only from `packages/contracts`. Never redeclare a contract type locally.
 4. **One production Nexconn app** for all real users (DECISIONS D-008). Never point real users at a test app.
 5. **Honest data:** seeded demo users and listings have ids prefixed `demo_` and are labelled "Demo" in the UI. Never create fake accounts to inflate traction.
-6. **Scope guard:** only build what is in `.coord/BACKLOG.md`. A new feature idea becomes a `DECISION` message for the humans, not code. Cut list: Call SDK, smart routing, timezone-aware date checks (unless BACKLOG says otherwise).
+6. **Scope guard:** only build what is in `.coord/BACKLOG.md`. A new feature idea becomes a `DECISION` message for the humans, not code. Cut list: see the bottom of BACKLOG (Call SDK, smart routing, timezone-aware date checks, Google sign-in, offline fallback, …).
 7. **Every user-facing failure has a visible, friendly state.** No blank screens, no raw errors, no infinite spinners.
 8. **Log AI tool usage** you are aware of in your `MEMORY.md` session log, so Dhrumil can compile `docs/AI_USAGE.md` for the write-up.
 

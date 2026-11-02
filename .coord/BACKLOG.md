@@ -13,6 +13,7 @@ Today's internal deadline: **submit Nov 21**. Real users from **Nov 10**.
 | H-02 | Humans | Create the production Nexconn app in console.nexconn.ai; put keys in both deploy envs; enable `message:send` webhook later | – | App Key, Secret, area stored in a password manager |
 | H-03 | Humans | Translation test: 30 real messages (lakh/crore, Hinglish, slang, prices, dates) through the chosen LLM; count real errors | – | Result recorded; D-013 applied if needed |
 | H-04 | Humans | Talk to 5 potential users (campus / local buy-sell groups) | – | Beachhead chosen |
+| H-08 | Humans | Register both of you on Reskilll, create the team, team leader selects track **Marketplace & Support** | – | Team visible on the Reskilll dashboard with the right track |
 | AKSHAT-T01 | Akshat | Monorepo scaffold, `packages/contracts` with C1–C6 types, Fastify server, `/health`, deployed | H-02 | Dhrumil can import contracts; server live URL works |
 | AKSHAT-T02 | Akshat | **SDK spike (server):** register user, issue Nexconn token, verify `extra` field + size limit, server-side group create, server-side message send. Update CONTRACTS "Verified facts" and mark C4/C6 | AKSHAT-T01 | Every `UNVERIFIED` item resolved or flagged as impossible |
 | DHRUMIL-T01 | Dhrumil | Next.js app scaffold, layout, design tokens, deployed to Vercel | AKSHAT-T01 (root config) | Live URL renders |
@@ -26,7 +27,7 @@ Today's internal deadline: **submit Nov 21**. Real users from **Nov 10**.
 | AKSHAT-T04 | Akshat | Listings API + DB + translated reads | AKSHAT-T03 | C3 listing routes live |
 | AKSHAT-T05 | Akshat | `POST /api/chats` (idempotent direct channel) + `GET /api/chats` | AKSHAT-T03 | |
 | AKSHAT-T06 | Akshat | `POST /api/messages/prepare` — translation only (guard returns empty issues) | AKSHAT-T02 | p95 < 2 s |
-| AKSHAT-T07 | Akshat | Cases: create (group), queue, claim (add agent), resolve, system messages, routing v0 | AKSHAT-T02 | C6 flow works end to end |
+| AKSHAT-T07 | Akshat | Cases: create (group), queue, claim (add agent), resolve, system messages, routing v0, frozen `dealSnapshot` (D-018), agent sign-in `POST /api/auth/agent` (D-017) | AKSHAT-T02 | C6 flow works end to end |
 | AKSHAT-T08 | Akshat | Webhook receiver + transcript store + `GET /api/cases/:id` with AI summary | AKSHAT-T07, H-02 | |
 | AKSHAT-T09 | Akshat | `pnpm smoke`: scripted Golden Path against the deployed server | AKSHAT-T07 | Runs green in CI or locally in < 2 min |
 | DHRUMIL-T03 | Dhrumil | Onboarding: name + language picker → guest session | AKSHAT-T03 (mock ok) | < 10 s from landing to signed in |
@@ -58,7 +59,7 @@ Today's internal deadline: **submit Nov 21**. Real users from **Nov 10**.
 
 | ID | Owner | Task |
 |---|---|---|
-| AKSHAT-T13 | Akshat | Seed script (`demo_` data, a scripted "2 lakh" conversation, an open case) + `POST /api/demo/session` |
+| AKSHAT-T13 | Akshat | Seed script (`demo_` data, a scripted "2 lakh" conversation, an open case) + `POST /api/demo/session` that signs in as a **fixed** `demo_` user, never a new one (D-015) |
 | DHRUMIL-T11 | Dhrumil | Judge sandbox: "Try as buyer / seller / agent" in one click, clearly labelled Demo |
 | DHRUMIL-T12 | Dhrumil | Landing page explaining the product in 10 seconds |
 | Both | Dhrumil, Akshat | `/review` of each other's work; fix all S1/S2 |
@@ -67,11 +68,11 @@ Today's internal deadline: **submit Nov 21**. Real users from **Nov 10**.
 
 | ID | Owner | Task |
 |---|---|---|
-| DHRUMIL-T13 | Dhrumil | README (judges-in-3-minutes section first), `docs/AI_USAGE.md` |
-| DHRUMIL-T14 | Dhrumil | Write-up PDF draft in rubric order: Works (50) → Problem & idea (30) → Traction & business (20). Akshat sends architecture section via `REQUEST`. |
-| AKSHAT-T14 | Akshat | Architecture section + traction numbers export from console/DB, sent to Dhrumil |
+| DHRUMIL-T13 | Dhrumil | README (judges-in-3-minutes section first, Nexconn features used, prior-work statement), `docs/AI_USAGE.md` |
+| DHRUMIL-T14 | Dhrumil | Write-up PDF draft in rubric order: Works (50) → Problem & idea (30) → Traction & business (20). Must include App Key, named Nexconn SDK features, prior-work statement (PRODUCT_BRIEF §8). Akshat sends architecture section via `REQUEST`. |
+| AKSHAT-T14 | Akshat | Architecture section + traction numbers export from console/DB (`isDemo = false` only), sent to Dhrumil |
 | H-07 | Humans | Record 2–3 min demo video; final checks; **submit Nov 21** |
 
 ## Cut list (do not build unless humans move it into a phase)
 
-Call SDK · smart routing beyond v0 · timezone-aware date checks · Google sign-in (see D-014) · push notifications · image uploads beyond a URL field.
+Call SDK · smart routing beyond v0 · timezone-aware date checks · Google sign-in (see D-014) · offline fallback mode (D-016) · push notifications · image uploads beyond a URL field.

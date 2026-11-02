@@ -33,6 +33,7 @@ The Nexconn user id **equals** our `User.id` (to be verified in AKSHAT-T02 — `
 | Method & path | Body | Returns | Notes |
 |---|---|---|---|
 | `POST /api/auth/guest` | `{ displayName, language }` | `{ sessionToken, user, nexconn: { appKey, token, area } }` | Registers user on Nexconn server-side, returns Nexconn token |
+| `POST /api/auth/agent` | `{ displayName, language, agentLanguages, code }` | same as `/api/auth/guest`, `user.role = "agent"` | `code` must equal `AGENT_ACCESS_CODE`; wrong code → 403 `BAD_AGENT_CODE` (D-017) |
 | `GET /api/me` | – | `{ user, nexconn: { appKey, token, area } }` | Re-issue on refresh |
 | `PATCH /api/me` | `{ displayName?, language? }` | `{ user }` | |
 | `GET /api/listings?q=&cursor=` | – | `{ items: Listing[], nextCursor? }` | |
@@ -106,6 +107,7 @@ type Case = {
   reason: CaseReason; status: "open" | "claimed" | "resolved";
   languages: LangCode[]; createdAt: string; claimedAt?: string; resolvedAt?: string;
   slaDueAt: string;
+  dealSnapshot?: Deal;          // latest agreed Deal, frozen when the case opens (D-018)
 };
 type TranscriptLine = { at: string; from: string; orig: { lang: LangCode; text: string }; tr: Partial<Record<LangCode, string>> };
 type CaseSummary = { lang: LangCode; text: string; keyFacts: string[]; deal?: Deal };
@@ -136,6 +138,7 @@ Akshat receives Nexconn's `message:send` webhook for: transcript storage, scam d
 | `LLM_API_KEY`, `LLM_MODEL` | server | **yes** / no |
 | `SESSION_SECRET` | server | **yes** |
 | `WEB_ORIGIN` | server (CORS) | no |
+| `AGENT_ACCESS_CODE` | server | **yes** (D-017) |
 
 ---
 

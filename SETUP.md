@@ -14,6 +14,9 @@ SETUP.md                  ← this file (for humans)
   review.md → /review     ← cross-review the other agent's work
 .coord/
   PROTOCOL.md             ← messaging rules (humans own)
+  PRODUCT_BRIEF.md        ← the why: insight, users, demo story, rubric, submission (humans own)
+  ARCHITECTURE.md         ← how web, server, DB, Nexconn and LLM connect (humans own)
+  PRIMER.md               ← Nexconn leads to verify + where to find truth (humans own)
   DECISIONS.md            ← stack & scope decisions (humans own)
   BACKLOG.md              ← all tasks, owners, dependencies, dates (humans own)
   CONTRACTS.md            ← Dhrumil↔Akshat interfaces (Agent Akshat owns)
@@ -57,7 +60,7 @@ SETUP.md                  ← this file (for humans)
 
 ## Rules for humans
 
-- Only humans edit `CLAUDE.md`, `PROTOCOL.md`, `DECISIONS.md`, `BACKLOG.md` and `.claude/commands/`.
+- Only humans edit `CLAUDE.md`, `SETUP.md`, `PROTOCOL.md`, `DECISIONS.md`, `BACKLOG.md`, `PRODUCT_BRIEF.md`, `ARCHITECTURE.md`, `PRIMER.md` and `.claude/commands/`.
 - If agents disagree after one round of messages, you two decide, then write it into DECISIONS.
 - Don't let agents relay messages through you in chat. Everything goes through the outboxes, so there's always a written record.
 - Nov 10 is launch day for real users. Nov 21 is submission day. Nov 22 is buffer only.
