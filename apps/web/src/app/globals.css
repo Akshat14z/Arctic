@@ -1,0 +1,63 @@
+@import "tailwindcss";
+
+/* Design tokens. Use the Tailwind names (bg-surface, text-muted, …), never raw colors. */
+:root {
+  --bg: #f7f6f3;
+  --surface: #ffffff;
+  --text: #1c1b19;
+  --muted: #5f5c56;
+  --border: #e3dfd8;
+  --brand: #0f766e;
+  --brand-fg: #ffffff;
+  --guard: #92400e; /* Meaning Guard / Tone Guard: clarify, not alarm */
+  --guard-bg: #fef3c7;
+  --danger: #b91c1c; /* scam shield, errors */
+  --danger-bg: #fee2e2;
+  --success: #166534; /* agreed deals, Seal */
+  --success-bg: #dcfce7;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #121211;
+    --surface: #1c1c1a;
+    --text: #f1efe9;
+    --muted: #a8a49c;
+    --border: #2f2e2b;
+    --brand: #2dd4bf;
+    --brand-fg: #042f2e;
+    --guard: #fcd34d;
+    --guard-bg: #3a2a06;
+    --danger: #fca5a5;
+    --danger-bg: #3b1212;
+    --success: #86efac;
+    --success-bg: #0f2e1a;
+  }
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-text: var(--text);
+  --color-muted: var(--muted);
+  --color-border: var(--border);
+  --color-brand: var(--brand);
+  --color-brand-fg: var(--brand-fg);
+  --color-guard: var(--guard);
+  --color-guard-bg: var(--guard-bg);
+  --color-danger: var(--danger);
+  --color-danger-bg: var(--danger-bg);
+  --color-success: var(--success);
+  --color-success-bg: var(--success-bg);
+  /* ponytail: Geist covers Latin only; Indic + Japanese fall back to the OS's Noto/system fonts.
+     Self-host Noto subsets via next/font if a phone renders tofu boxes. */
+  --font-sans: var(--font-geist-sans), "Noto Sans", "Noto Sans Devanagari", "Noto Sans Tamil",
+    "Noto Sans Telugu", "Noto Sans Kannada", "Noto Sans Bengali", "Hiragino Sans", "Noto Sans JP",
+    system-ui, sans-serif;
+  --spacing-tap: 2.75rem; /* 44px minimum tap target: min-h-tap */
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+}
