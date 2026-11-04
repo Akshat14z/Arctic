@@ -2,28 +2,29 @@
 
 Writer: **Agent Akshat only**. Overwrite this whole file at the end of every session (`/wrap`). Agent Dhrumil and the humans read it to know where you are.
 
-**Last updated:** 2026-11-04 14:55 IST
-**Current task:** AKSHAT-T02 (Completed)
-**Branch:** akshat/AKSHAT-T02-server-sdk-and-db
-**Progress:** Completed AKSHAT-T02: Prisma 6 database schema with 9 models validated and compiled; `@nexconn/server-sdk` v0.1.2 installed and integrated with token issuance and group creation adapters; all 16 workspace tests passing.
+**Last updated:** 2026-11-04 15:45 IST
+**Current task:** AKSHAT-T04 (Next)
+**Branch:** main (AKSHAT-T03 merged at commit `f8ef76d`)
+**Progress:** Completed AKSHAT-T03: Implemented Guest and Agent authentication (`POST /api/auth/guest`, `POST /api/auth/agent`), session persistence in Supabase PostgreSQL via Prisma with SHA-256 token hashing, live Nexconn connection token issuance via Singapore gateway (`api.sg-light-api.com`), and profile endpoints (`GET /api/me`, `PATCH /api/me`). All 24 workspace tests passing.
 
 ## Done since last update
-- S1 Security fix: Replaced `AGENT_ACCESS_CODE` in `.env.example` with `change-me`.
-- Database setup: Added Prisma 6.19.3 (`prisma` and `@prisma/client`), authored `apps/server/prisma/schema.prisma` with all 9 architectural models (`users`, `sessions`, `listings`, `listing_translations`, `chats`, `deals`, `cases`, `transcript_lines`, `webhook_nonces`), validated schema and generated client. Created `apps/server/src/db/prisma.ts` singleton and tests in `test/db.test.ts`.
-- Nexconn Server SDK: Installed official `@nexconn/server-sdk` v0.1.2 via GitHub repository into `apps/server`.
-- Nexconn Server Adapter: Implemented `apps/server/src/nexconn/client.ts`, `tokens.ts`, `channels.ts`, `index.ts` with tests in `test/nexconn.test.ts`.
-- Verified and updated `.coord/CONTRACTS.md` with verified SDK facts (token issue, server-side group creation, primary/backup failover domains, C4 extra string payload).
-- Published AKSHAT-002 ACK to Dhrumil in `OUTBOX.md`.
+- Verified live Nexconn API regional domain: Singapore (`SG`) data center domain is `https://api.sg-light-api.com` (primary) and `https://api-b.sg-light-api.com` (backup). Configured as defaults in `apps/server/src/config.ts`.
+- Resolved PgBouncer compatibility in Supabase: Added `?pgbouncer=true` to pooler connection string, preventing prepared statement collisions (`42P05`).
+- Auth & Sessions service: Created `apps/server/src/services/auth.service.ts` with `loginGuest`, `loginAgent`, `validateSession`, `getMe`, `updateMe`.
+- Auth middleware: Created `apps/server/src/middleware/auth.ts` enforcing `Authorization: Bearer <sessionToken>`.
+- Auth routes: Created `apps/server/src/routes/auth.ts` (`POST /api/auth/guest`, `POST /api/auth/agent`) and `apps/server/src/routes/me.ts` (`GET /api/me`, `PATCH /api/me`).
+- Auth tests: Created `apps/server/test/auth.test.ts` with 8 comprehensive integration tests covering guest onboarding, agent authentication with access code verification, 403 `BAD_AGENT_CODE`, 401 `UNAUTHORIZED`, session validation, and profile updates.
+- Untracked `tsconfig.tsbuildinfo` per DHRUMIL-001 review and added `*.tsbuildinfo` to `.gitignore`.
+- Appended `AKSHAT-004 · DONE` to `OUTBOX.md` unblocking Dhrumil's onboarding UI (DHRUMIL-T03) and live `/spike` testing.
 
 ## Blocked on
-- H-02: Real Nexconn production app credentials (`NEXCONN_APP_KEY`, `NEXCONN_APP_SECRET`) needed for live socket testing.
-- PostgreSQL / Neon connection string (`DATABASE_URL`) needed for live database migrations.
+- None. Database and Nexconn credentials are live and verified.
 
 ## Mocks in use
 | Mock | Replaces | Remove when |
 |---|---|---|
-| Vitest userApi mock | Live Nexconn Server SDK HTTP calls | H-02 credentials provided |
+| Vitest userApi mock in tests | Live Nexconn Server SDK HTTP calls in CI/test runs | Optional (keeps automated tests <2s offline) |
 
 ## Next up
-1. AKSHAT-T03: Auth & sessions (`POST /api/auth/guest`, `POST /api/auth/agent`, `GET /api/me`, session store with token hashing).
-2. AKSHAT-T04: Listings CRUD & translated cache endpoints.
+1. AKSHAT-T04: Listings CRUD & translated cache endpoints (`POST /api/listings`, `GET /api/listings`, `GET /api/listings/:id`).
+2. AKSHAT-T05: Chat endpoints (`POST /api/chats`, `GET /api/chats`).

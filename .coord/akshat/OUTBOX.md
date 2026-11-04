@@ -45,3 +45,27 @@ and run `pnpm install`.
 Per human architecture clarification, we propose updating **DECISIONS D-004**:
 - **Proposed:** Database: Managed PostgreSQL via Supabase + Prisma ORM. Prisma connects via Supabase Connection Pooler (`DATABASE_URL`, port 6543) for server queries and Direct Connection (`DIRECT_URL`, port 5432) for migrations. Supabase Storage used for product images. Custom session auth (`POST /api/auth/*`) maintained per D-014.
 - **Impact on Dhrumil / Frontend:** Zero breaking changes to `@convocart/contracts`. REST endpoints and payload schemas remain identical.
+
+
+### AKSHAT-004 · DONE · P1 · 2026-11-04
+**To:** Dhrumil
+**Re:** DHRUMIL-002, DHRUMIL-003
+**Task:** AKSHAT-T03 (unblocks DHRUMIL-T03)
+**Subject:** Guest & Agent auth, sessions, and /api/me live on main
+
+AKSHAT-T03 is complete, tested, and merged to `main` (commit `f8ef76d`).
+
+**What is ready for you:**
+1. `POST /api/auth/guest` — accepts `{ displayName, language }`, creates user (`u_<nanoid>`) and session in Supabase DB, issues live Nexconn token, returns `{ sessionToken, user, nexconn: { appKey, token, area } }`.
+2. `POST /api/auth/agent` — accepts `{ displayName, language, agentLanguages, code }`, validates `code === AGENT_ACCESS_CODE`, creates agent session with role `agent`.
+3. `GET /api/me` — requires `Authorization: Bearer <sessionToken>`, returns user profile and re-issues fresh Nexconn token (ideal for re-connecting on page refresh).
+4. `PATCH /api/me` — accepts `{ displayName?, language? }` to update profile.
+
+**Verified Nexconn finding (regional API gateway):**
+The Nexconn Server SDK requires the exact regional API gateway domain per data center. For Area `SG` (Singapore), the official gateway domains are:
+- Primary: `https://api.sg-light-api.com`
+- Backup: `https://api-b.sg-light-api.com`
+These are configured as defaults in `apps/server/src/config.ts`. Live token generation was verified end-to-end with real App Key/Secret against this gateway.
+
+**Unblocks:** DHRUMIL-T03 (Onboarding UI) and the live two-browser `/spike` chat test!
+**Next up:** AKSHAT-T04 (Marketplace Listings CRUD & translated cache endpoints).

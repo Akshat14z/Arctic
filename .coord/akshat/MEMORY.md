@@ -15,6 +15,9 @@ Writer: **Agent Akshat only**. Long-lived knowledge that must survive between se
 | 5 | Token generation endpoint is `userManagementApi.issueAccessToken({ userId, name, avatarUrl })` returning `result.accessToken` | Inspected type definitions in `api.d.ts` | 2026-11-04 |
 | 6 | Server-side group creation is supported via `groupChannelManagementApi.createGroupChannel({ channelId, name, owner, userIds })` | Inspected type definitions in `api.d.ts` | 2026-11-04 |
 | 7 | Server SDK Configuration requires `setPrimaryBackupDomains(primary, backup)` before sending requests | Inspected `configuration.d.ts` | 2026-11-04 |
+| 8 | Regional API gateway for Singapore data center (`SG`) is `https://api.sg-light-api.com` (backup: `https://api-b.sg-light-api.com`) | Official doc `docs.nexconn.ai/platform-chat-api/prepare-to-use-api/base-url.md` & live DNS resolution | 2026-11-04 |
+| 9 | Supabase PgBouncer pooler (port 6543) requires `?pgbouncer=true` on `DATABASE_URL` to disable prepared statements and prevent `42P05` collisions | Discovered during integration testing against Supabase | 2026-11-04 |
+| 10 | Live token generation produces 96-104 char access tokens verified against Singapore gateway | Tested live with real credentials against `https://api.sg-light-api.com` | 2026-11-04 |
 
 ## Open threads
 | Msg ID | With | Topic | State (waiting on me / waiting on them / closed) |
@@ -25,11 +28,14 @@ Writer: **Agent Akshat only**. Long-lived knowledge that must survive between se
 | DHRUMIL-003 | Dhrumil | Client SDK FINDING | closed (facts incorporated) |
 | AKSHAT-002 | Dhrumil | AKSHAT-T02 completion & S1 resolution | closed (FYI) |
 | AKSHAT-003 | Humans | Adopt Supabase PostgreSQL + Storage (D-004 update) | waiting on humans |
+| AKSHAT-004 | Dhrumil | Auth & sessions endpoints live on main (unblocks DHRUMIL-T03) | closed (FYI) |
 
 ## Gotchas & lessons
 - Windows npm global bin path (`%APPDATA%\npm`) needed to be added to user PATH to resolve `pnpm` directly.
 - In Fastify, unmatched routes bypass standard error handlers unless `setNotFoundHandler` is explicitly configured.
 - `GroupChannelCreateRequest` in `@nexconn/server-sdk` uses property name `userIds` (array of strings), not `members`.
+- Connecting Prisma to Supabase connection pooler on port 6543 requires `?pgbouncer=true` in `DATABASE_URL`; otherwise queries fail with `prepared statement "s0" already exists`.
+- Nexconn regional gateway domains must be configured explicitly; Singapore (`SG`) area uses `https://api.sg-light-api.com`.
 
 ## Session log (append-only, newest at bottom, 3–5 lines per session)
 ### 2026-11-02 · session 1
@@ -43,3 +49,9 @@ Writer: **Agent Akshat only**. Long-lived knowledge that must survive between se
 - Learned: Nexconn server SDK distribution and OpenAPI structure; `issueAccessToken` and `createGroupChannel` exact method signatures.
 - AI tools used: Gemini (Antigravity)
 - Next: AKSHAT-T03 (Authentication & Sessions routes with Nexconn token issuing and Prisma DB persistence).
+
+### 2026-11-04 · session 3
+- Did: Discovered Singapore regional API gateway `https://api.sg-light-api.com` in Nexconn docs and configured defaults. Added `?pgbouncer=true` to Supabase connection strings to prevent PgBouncer prepared statement conflicts. Implemented AKSHAT-T03 (auth service, bearer auth middleware, `POST /api/auth/guest`, `POST /api/auth/agent`, `GET /api/me`, `PATCH /api/me`). All 24 tests passing. Verified live token generation and DB persistence.
+- Learned: Supabase pooler requires `?pgbouncer=true` for Prisma; Nexconn Singapore data center base URL is `api.sg-light-api.com`.
+- AI tools used: Gemini (Antigravity)
+- Next: AKSHAT-T04 (Marketplace Listings CRUD & translated cache endpoints).
