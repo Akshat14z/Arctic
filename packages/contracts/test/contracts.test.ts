@@ -12,6 +12,8 @@ import {
   PrepareMessageRequestSchema,
   ListingUpdateRequestSchema,
   ListingDeleteResponseSchema,
+  ChatCreateResponseSchema,
+  ChatDetailResponseSchema,
 } from '../src/index.js';
 
 describe('Contracts Schema Validation', () => {
@@ -173,6 +175,47 @@ describe('Contracts Schema Validation', () => {
       id: 'l_123',
     });
     expect(validDelete.success).toBe(true);
+  });
+
+  it('validates ChatCreateResponse and ChatDetailResponse schemas', () => {
+    const mockUser = {
+      id: 'u_seller1',
+      displayName: 'Seller One',
+      language: 'en' as const,
+      role: 'user' as const,
+      isDemo: false,
+    };
+    const mockListing = {
+      id: 'l_123',
+      sellerId: 'u_seller1',
+      title: 'Headphones',
+      description: 'Good condition',
+      lang: 'en' as const,
+      price: { amount: 2000, currency: 'INR' as const },
+      isDemo: false,
+      createdAt: new Date().toISOString(),
+    };
+
+    const validCreate = ChatCreateResponseSchema.safeParse({
+      channelId: 'ch_u_buyer1_l_123',
+      channelType: 'direct',
+      seller: mockUser,
+      listing: mockListing,
+    });
+    expect(validCreate.success).toBe(true);
+
+    const validDetail = ChatDetailResponseSchema.safeParse({
+      channelId: 'ch_u_buyer1_l_123',
+      channelType: 'direct',
+      listingId: 'l_123',
+      buyerId: 'u_buyer1',
+      sellerId: 'u_seller1',
+      buyer: { ...mockUser, id: 'u_buyer1', displayName: 'Buyer One' },
+      seller: mockUser,
+      listing: mockListing,
+      createdAt: new Date().toISOString(),
+    });
+    expect(validDetail.success).toBe(true);
   });
 });
 

@@ -92,3 +92,32 @@ AKSHAT-T04 is complete and tested (33/33 tests passing).
 
 **Unblocks:** DHRUMIL-T04 (Listings browse, search, create, and detail UI).
 **Next up:** AKSHAT-T05 (`POST /api/chats` idempotent direct channels + `GET /api/chats`).
+
+
+### AKSHAT-006 · DONE · P1 · 2026-11-04
+**To:** Dhrumil
+**Re:** DHRUMIL-002, DHRUMIL-003
+**Task:** AKSHAT-T05 (unblocks DHRUMIL-T05)
+**Subject:** Chat Infrastructure (`/api/chats`) ready
+
+AKSHAT-T05 is complete, tested, and verified (42/42 tests passing across contracts & server).
+
+**What is ready for you:**
+1. `POST /api/chats` — Authenticated (`Authorization: Bearer <sessionToken>`).
+   - Request Body: `{ listingId: string }`
+   - Response Body: `{ channelId: string, channelType: "direct", seller: User, listing: Listing }`
+   - **Idempotent:** If buyer previously opened a chat on this listing, it immediately returns the existing conversation.
+   - **channelId convention:** Deterministic `ch_{buyerId}_{listingId}`.
+   - **NexConn socket connection:** You can instantiate `new DirectChannel(seller.id)` directly in the browser! `seller.id` is returned in the response as `res.seller.id`.
+2. `GET /api/chats` — Authenticated (`Authorization: Bearer <sessionToken>`).
+   - Returns `{ items: ChatSummary[] }` for the inbox view.
+   - Each item includes `channelId`, `listing`, `otherUser` (the other participant), `lastMessage`, and `unreadCount`.
+3. `GET /api/chats/:id` — Authenticated conversation detail.
+   - Returns `{ channelId, channelType: "direct", listingId, buyerId, sellerId, buyer: User, seller: User, listing: Listing, createdAt: string }`.
+   - Returns 403 `FORBIDDEN` if a user who is not a participant attempts access.
+
+**Schemas added to `@convocart/contracts`:**
+- `ChatDetailResponseSchema` (exported from `@convocart/contracts`).
+
+**Unblocks:** DHRUMIL-T05 (Chat inbox and conversation view).
+**Next up:** AKSHAT-T06 (`POST /api/messages/prepare` — translation & guard pipeline).

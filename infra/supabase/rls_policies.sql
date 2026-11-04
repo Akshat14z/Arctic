@@ -124,7 +124,7 @@ CREATE POLICY "Buyers can initiate chats"
   ON "public"."chats"
   FOR INSERT
   TO authenticated
-  WITH CHECK ("buyerId" = auth.uid()::text);
+  WITH CHECK ("buyerId" = auth.uid()::text AND "buyerId" != "sellerId");
 
 -- ------------------------------------------------------------------------------
 -- 7. Deals Table Policies

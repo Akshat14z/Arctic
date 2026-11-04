@@ -126,6 +126,19 @@ export const ChatCreateResponseSchema = z.object({
 });
 export type ChatCreateResponse = z.infer<typeof ChatCreateResponseSchema>;
 
+export const ChatDetailResponseSchema = z.object({
+  channelId: z.string().min(1),
+  channelType: z.literal('direct'),
+  listingId: z.string().min(1),
+  buyerId: z.string().min(1),
+  sellerId: z.string().min(1),
+  buyer: UserSchema,
+  seller: UserSchema,
+  listing: ListingSchema,
+  createdAt: z.string().datetime(),
+});
+export type ChatDetailResponse = z.infer<typeof ChatDetailResponseSchema>;
+
 export const ChatSummarySchema = z.object({
   channelId: z.string().min(1),
   listing: ListingSchema,

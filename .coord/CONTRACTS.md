@@ -42,8 +42,10 @@ The Nexconn user id **equals** our `User.id` (to be verified in AKSHAT-T02 — `
 | `PATCH /api/listings/:id` | `{ title?, description?, price?: Money, imageUrl? }` | `{ listing }` | `IMPLEMENTED`. Authenticated, owner-only (403 on intruder) |
 | `DELETE /api/listings/:id` | – | `{ success: true, id }` | `IMPLEMENTED`. Authenticated, owner-only (403 on intruder) |
 | `GET /api/listings/:id?lang=` | – | `{ listing }` | Fields translated into `lang`. **Public, no auth** (D-025) |
-| `POST /api/chats` | `{ listingId }` | `{ channelId, channelType: "direct", seller: User, listing }` | Idempotent: same buyer+listing → same chat |
-| `GET /api/chats` | – | `{ items: ChatSummary[] }` | For the inbox view |
+| `POST /api/chats` | `{ listingId }` | `{ channelId, channelType: "direct", seller: User, listing }` | `IMPLEMENTED`. Idempotent: same buyer+listing → same chat. channelId: `ch_{buyerId}_{listingId}` |
+| `GET /api/chats` | – | `{ items: ChatSummary[] }` | `IMPLEMENTED`. Inbox view for authenticated user (buyer or seller) |
+| `GET /api/chats/:id` | – | `ChatDetailResponse` | `IMPLEMENTED`. Full conversation detail (403 for non-participants) |
+
 | `POST /api/messages/prepare` | `{ channelId, text, senderLang }` | `PreparedMessage` (see C4) | Translation + Meaning Guard. **Called before every send.** |
 | `POST /api/deals/extract` | `{ channelId }` | `{ deal: Deal \| null }` | Phase 2 |
 | `GET /api/seals/:code?lang=` | – | `{ deal, sealedAt, buyer: { displayName }, seller: { displayName } }` | **Public, no auth.** 404 if unknown (D-023) |

@@ -7,6 +7,7 @@ import { healthRoutes } from './routes/health.js';
 import { authRoutes } from './routes/auth.js';
 import { meRoutes } from './routes/me.js';
 import { listingRoutes } from './routes/listings.js';
+import { chatRoutes } from './routes/chats.js';
 
 export async function buildApp(): Promise<FastifyInstance> {
   const config = getConfig();
@@ -46,6 +47,7 @@ export async function buildApp(): Promise<FastifyInstance> {
   await app.register(authRoutes);
   await app.register(meRoutes);
   await app.register(listingRoutes);
+  await app.register(chatRoutes);
 
   return app;
 }
