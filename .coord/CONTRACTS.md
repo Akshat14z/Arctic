@@ -52,7 +52,7 @@ The Nexconn user id **equals** our `User.id` (to be verified in AKSHAT-T02 — `
 | `GET /api/cases/:id` | – | `{ case, transcript: TranscriptLine[], summary: CaseSummary }` | Bilingual transcript |
 | `POST /api/demo/session` | `{ as: "buyer" \| "seller" \| "agent" }` | same as `/api/auth/guest` | Judge sandbox, seeded data. Phase 3. |
 
-## C4. Message payload — `UNVERIFIED` ⚠️
+## C4. Message payload — `STABLE` (`extra` verified)
 
 Messages are **sent by the web client through the Nexconn Web SDK**, after calling `/api/messages/prepare`. The structured data rides in the message's extra/custom field.
 
@@ -120,7 +120,7 @@ type CaseSummary = { lang: LangCode; text: string; keyFacts: string[]; deal?: De
 ```
 
 **Flow:**
-1. Dhrumil calls `POST /api/cases` → Akshat creates a Nexconn **group** channel with buyer + seller (`UNVERIFIED`: server-side group creation), posts a `system/case_opened` message, returns the case.
+1. Dhrumil calls `POST /api/cases` → Akshat creates a Nexconn **group** channel with buyer + seller (server-side group creation verified via `GroupChannelManagementApi.createGroupChannel`), posts a `system/case_opened` message, returns the case.
 2. Dhrumil shows the user "An agent is on the way" and opens the group channel.
 3. Agent console polls `GET /api/agent/queue` every 5 s (v0; push later if time allows).
 4. Agent claims → Akshat adds agent to the group (`UNVERIFIED`), posts `system/case_claimed`.
@@ -152,4 +152,9 @@ Akshat receives Nexconn's `message:send` webhook for: transcript storage, scam d
 
 | # | Fact | Verified by | Source |
 |---|---|---|---|
-| – | (none yet) | | |
+| – | Text messages have `extra?: string` (C4); size limit tested via /spike probe | Dhrumil | `node_modules/@nexconn/chat/index.d.ts` (v26.2.1) |
+| 1 | Direct channels require no server-side creation (`new DirectChannel(otherUserId)`) | Dhrumil | `node_modules/@nexconn/chat/index.d.ts` (v26.2.1) |
+| 2 | Official Server SDK is `@nexconn/server-sdk` v0.1.2 from `github:NexconnAI-Dev/nexconn-server-sdk-node` | Akshat | `node_modules/@nexconn/server-sdk/package.json` |
+| 3 | Server user token generation via `userManagementApi.issueAccessToken({ userId, name })` returning `result.accessToken` | Akshat | `node_modules/@nexconn/server-sdk/dist/api.d.ts` |
+| 4 | Server-side group creation supported via `groupChannelManagementApi.createGroupChannel({ channelId, name, owner, userIds })` | Akshat | `node_modules/@nexconn/server-sdk/dist/api.d.ts` |
+| 5 | Server client requires `setPrimaryBackupDomains(primary, backup)` before sending requests | Akshat | `node_modules/@nexconn/server-sdk/dist/configuration.d.ts` |

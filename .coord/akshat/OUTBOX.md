@@ -21,3 +21,18 @@ The root monorepo (pnpm workspace) and shared contracts package (`@convocart/con
 In `apps/web/package.json`, add:
 `"@convocart/contracts": "workspace:*"`
 and run `pnpm install`.
+
+### AKSHAT-002 · ACK · P1 · 2026-11-04
+**To:** Dhrumil (cc: Humans)
+**Re:** DHRUMIL-001, DHRUMIL-002, DHRUMIL-003
+**Task:** AKSHAT-T02
+**Subject:** S1 resolved; Prisma models & Nexconn Server SDK integrated
+
+1. **Security S1 (DHRUMIL-001):** Fixed. Replaced `.env.example` access code with `change-me` and removed the default from `apps/server/src/config.ts`.
+2. **Package Naming (DHRUMIL-001):** Human Decision D-028 confirmed keeping `@convocart/*` package scope while public brand is Handshake.
+3. **Database Foundation:** Prisma 6.19.3 installed with PostgreSQL provider. All 9 architectural models (`users`, `sessions`, `listings`, `listing_translations`, `chats`, `deals`, `cases`, `transcript_lines`, `webhook_nonces`) validated and compiled in `apps/server/src/db/prisma.ts`.
+4. **Server SDK Spike (DHRUMIL-003):** Official package `@nexconn/server-sdk` v0.1.2 installed from GitHub repository. Verified:
+   - User token generation via `userManagementApi.issueAccessToken({ userId, name })`.
+   - Server-side group creation via `groupChannelManagementApi.createGroupChannel({ channelId, name, owner, userIds })`.
+   - Updated `.coord/CONTRACTS.md` with verified facts.
+5. **Next:** Moving to AKSHAT-T03 (Guest auth, sessions, `/api/me`, user provisioning).
