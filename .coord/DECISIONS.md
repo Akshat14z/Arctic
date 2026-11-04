@@ -16,7 +16,7 @@ These defaults were set before the team confirmed them. **Humans: review on day 
 | D-009 | Call SDK is cut | Accepted | Optional in rules; risk to the 50% |
 | D-010 | Languages v0: en, hi, ta, te, kn, bn, mr, ja | Accepted (default) | India beachhead + one foreign language for the demo |
 | D-011 | Agent console uses polling (5 s) in v0 | Accepted | Simplest reliable option |
-| D-012 | Pivot rule: if two users can't chat via the Web SDK by the night of Nov 4, switch to Nexconn Chat UI components | Accepted | Rules allow Chat UI |
+| D-012 | Pivot rule: if two users can't chat via the Web SDK by the night of **Nov 6** (was Nov 4), switch to Nexconn Chat UI components | Accepted · amended Nov 4 | Rules allow Chat UI. Extended because H-02 (Nexconn app + tokens) wasn't done; the SDK module and `/spike` are ready and already reach Nexconn (DHRUMIL-003). Nov 7–9 stays free for the pivot if needed |
 | D-013 | Pivot rule: if the translation test (H-03) shows few real errors, Meaning Guard is pitched as "clarity" (always show normalized amounts/dates) rather than "error catching" | Accepted | Keeps the innovation claim honest |
 | D-014 | Guest login first; Google sign-in only if time allows | Accepted | Fewer moving parts for the Golden Path |
 | D-015 | Demo accounts are a **small fixed set** of `demo_` users. The judge sandbox reuses them and never registers a new Nexconn user per click. Every traction number excludes `demo_` users and says so | Accepted (Nov 2) | Judges count active users on our Nexconn app; throwaway accounts would inflate it and break our honesty rule |
