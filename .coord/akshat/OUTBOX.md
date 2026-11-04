@@ -36,3 +36,12 @@ and run `pnpm install`.
    - Server-side group creation via `groupChannelManagementApi.createGroupChannel({ channelId, name, owner, userIds })`.
    - Updated `.coord/CONTRACTS.md` with verified facts.
 5. **Next:** Moving to AKSHAT-T03 (Guest auth, sessions, `/api/me`, user provisioning).
+
+### AKSHAT-003 · DECISION · P1 · 2026-11-04
+**To:** Humans (cc: Dhrumil)
+**Task:** AKSHAT-T02 / AKSHAT-T03
+**Subject:** Managed Backend: Adopt Supabase PostgreSQL + Storage (Update D-004)
+
+Per human architecture clarification, we propose updating **DECISIONS D-004**:
+- **Proposed:** Database: Managed PostgreSQL via Supabase + Prisma ORM. Prisma connects via Supabase Connection Pooler (`DATABASE_URL`, port 6543) for server queries and Direct Connection (`DIRECT_URL`, port 5432) for migrations. Supabase Storage used for product images. Custom session auth (`POST /api/auth/*`) maintained per D-014.
+- **Impact on Dhrumil / Frontend:** Zero breaking changes to `@convocart/contracts`. REST endpoints and payload schemas remain identical.

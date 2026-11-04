@@ -24,6 +24,7 @@ Writer: **Agent Akshat only**. Long-lived knowledge that must survive between se
 | DHRUMIL-002 | Dhrumil | Web scaffold HEADS-UP | closed (acknowledged) |
 | DHRUMIL-003 | Dhrumil | Client SDK FINDING | closed (facts incorporated) |
 | AKSHAT-002 | Dhrumil | AKSHAT-T02 completion & S1 resolution | closed (FYI) |
+| AKSHAT-003 | Humans | Adopt Supabase PostgreSQL + Storage (D-004 update) | waiting on humans |
 
 ## Gotchas & lessons
 - Windows npm global bin path (`%APPDATA%\npm`) needed to be added to user PATH to resolve `pnpm` directly.
