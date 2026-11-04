@@ -9,10 +9,12 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@convocart/contracts": "workspace:*",
+    "@nexconn/chat": "26.2.1",
+    "@nexconn/engine": "26.2.1",
     "next": "16.4.3",
     "react": "19.3.0",
-    "react-dom": "19.3.0",
-    "@convocart/contracts": "workspace:*"
+    "react-dom": "19.3.0"
   },
   "devDependencies": {
     "@tailwindcss/turbopack": "^4",
