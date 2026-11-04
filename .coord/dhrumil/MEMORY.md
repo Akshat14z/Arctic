@@ -8,11 +8,19 @@ Writer: **Agent Dhrumil only**. Long-lived knowledge that must survive between s
 ## Verified facts (SDK behavior, APIs, limits, gotchas)
 | # | Fact | How verified | Date |
 |---|---|---|---|
-| – | (none yet) | | |
+| 1 | Text messages carry `extra?: string` via `SendTextMessageParams({ text, extra })`; size limit unknown | @nexconn/chat 26.2.1 d.ts | 2026-11-04 |
+| 2 | `metadata?: Record<string,string>` on send + `message.setMetadata()` after send | d.ts | 2026-11-04 |
+| 3 | `new DirectChannel(otherUserId)` — no server-side creation; history via `BaseChannel.createMessagesQuery(...).loadNextPage()` | d.ts | 2026-11-04 |
+| 4 | `NCEngine.initialize({appKey, areaCode, logLevel})` → `NCEngine.connect({token})` → `RCResult<{userId}>`; AreaCode SG=2 NA=3 SA=5 OM=6 BJ=1 | d.ts | 2026-11-04 |
+| 5 | Statuses CONNECTED 0 / CONNECTING 1 / DISCONNECTED 2 / SUSPENDED 3 (auto-retry 5 s); handler key is `onConnectionStatusChanged` (JSDoc example is wrong) | d.ts | 2026-11-04 |
+| 6 | Bad App Key/token → connect fails with code 31004 | live, /spike | 2026-11-04 |
+| 7 | Built-in `NCEngine.translateModule` (translateMessages/Texts, setTranslationLanguage, auto-translate, per-channel strategy) | d.ts | 2026-11-04 |
+| 8 | `GroupChannel.createGroup` exists client-side | d.ts | 2026-11-04 |
 
 ## Open threads
 | Msg ID | With | Topic | State (waiting on me / waiting on them / closed) |
 |---|---|---|---|
+| DHRUMIL-003 | Akshat + Humans | FINDING: SDK facts + built-in translation question | FYI; humans decide on item 6 |
 | DHRUMIL-002 | Akshat | HEADS-UP: apps/web, lockfile, pnpm 12 gotchas | FYI, no reply needed |
 | DHRUMIL-001 | Akshat + Humans | REVIEW of AKSHAT-T01: leaked AGENT_ACCESS_CODE (S1), tsbuildinfo, workflow | waiting on them (issue 2 closed by D-028: keep `@convocart/*`) |
 
@@ -34,3 +42,9 @@ Writer: **Agent Dhrumil only**. Long-lived knowledge that must survive between s
 - Learned: pnpm 12 release-age policy + corepack gotcha; Next 16 retry()/Activity behavior.
 - AI tools used: Claude Code (Claude Opus 5.5) for planning docs, research, scaffold, browser checks.
 - Next: Vercel deploy + merge DHRUMIL-T01, then DHRUMIL-T02 SDK spike.
+
+### 2026-11-04 · session 2
+- Did: DHRUMIL-T02 code — SDK module `src/lib/nexconn` + `/spike` page (branch pushed, 794b8e0); DHRUMIL-003 FINDING.
+- Learned: see verified facts 1-8; SDK loads fine under Next 16 SSR/prerender.
+- AI tools used: Claude Code (Claude Opus 5.5) for reading SDK type defs, module + spike, browser check.
+- Next: live two-browser test once H-02 app + tokens exist; D-012 deadline is tonight.
