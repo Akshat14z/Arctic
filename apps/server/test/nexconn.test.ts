@@ -28,7 +28,7 @@ describe('Nexconn Server SDK Adapter', () => {
 
     const config = getNexconnConfig();
     expect(config).toBeDefined();
-    expect(config.getActiveHost()).toBe('https://api.nexconn.ai');
+    expect(config.getActiveHost()).toBe('https://api.sg-light-api.com');
   });
 
   it('issues token successfully from UserManagementApi', async () => {

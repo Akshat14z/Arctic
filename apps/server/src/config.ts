@@ -16,8 +16,8 @@ const ConfigSchema = z.object({
   NEXCONN_APP_KEY: z.string().optional(),
   NEXCONN_APP_SECRET: z.string().optional(),
   NEXCONN_AREA: z.string().default('SG'),
-  NEXCONN_PRIMARY_API_DOMAIN: z.string().default('https://api.nexconn.ai'),
-  NEXCONN_SECONDARY_API_DOMAIN: z.string().default('https://api-backup.nexconn.ai'),
+  NEXCONN_PRIMARY_API_DOMAIN: z.string().default('https://api.sg-light-api.com'),
+  NEXCONN_SECONDARY_API_DOMAIN: z.string().default('https://api-b.sg-light-api.com'),
   LLM_API_KEY: z.string().optional(),
   LLM_MODEL: z.string().default('gemini-2.0-flash'),
 });

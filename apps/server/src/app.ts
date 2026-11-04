@@ -4,6 +4,8 @@ import type { ApiErrorResponse } from '@convocart/contracts';
 import { getConfig } from './config.js';
 import { errorHandler } from './errors.js';
 import { healthRoutes } from './routes/health.js';
+import { authRoutes } from './routes/auth.js';
+import { meRoutes } from './routes/me.js';
 
 export async function buildApp(): Promise<FastifyInstance> {
   const config = getConfig();
@@ -40,6 +42,8 @@ export async function buildApp(): Promise<FastifyInstance> {
 
   // 4. Register Routes
   await app.register(healthRoutes);
+  await app.register(authRoutes);
+  await app.register(meRoutes);
 
   return app;
 }

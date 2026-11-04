@@ -39,10 +39,11 @@ export function errorHandler(
   }
 
   // 2. Zod Validation Errors
-  if (error instanceof ZodError) {
-    const firstIssue = error.issues[0];
+  if (error instanceof ZodError || error.name === 'ZodError' || ('issues' in error && Array.isArray((error as any).issues))) {
+    const issues = (error as any).issues || [];
+    const firstIssue = issues[0];
     const message = firstIssue
-      ? `${firstIssue.path.join('.') || 'body'}: ${firstIssue.message}`
+      ? `${firstIssue.path?.join('.') || 'body'}: ${firstIssue.message}`
       : 'Invalid request payload';
 
     const payload: ApiErrorResponse = {
