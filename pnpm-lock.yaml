@@ -206,6 +206,12 @@ importers:
       '@convocart/contracts':
         specifier: workspace:*
         version: link:../../packages/contracts
+      '@nexconn/chat':
+        specifier: 26.2.1
+        version: 26.2.1(@nexconn/engine@26.2.1)
+      '@nexconn/engine':
+        specifier: 26.2.1
+        version: 26.2.1
       next:
         specifier: 16.4.3
         version: 16.4.3(@types/node@20.19.43)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
@@ -624,6 +630,14 @@ packages:
     cpu: [x64]
     os: [linux]
     libc: [glibc]
+
+  '@nexconn/chat@26.2.1':
+    resolution: {integrity: sha512-o1yBPQIBrSsVJcqq9rrh35yLymRFOuv7L2uYg+OKwWlmJVYot5p5h6igixnjcoSbGqvVYrVdCN+M8V89N0Heiw==}
+    peerDependencies:
+      '@nexconn/engine': '=26.2.1'
+
+  '@nexconn/engine@26.2.1':
+    resolution: {integrity: sha512-CHyqWTcKZVWphCeL67vjRWUINr/t1tL5uXIkCwKggFEK/Guq3qOh6w2GleIb5J/cz9YeGd/ZYKaAjgqjhT44yg==}
 
   '@next/env@16.4.3':
     resolution: {integrity: sha512-a7tz1QCcWWkwC/rPJcPMJk/UNRu9CFhDd3OHYE5hddbJrs8BqRTalxI6GlKCWEGzRLHN+S/B7a4PAHCtm25aBQ==}
@@ -1775,6 +1789,12 @@ snapshots:
 
   '@napi-rs/lzma-linux-x64-gnu@1.5.1':
     optional: true
+
+  '@nexconn/chat@26.2.1(@nexconn/engine@26.2.1)':
+    dependencies:
+      '@nexconn/engine': 26.2.1
+
+  '@nexconn/engine@26.2.1': {}
 
   '@next/env@16.4.3': {}
 
