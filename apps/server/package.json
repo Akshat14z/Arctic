@@ -10,20 +10,24 @@
     "build": "tsc -b",
     "start": "node dist/index.js",
     "typecheck": "tsc --noEmit",
-    "test": "vitest run"
+    "test": "vitest run",
+    "db:generate": "prisma generate",
+    "db:validate": "prisma validate"
   },
   "dependencies": {
     "@convocart/contracts": "workspace:*",
     "@fastify/cors": "^10.0.2",
+    "@nexconn/server-sdk": "github:NexconnAI-Dev/nexconn-server-sdk-node#v0.1.2",
+    "@prisma/client": "^6.4.1",
     "dotenv": "^16.4.7",
     "fastify": "^5.2.1",
     "zod": "^3.24.2"
   },
   "devDependencies": {
     "@types/node": "^22.13.4",
+    "prisma": "^6.4.1",
     "tsx": "^4.19.2",
     "typescript": "^5.7.3",
     "vitest": "^3.0.5"
   }
 }
-

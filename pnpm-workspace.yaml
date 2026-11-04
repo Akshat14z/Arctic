@@ -3,4 +3,10 @@ packages:
   - 'packages/*'
 
 allowBuilds:
+  '@nexconn/server-sdk@https://codeload.github.com/NexconnAI-Dev/nexconn-server-sdk-node/tar.gz/06acc1a48583761e93247c55d5c60d3d46338b0e': true
+  '@nexconn/server-sdk': true
+  '@prisma/client': true
+  '@prisma/engines': true
   esbuild: true
+  prisma: true
+  workerd: true

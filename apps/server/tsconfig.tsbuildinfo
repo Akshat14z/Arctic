@@ -1,1 +1,1 @@
-{"root":["./src/app.ts","./src/config.ts","./src/errors.ts","./src/index.ts","./src/routes/health.ts"],"version":"5.9.3"}
+{"root":["./src/app.ts","./src/config.ts","./src/errors.ts","./src/index.ts","./src/db/prisma.ts","./src/nexconn/channels.ts","./src/nexconn/client.ts","./src/nexconn/index.ts","./src/nexconn/tokens.ts","./src/routes/health.ts"],"version":"5.9.3"}

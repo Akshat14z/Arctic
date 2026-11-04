@@ -1,0 +1,173 @@
+// Prisma schema for ConvoCart / Handshake
+// Matches .coord/ARCHITECTURE.md §5 Data Model
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id             String    @id // u_<nanoid> or demo_u_... (equals Nexconn user ID)
+  displayName    String
+  language       String    // ISO 639-1 code (e.g. en, hi, ja)
+  role           String    @default("user") // "user" | "agent"
+  isDemo         Boolean   @default(false)
+  agentLanguages String[]  @default([])
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  sessions       Session[]
+  listings       Listing[]
+  chatsAsBuyer   Chat[]    @relation("BuyerChats")
+  chatsAsSeller  Chat[]    @relation("SellerChats")
+  casesAsBuyer   Case[]    @relation("BuyerCases")
+  casesAsSeller  Case[]    @relation("SellerCases")
+  casesAsAgent   Case[]    @relation("AgentCases")
+
+  @@index([role])
+  @@index([isDemo])
+  @@map("users")
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  tokenHash String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  expiresAt DateTime
+
+  @@index([userId])
+  @@map("sessions")
+}
+
+model Listing {
+  id            String               @id // l_<nanoid>
+  sellerId      String
+  seller        User                 @relation(fields: [sellerId], references: [id], onDelete: Cascade)
+  title         String
+  description   String
+  lang          String               // author's language
+  priceAmount   Float
+  priceCurrency String               @default("INR")
+  imageUrl      String?
+  isDemo        Boolean              @default(false)
+  createdAt     DateTime             @default(now())
+  updatedAt     DateTime             @updatedAt
+
+  translations  ListingTranslation[]
+  chats         Chat[]
+  deals         Deal[]
+
+  @@index([sellerId])
+  @@index([createdAt])
+  @@index([isDemo])
+  @@map("listings")
+}
+
+model ListingTranslation {
+  id          String   @id @default(cuid())
+  listingId   String
+  listing     Listing  @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  lang        String
+  title       String
+  description String
+  createdAt   DateTime @default(now())
+
+  @@unique([listingId, lang])
+  @@map("listing_translations")
+}
+
+model Chat {
+  channelId       String           @id // direct or group channel ID
+  listingId       String
+  listing         Listing          @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  buyerId         String
+  buyer           User             @relation("BuyerChats", fields: [buyerId], references: [id], onDelete: Cascade)
+  sellerId        String
+  seller          User             @relation("SellerChats", fields: [sellerId], references: [id], onDelete: Cascade)
+  createdAt       DateTime         @default(now())
+
+  deals           Deal[]
+  cases           Case[]
+  transcriptLines TranscriptLine[]
+
+  @@unique([buyerId, listingId]) // Idempotency: same buyer + listing -> same chat
+  @@index([buyerId])
+  @@index([sellerId])
+  @@map("chats")
+}
+
+model Deal {
+  id             String    @id // d_<nanoid>
+  channelId      String
+  chat           Chat      @relation(fields: [channelId], references: [channelId], onDelete: Cascade)
+  listingId      String
+  listing        Listing   @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  payload        Json      // Structured Deal JSON conforming to DealSchema
+  status         String    @default("proposed") // "proposed" | "agreed" | "disputed"
+  agreedBuyerAt  DateTime?
+  agreedSellerAt DateTime?
+  sealCode       String?   @unique // Unguessable code for public verification (D-023)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  @@index([channelId])
+  @@map("deals")
+}
+
+model Case {
+  id             String    @id // c_<nanoid>
+  channelId      String
+  chat           Chat      @relation(fields: [channelId], references: [channelId], onDelete: Cascade)
+  groupChannelId String    // 3-way Nexconn group channel ID (buyer + seller + agent)
+  buyerId        String
+  buyer          User      @relation("BuyerCases", fields: [buyerId], references: [id])
+  sellerId       String
+  seller         User      @relation("SellerCases", fields: [sellerId], references: [id])
+  agentId        String?
+  agent          User?     @relation("AgentCases", fields: [agentId], references: [id])
+  reason         String    // CaseReason: "item_not_as_described" | ...
+  status         String    @default("open") // "open" | "claimed" | "resolved"
+  dealSnapshot   Json?     // Frozen snapshot of agreed deal at moment case opened (D-018)
+  resolution     String?
+  slaDueAt       DateTime
+  createdAt      DateTime  @default(now())
+  claimedAt      DateTime?
+  resolvedAt     DateTime?
+
+  @@index([status])
+  @@index([agentId])
+  @@index([slaDueAt])
+  @@map("cases")
+}
+
+model TranscriptLine {
+  nexconnMessageId String   @id // Unique Nexconn message ID de-duplicates webhook retries
+  channelId        String
+  chat             Chat     @relation(fields: [channelId], references: [channelId], onDelete: Cascade)
+  at               DateTime
+  fromId           String
+  origLang         String
+  origText         String
+  tr               Json     // Partial<Record<LangCode, string>>
+  shownTo          Json     // Per-member rendered view (D-022 "Show me what they saw")
+  createdAt        DateTime @default(now())
+
+  @@index([channelId])
+  @@index([at])
+  @@map("transcript_lines")
+}
+
+model WebhookNonce {
+  nonce      String   @id
+  receivedAt DateTime @default(now())
+
+  @@index([receivedAt])
+  @@map("webhook_nonces")
+}
+
