@@ -54,6 +54,20 @@ export const ListingDetailResponseSchema = z.object({
 });
 export type ListingDetailResponse = z.infer<typeof ListingDetailResponseSchema>;
 
+export const ListingUpdateRequestSchema = z.object({
+  title: z.string().min(1, 'Title cannot be empty').max(150).optional(),
+  description: z.string().min(1, 'Description cannot be empty').max(2000).optional(),
+  price: MoneySchema.optional(),
+  imageUrl: z.string().url('Invalid image URL').optional().nullable(),
+});
+export type ListingUpdateRequest = z.infer<typeof ListingUpdateRequestSchema>;
+
+export const ListingDeleteResponseSchema = z.object({
+  success: z.literal(true),
+  id: z.string(),
+});
+export type ListingDeleteResponse = z.infer<typeof ListingDeleteResponseSchema>;
+
 /* -------------------------------------------------------------------------- */
 /* Auth Schemas                                                               */
 /* -------------------------------------------------------------------------- */

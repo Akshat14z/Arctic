@@ -29,3 +29,4 @@ export const meRoutes: FastifyPluginAsync = async (app) => {
     }
   );
 };
+

@@ -25,3 +25,4 @@ export async function authenticate(request: FastifyRequest, _reply: FastifyReply
   request.user = user;
   request.sessionToken = token;
 }
+

@@ -10,6 +10,8 @@ import {
   CaseSchema,
   GuestAuthRequestSchema,
   PrepareMessageRequestSchema,
+  ListingUpdateRequestSchema,
+  ListingDeleteResponseSchema,
 } from '../src/index.js';
 
 describe('Contracts Schema Validation', () => {
@@ -152,6 +154,25 @@ describe('Contracts Schema Validation', () => {
       senderLang: 'en',
     });
     expect(prepareReq.success).toBe(true);
+  });
+
+  it('validates ListingUpdateRequest and ListingDeleteResponse schemas', () => {
+    const validUpdate = ListingUpdateRequestSchema.safeParse({
+      title: 'Updated iPhone 15',
+      price: { amount: 65000, currency: 'INR' },
+    });
+    expect(validUpdate.success).toBe(true);
+
+    const emptyTitle = ListingUpdateRequestSchema.safeParse({
+      title: '',
+    });
+    expect(emptyTitle.success).toBe(false);
+
+    const validDelete = ListingDeleteResponseSchema.safeParse({
+      success: true,
+      id: 'l_123',
+    });
+    expect(validDelete.success).toBe(true);
   });
 });
 

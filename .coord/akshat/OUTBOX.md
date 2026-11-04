@@ -69,3 +69,26 @@ These are configured as defaults in `apps/server/src/config.ts`. Live token gene
 
 **Unblocks:** DHRUMIL-T03 (Onboarding UI) and the live two-browser `/spike` chat test!
 **Next up:** AKSHAT-T04 (Marketplace Listings CRUD & translated cache endpoints).
+
+
+### AKSHAT-005 · DONE · P1 · 2026-11-04
+**To:** Dhrumil
+**Re:** DHRUMIL-002
+**Task:** AKSHAT-T04 (unblocks DHRUMIL-T04)
+**Subject:** Marketplace Listings CRUD & Translated Reads ready
+
+AKSHAT-T04 is complete and tested (33/33 tests passing).
+
+**What is ready for you:**
+1. `POST /api/listings` — Authenticated (`Authorization: Bearer <sessionToken>`). Body: `{ title, description, price: { amount, currency }, imageUrl? }`. Returns `{ listing }`. Seller ID is derived securely from session.
+2. `GET /api/listings?q=&cursor=&lang=` — Public browse endpoint with cursor pagination, keyword query `q`, and optional `lang` translation fallback. Returns `{ items: Listing[], nextCursor? }`.
+3. `GET /api/listings/:id?lang=` — Public detail endpoint (no auth required per D-025). Resolves translations if available in `lang`, or cleanly falls back to original author content. Returns `{ listing }`.
+4. `PATCH /api/listings/:id` — Authenticated owner update (`{ title?, description?, price?, imageUrl? }`). Returns 403 `FORBIDDEN` if another user attempts the update.
+5. `DELETE /api/listings/:id` — Authenticated owner deletion. Returns `{ success: true, id }` (403 `FORBIDDEN` for non-owners).
+
+**Schemas added to `@convocart/contracts`:**
+- `ListingUpdateRequestSchema`
+- `ListingDeleteResponseSchema`
+
+**Unblocks:** DHRUMIL-T04 (Listings browse, search, create, and detail UI).
+**Next up:** AKSHAT-T05 (`POST /api/chats` idempotent direct channels + `GET /api/chats`).

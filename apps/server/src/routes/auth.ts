@@ -20,3 +20,4 @@ export const authRoutes: FastifyPluginAsync = async (app) => {
     return reply.status(201).send(response);
   });
 };
+

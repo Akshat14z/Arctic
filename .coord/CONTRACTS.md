@@ -38,7 +38,9 @@ The Nexconn user id **equals** our `User.id` (to be verified in AKSHAT-T02 — `
 | `GET /api/me` | – | `{ user, nexconn: { appKey, token, area } }` | Re-issue on refresh |
 | `PATCH /api/me` | `{ displayName?, language? }` | `{ user }` | |
 | `GET /api/listings?q=&cursor=` | – | `{ items: Listing[], nextCursor? }` | |
-| `POST /api/listings` | `{ title, description, price: Money, imageUrl? }` | `{ listing }` | Title/description stored in author's language + translated on read |
+| `POST /api/listings` | `{ title, description, price: Money, imageUrl? }` | `{ listing }` | `IMPLEMENTED`. Title/description stored in author's language + translated on read |
+| `PATCH /api/listings/:id` | `{ title?, description?, price?: Money, imageUrl? }` | `{ listing }` | `IMPLEMENTED`. Authenticated, owner-only (403 on intruder) |
+| `DELETE /api/listings/:id` | – | `{ success: true, id }` | `IMPLEMENTED`. Authenticated, owner-only (403 on intruder) |
 | `GET /api/listings/:id?lang=` | – | `{ listing }` | Fields translated into `lang`. **Public, no auth** (D-025) |
 | `POST /api/chats` | `{ listingId }` | `{ channelId, channelType: "direct", seller: User, listing }` | Idempotent: same buyer+listing → same chat |
 | `GET /api/chats` | – | `{ items: ChatSummary[] }` | For the inbox view |
