@@ -17,7 +17,6 @@ import { formatPrice, localeFor } from "@/lib/format";
 import { LANGUAGES } from "@/lib/languages";
 import { useRequireAgent } from "@/lib/use-require-agent";
 import { ChatThread } from "@/components/chat-thread";
-import { MOCK_GROUP_PREFIX } from "@/mocks/api";
 
 const card = "rounded-xl border border-border bg-surface p-4";
 const langName = (code: LangCode) => LANGUAGES.find((l) => l.code === code)?.native ?? code;
@@ -184,7 +183,6 @@ export function AgentCase() {
   const lang = session.user.language;
   const mine = c.agent?.id === session.user.id;
   const deal = c.dealSnapshot ?? summary.deal;
-  const mockGroup = c.groupChannelId.startsWith(MOCK_GROUP_PREFIX); // MOCK: remove with the cases mock (DHRUMIL-010)
 
   return (
     <section data-wide className="flex flex-col gap-4">
@@ -279,8 +277,6 @@ export function AgentCase() {
           <h2 className="font-semibold">Chat with both sides</h2>
           {!mine && c.status !== "resolved" ? (
             <p className="m-auto max-w-xs py-8 text-center text-sm text-muted">Claim the case to join the chat.</p>
-          ) : mockGroup ? (
-            <p className="m-auto max-w-xs py-8 text-center text-sm text-muted">(Mock) The 3-way chat opens here once the server creates the case group.</p>
           ) : (
             <ChatThread
               session={session}

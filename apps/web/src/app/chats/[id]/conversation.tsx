@@ -73,7 +73,16 @@ export function Conversation() {
             <span lang={chat.listing.lang}>{chat.listing.title}</span> · {formatPrice(chat.listing.price, session.user.language)}
           </Link>
         </div>
-        <GetHelp channelId={chat.channelId} token={session.sessionToken} />
+        {chat.openCaseId ? (
+          <Link
+            href={`/cases/${encodeURIComponent(chat.openCaseId)}`}
+            className="flex min-h-tap shrink-0 items-center rounded-lg bg-guard-bg px-3 text-sm font-medium text-guard"
+          >
+            Help requested · View
+          </Link>
+        ) : (
+          <GetHelp channelId={chat.channelId} token={session.sessionToken} />
+        )}
       </header>
 
       <ChatThread
