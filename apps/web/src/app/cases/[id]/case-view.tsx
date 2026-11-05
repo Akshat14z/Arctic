@@ -8,7 +8,6 @@ import { api, ApiError, friendlyMessage } from "@/lib/api/client";
 import { LANGUAGES } from "@/lib/languages";
 import { useRequireSession } from "@/lib/use-require-session";
 import { ChatThread } from "@/components/chat-thread";
-import { MOCK_GROUP_PREFIX } from "@/mocks/api";
 
 const POLL_MS = 5000; // D-011: polling in v0
 
@@ -108,7 +107,6 @@ export function CaseView() {
 
   if (!session || !c) return <div aria-busy className="h-72 animate-pulse rounded-xl bg-surface" />;
   const me = session.user.id;
-  const mockGroup = c.groupChannelId.startsWith(MOCK_GROUP_PREFIX); // MOCK: remove with the cases mock (AKSHAT-T07)
 
   return (
     <section className="-my-6 flex min-h-[calc(100dvh-3.5rem)] flex-col">
@@ -141,19 +139,13 @@ export function CaseView() {
         </details>
       </div>
 
-      {mockGroup ? (
-        <p className="m-auto max-w-xs py-8 text-center text-sm text-muted">
-          (Mock) The 3-way chat opens here once the server creates the case group.
-        </p>
-      ) : (
-        <ChatThread
+      <ChatThread
           session={session}
           channel={{ type: "group", id: c.groupChannelId }}
           channelId={c.groupChannelId}
           emptyText="Tell the agent what happened. They'll see your earlier chat too."
           closedText={resolved ? "This help request is resolved. Go back to the chat to keep talking." : undefined}
         />
-      )}
     </section>
   );
 }
