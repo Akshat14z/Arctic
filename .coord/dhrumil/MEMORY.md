@@ -29,6 +29,7 @@ Writer: **Agent Dhrumil only**. Long-lived knowledge that must survive between s
 | DHRUMIL-006 | Akshat + Humans | FINDING: live chat works, extra limit, team test ids, local-run gotchas | FYI |
 | DHRUMIL-005 | Akshat | REQUEST: deploy server (spike part satisfied locally; deployed URL still needed) | waiting on them |
 | DHRUMIL-004 | Akshat + Humans | REVIEW S2: channel scoping | closed by humans: D-029 (group per chat) |
+| DHRUMIL-011 | Akshat | REQUEST: queue order, claim idempotent/409, resolve owner-only, agent summary lang + shownTo both sides | waiting on them |
 | DHRUMIL-010 | Akshat | REQUEST: cases API behaviours for Get help (idempotent, real group, user GET, system msgs, note, openCaseId) | waiting on them |
 | DHRUMIL-009 | Akshat | HEADS-UP: chat UI ready for D-029; asks: prepare shape, lastMessage via T08, CORS list | waiting on them (#4) |
 | DHRUMIL-008 | Akshat | REQUEST P0: implement D-029 in POST /api/chats + channelType "group" | waiting on them |
@@ -39,6 +40,8 @@ Writer: **Agent Dhrumil only**. Long-lived knowledge that must survive between s
 | DHRUMIL-001 | Akshat + Humans | REVIEW of AKSHAT-T01 | closed (S1 + tsbuildinfo fixed in AKSHAT-002; D-028) |
 
 ## Gotchas & lessons
+- One origin = one session: signing in as an agent replaces the user session in that browser (the sign-in page says so).
+- Wide pages: put `data-wide` on the page root; `<main>` widens via `has-[[data-wide]]:max-w-6xl`.
 - Per-route mocks: `NOT_LIVE` prefixes in `lib/api/client.ts` go to `mocks/api.ts` even when the real server is set.
 - Native `<dialog>` + `showModal()` gives focus trap, Esc and backdrop for free; Tailwind `backdrop:` styles it.
 - Effects must not return values: `scrollIntoView()` now returns a Promise in Chromium, so `useEffect(() => el.scrollIntoView())` triggers a React error. Always use braces.
@@ -100,3 +103,8 @@ Writer: **Agent Dhrumil only**. Long-lived knowledge that must survive between s
 - Did: DHRUMIL-T06 Get help + case page (branch 547d055), ChatThread refactor, per-route cases mock; DHRUMIL-010.
 - AI tools used: Claude Code (Claude Opus 5.5) for case UI, mock, browser tests.
 - Next: merge T06; DHRUMIL-T07 agent console (against the same mock) or DHRUMIL-T08 polish.
+
+### 2026-11-05 · session 3f
+- Did: DHRUMIL-T07 agent console (branch 2ae6e6a): sign-in (real), queue, claim, case view with summary/deal/"what each side saw", resolve; DHRUMIL-011.
+- AI tools used: Claude Code (Claude Opus 5.5) for console UI, mock, end-to-end browser test.
+- Next: merge T07; then DHRUMIL-T08 Golden Path polish once AKSHAT-T06/T07/T08 + deploy land.

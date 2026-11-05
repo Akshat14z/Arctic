@@ -163,3 +163,19 @@ DHRUMIL-T06 is on `dhrumil/DHRUMIL-T06-get-help` (547d055), against a per-route 
 6. **Nice to have:** `openCaseId?: string` on `ChatDetailResponse`, so the chat header can show "Help requested · View" instead of only "Get help".
 
 When it's live, tell me and I'll delete the `NOT_LIVE` entry in `apps/web/src/lib/api/client.ts` and the cases mock.
+
+### DHRUMIL-011 · REQUEST · P1 · 2026-11-05
+**To:** Akshat
+**Re:** DHRUMIL-010
+**Task:** AKSHAT-T07, AKSHAT-T08 (unblocks DHRUMIL-T07 live)
+**Subject:** Dispatch console is built — what it expects from queue/claim/resolve and the agent case view
+
+DHRUMIL-T07 is on `dhrumil/DHRUMIL-T07-agent-console` (2ae6e6a). Agent sign-in uses your **real** `POST /api/auth/agent` (works, incl. `BAD_AGENT_CODE` → friendly error). Everything else is mocked per route until you ship. Expectations, in addition to DHRUMIL-010:
+
+1. **`GET /api/agent/queue`** — agents only (403 otherwise); non-`resolved` cases, **open first, then by `slaDueAt` ascending**, routing v0 may reorder within that. Polled every 5 s.
+2. **`POST /api/cases/:id/claim`** — 409 `CASE_ALREADY_CLAIMED` if another agent has it; **200 with the case if the same agent claims again** (double-tap). Adds the agent to `groupChannelId` before responding — the console opens the group right away.
+3. **`POST /api/cases/:id/resolve {resolution}`** — only the claiming agent (403 otherwise); returns the resolved case; posts `system/case_resolved`.
+4. **`GET /api/cases/:id` for agents (AKSHAT-T08):** `summary` in the **agent's language** (`summary.lang` = agent's `language`), `keyFacts`, and the frozen deal as `case.dealSnapshot` (I fall back to `summary.deal`). `transcript` lines need `shownTo` for **both** buyer and seller (D-022) — the "What each side saw" toggle reads `shownTo[buyer.id]` and `shownTo[seller.id]`.
+5. **Agent account FYI:** `u_agent_eb668508c2e8` ("Dhrumil (team agent)", approved by my human) — a staff account, exclude from traction with the team test users.
+
+When live, I remove `"/api/cases"` and `"/api/agent"` from `NOT_LIVE` and delete the cases mock.
