@@ -16,11 +16,15 @@ Writer: **Agent Dhrumil only**. Long-lived knowledge that must survive between s
 | 6 | Bad App Key/token → connect fails with code 31004 | live, /spike | 2026-11-04 |
 | 7 | Built-in `NCEngine.translateModule` (translateMessages/Texts, setTranslationLanguage, auto-translate, per-channel strategy) | d.ts | 2026-11-04 |
 | 8 | `GroupChannel.createGroup` exists client-side | d.ts | 2026-11-04 |
+| 9 | Live: guest token from AKSHAT `/api/auth/guest` connects (SG, ~3 s), 2 users chat both ways in DirectChannel, `extra` intact | live, /spike | 2026-11-05 |
+| 10 | `extra` limit: 8 KB ok, 16 KB fails with code 20115 (ASCII; budget ~8 KB for text+extra) | live probe | 2026-11-05 |
+| 11 | Team test accounts on prod (exclude from traction): u_0bed9289e709, u_319b2e85b23c | created with human OK | 2026-11-05 |
 
 ## Open threads
 | Msg ID | With | Topic | State (waiting on me / waiting on them / closed) |
 |---|---|---|---|
-| DHRUMIL-005 | Akshat | REQUEST P0: deploy server or send 2 test tokens (D-012, Nov 6) | waiting on them |
+| DHRUMIL-006 | Akshat + Humans | FINDING: live chat works, extra limit, team test ids, local-run gotchas | FYI |
+| DHRUMIL-005 | Akshat | REQUEST: deploy server (spike part satisfied locally; deployed URL still needed) | waiting on them |
 | DHRUMIL-004 | Akshat + Humans | REVIEW S2: listing-scoped channelId vs pair-scoped DirectChannel; options (a) group per chat (b) listingId in extra | waiting on them |
 | AKSHAT-004/005/006 | Akshat | DONE auth, listings, chats | verify against deployed server once DHRUMIL-005 lands |
 | AKSHAT-003 | Humans | DECISION: Supabase instead of Neon (D-004) | waiting on humans |
@@ -29,6 +33,8 @@ Writer: **Agent Dhrumil only**. Long-lived knowledge that must survive between s
 | DHRUMIL-001 | Akshat + Humans | REVIEW of AKSHAT-T01 | closed (S1 + tsbuildinfo fixed in AKSHAT-002; D-028) |
 
 ## Gotchas & lessons
+- Run the server locally with `.claude/launch.json` "server" (tsx `--env-file=<repo>/.env`); web uses `apps/web/.env.local` `NEXT_PUBLIC_API_URL=http://localhost:4001` (gitignored).
+- Never paste tokens into pages myself: let the app obtain them from `/api/auth/guest`.
 - `useSyncExternalStore` getSnapshot must return a stable reference: `lib/session.ts` caches by the raw localStorage string.
 - Don't read `navigator`/`localStorage` during render (hydration mismatch with static prerender); do it in effects or via `useSyncExternalStore` with a server snapshot.
 - With cacheComponents, hidden routes stay in the DOM (Activity): accessibility-tree searches can show elements from a previous page.
@@ -61,3 +67,8 @@ Writer: **Agent Dhrumil only**. Long-lived knowledge that must survive between s
 - Learned: Nexconn DirectChannel is pair-scoped, so listing-scoped chat ids collide (DHRUMIL-004).
 - AI tools used: Claude Code (Claude Opus 5.5) for review, onboarding UI, browser tests.
 - Next: merge T03, wire real API once deployed, T02 live test, T04 listings.
+
+### 2026-11-05 · session 3b
+- Did: verified H-02 — local server + real /api/auth/guest → two users chatted live on prod Nexconn; measured extra limit; DHRUMIL-006.
+- AI tools used: Claude Code (Claude Opus 5.5) for env check (names only), spike rework, live browser test.
+- Next: merge live-test branch; DHRUMIL-T04 listings against Akshat's real routes.
