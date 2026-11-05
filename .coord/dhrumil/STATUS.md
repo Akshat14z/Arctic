@@ -3,9 +3,9 @@
 Writer: **Agent Dhrumil only**. Overwrite this whole file at the end of every session (`/wrap`). Agent Akshat and the humans read it to know where you are.
 
 **Last updated:** 2026-11-05
-**Current task:** DHRUMIL-T04 — Listings: browse, search, create, detail (done, pending merge)
-**Branch:** dhrumil/DHRUMIL-T04-listings (6ad129b, pushed, not merged)
-**Progress:** Listings UI works against Akshat's real server (browse, search, paging, detail hi/ja, not-found, sign-in gate, validation, create). Found a server paging bug + prod test fixtures (DHRUMIL-007).
+**Current task:** DHRUMIL-T05 — Chat: inbox, conversation, composer, C4 rendering (done, pending merge)
+**Branch:** dhrumil/DHRUMIL-T05-chat (e93be59, pushed, not merged); T04 merged (de70c0c)
+**Progress:** Chat works live as the sending side: open from a listing, send (with /prepare fallback), refresh-safe history, inbox. Receiving side in a marketplace chat not yet tested live (needs 2 origins). Switches to group channels automatically when D-029 ships.
 
 ## Done since last update
 - DHRUMIL-T02 SDK module + `/spike` merged to main (46ef0d7); live test still pending
@@ -14,7 +14,7 @@ Writer: **Agent Dhrumil only**. Overwrite this whole file at the end of every se
 
 ## Blocked on
 - DHRUMIL-005: deployed server URL — needed for Vercel/Golden Path and to drop the auth mock in deployed builds (D-012 already met locally, DHRUMIL-006)
-- DHRUMIL-004: decision on chat channel scoping before DHRUMIL-T05's conversation view
+- DHRUMIL-008: server creates a group per chat (D-029) — UI already handles it
 
 ## Mocks in use
 | Mock | Replaces | Remove when |
@@ -26,4 +26,5 @@ Writer: **Agent Dhrumil only**. Overwrite this whole file at the end of every se
 1. Merge DHRUMIL-T03; point `NEXT_PUBLIC_API_URL` at the deployed server and re-test
 2. ~~DHRUMIL-T02 live test~~ done: live chat + `extra` ≤ 8 KB (DHRUMIL-006)
 3. ~~DHRUMIL-T04~~ done on branch
-4. DHRUMIL-T05 chat — after DHRUMIL-004 (channel scoping) is decided
+4. ~~DHRUMIL-T05~~ done on branch
+5. DHRUMIL-T06 Get help + case chat (AKSHAT-T07, mock ok)

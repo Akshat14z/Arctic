@@ -29,6 +29,7 @@ Writer: **Agent Dhrumil only**. Long-lived knowledge that must survive between s
 | DHRUMIL-006 | Akshat + Humans | FINDING: live chat works, extra limit, team test ids, local-run gotchas | FYI |
 | DHRUMIL-005 | Akshat | REQUEST: deploy server (spike part satisfied locally; deployed URL still needed) | waiting on them |
 | DHRUMIL-004 | Akshat + Humans | REVIEW S2: channel scoping | closed by humans: D-029 (group per chat) |
+| DHRUMIL-009 | Akshat | HEADS-UP: chat UI ready for D-029; asks: prepare shape, lastMessage via T08, CORS list | waiting on them (#4) |
 | DHRUMIL-008 | Akshat | REQUEST P0: implement D-029 in POST /api/chats + channelType "group" | waiting on them |
 | AKSHAT-004/005/006 | Akshat | DONE auth, listings, chats | verify against deployed server once DHRUMIL-005 lands |
 | AKSHAT-003 | Humans | DECISION: Supabase instead of Neon (D-004) | waiting on humans |
@@ -37,6 +38,9 @@ Writer: **Agent Dhrumil only**. Long-lived knowledge that must survive between s
 | DHRUMIL-001 | Akshat + Humans | REVIEW of AKSHAT-T01 | closed (S1 + tsbuildinfo fixed in AKSHAT-002; D-028) |
 
 ## Gotchas & lessons
+- Effects must not return values: `scrollIntoView()` now returns a Promise in Chromium, so `useEffect(() => el.scrollIntoView())` triggers a React error. Always use braces.
+- Two signed-in users in one browser need two origins (localStorage per origin); server CORS only allows WEB_ORIGIN.
+- Web tests: `pnpm --filter @convocart/web test` (node:test, `.test.mts`, no deps).
 - Cache Components: `useParams()`/URL data in a client component must sit under `<Suspense>` or `next build` fails prerendering.
 - Intl: pin `numberingSystem: "latn"` — bn/mr locales default to native digits.
 - Run the server locally with `.claude/launch.json` "server" (tsx `--env-file=<repo>/.env`); web uses `apps/web/.env.local` `NEXT_PUBLIC_API_URL=http://localhost:4001` (gitignored).
@@ -83,3 +87,8 @@ Writer: **Agent Dhrumil only**. Long-lived knowledge that must survive between s
 - Did: DHRUMIL-T04 listings UI (branch 6ad129b), tested live incl. create+delete; DHRUMIL-007 REVIEW.
 - AI tools used: Claude Code (Claude Opus 5.5) for listings UI and live browser tests.
 - Next: merge T04; DHRUMIL-T05 waits on DHRUMIL-004 decision (channel scoping).
+
+### 2026-11-05 · session 3d
+- Did: DHRUMIL-T05 chat (branch e93be59): inbox, conversation, composer with /prepare fallback, C4 render + test; D-029 recorded with humans; DHRUMIL-008, DHRUMIL-009.
+- AI tools used: Claude Code (Claude Opus 5.5) for chat UI, live tests, render checks.
+- Next: merge T05; receiving-side live test once CORS allows 2 origins or D-029 lands; then DHRUMIL-T06 Get help.

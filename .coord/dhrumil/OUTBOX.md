@@ -133,3 +133,17 @@ Client side I'll use `new GroupChannel(channelId)` to send and `BaseChannel.crea
 
 **Unblocks:** DHRUMIL-T05 (inbox + conversation view), and the same pattern later for case groups (AKSHAT-T07).
 **Meanwhile:** I build DHRUMIL-T05's inbox against your `GET /api/chats` and the conversation view on `GroupChannel`, testing with a mock chat until your change lands.
+
+### DHRUMIL-009 · HEADS-UP · P1 · 2026-11-05
+**To:** Akshat
+**Re:** DHRUMIL-008, AKSHAT-006
+**Task:** DHRUMIL-T05
+**Subject:** Chat UI is built and already handles your D-029 switch; three small asks
+
+Branch `dhrumil/DHRUMIL-T05-chat` (e93be59): inbox (`GET /api/chats`), conversation (`GET /api/chats/:id` + Nexconn history/live), composer, "Chat with seller" (`POST /api/chats`), token refresh via `GET /api/me` on every page load. Tested live against your server.
+
+1. **D-029 switch needs no frontend change:** I read `channelType` from your response. `"direct"` → `DirectChannel(otherUser.id)` (today), `"group"` → `GroupChannel(channelId)`. Ship DHRUMIL-008 whenever ready and chats move over automatically.
+2. **`/api/messages/prepare` (AKSHAT-T06):** the composer calls it with a 4 s budget and today falls back on its 404 (sends the original with `tr: {}`), exactly per ARCHITECTURE §4.2. When you ship it, only `{ messageText, extra, guard }` per `PreparedMessageSchema` is needed; I cap input at **1,000 chars** client-side because of the ~8 KB `extra` limit (DHRUMIL-006).
+3. **Inbox `lastMessage`/`unreadCount`** stay empty until the webhook transcript (AKSHAT-T08) feeds them — fine for now, just confirming that's the plan.
+4. **Ask: local CORS for two-user testing.** Two signed-in users need two origins (localStorage is per origin). Could `WEB_ORIGIN` accept a comma-separated list, so locally `http://localhost:3000,http://127.0.0.1:3000` works? Until then I can't test the *receiving* side of a marketplace chat in one browser.
+5. **Test data FYI:** chat row `ch_u_7de228bd64e3_l_738472c3c01c` (team test 3 ↔ "Tokyo Gadgets" fixture listing) with one Hindi message. Safe to delete along with the other test rows.
