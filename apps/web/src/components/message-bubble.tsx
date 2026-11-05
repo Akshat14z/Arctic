@@ -7,8 +7,18 @@ import { LANGUAGES } from "@/lib/languages";
 import { localeFor } from "@/lib/format";
 import { parseExtra, pickDisplay } from "@/lib/render";
 
+function resolveAudioUrl(url: string): string {
+  if (url.startsWith("http://") || url.startsWith("https://") || url.startsWith("data:") || url.startsWith("blob:")) {
+    return url;
+  }
+  const base = (process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000").replace(/\/+$/, "");
+  const path = url.startsWith("/") ? url : `/${url}`;
+  return `${base}${path}`;
+}
+
 export function MessageBubble({ message, lang }: { message: ChatMessage; lang: LangCode }) {
   const [showOriginal, setShowOriginal] = useState(false);
+  const [audioError, setAudioError] = useState(false);
   const extra = parseExtra(message.extra);
   const time = new Date(message.sentAt).toLocaleTimeString(localeFor(lang), { hour: "numeric", minute: "2-digit" });
 
@@ -31,7 +41,32 @@ export function MessageBubble({ message, lang }: { message: ChatMessage; lang: L
           message.mine ? "rounded-br-md bg-brand text-brand-fg" : "rounded-bl-md border border-border bg-surface"
         }`}
       >
-        {shown.text}
+        {extra?.kind === "voice_note" && (
+          <div className="mb-1 flex items-center gap-1.5 text-xs font-semibold opacity-90">
+            <span>🎙️</span>
+            <span>Voice Memo</span>
+            {extra.audioDurationSec ? <span>({extra.audioDurationSec}s)</span> : null}
+          </div>
+        )}
+        {extra?.kind === "voice_note" && extra.audioUrl && (
+          <div className="my-1.5">
+            {audioError ? (
+              <p className="text-xs text-danger">Audio unavailable</p>
+            ) : (
+              <audio
+                src={resolveAudioUrl(extra.audioUrl)}
+                controls
+                preload="metadata"
+                className="h-8 max-w-[220px]"
+                onError={(e) => {
+                  console.warn("[Voice] Audio playback failed:", e);
+                  setAudioError(true);
+                }}
+              />
+            )}
+          </div>
+        )}
+        <div>{shown.text}</div>
       </div>
       <div className="flex items-center gap-2 px-1 text-xs text-muted">
         <time dateTime={new Date(message.sentAt).toISOString()}>{time}</time>

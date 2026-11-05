@@ -70,6 +70,12 @@ function toChatMessage(m: Message): ChatMessage | null {
 /** Initializes once per App Key, then connects. Resolves to our user id (= Nexconn user id, C2). */
 export async function connect({ appKey, token, area }: NexconnCredentials): Promise<string> {
   if (initializedKey !== appKey) {
+    try {
+      const { NCCallEngine } = await import("@nexconn/call");
+      NCCallEngine.install();
+    } catch (e) {
+      console.warn("[NexConn] Call engine install skipped:", e);
+    }
     NCEngine.initialize({
       appKey,
       areaCode: AreaCode[area as keyof typeof AreaCode] ?? AreaCode.SG,

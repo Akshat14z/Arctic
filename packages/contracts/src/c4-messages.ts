@@ -30,12 +30,14 @@ export type SystemEvent = z.infer<typeof SystemEventSchema>;
 
 export const HandshakeExtraV1Schema = z.object({
   v: z.literal(1),
-  kind: z.enum(['text', 'deal_card', 'system']),
+  kind: z.enum(['text', 'deal_card', 'system', 'voice_note']),
   orig: z.object({
     lang: LangCodeSchema,
     text: z.string(),
   }),
   tr: z.record(LangCodeSchema, z.string()),
+  audioUrl: z.string().optional(),
+  audioDurationSec: z.number().optional(),
   guard: z
     .object({
       issues: z.array(GuardIssueSchema),

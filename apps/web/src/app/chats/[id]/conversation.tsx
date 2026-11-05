@@ -7,6 +7,7 @@ import { ChatDetailResponseSchema, type ChatDetailResponse } from "@convocart/co
 import { api, ApiError, friendlyMessage } from "@/lib/api/client";
 import { formatPrice } from "@/lib/format";
 import type { ChannelRef } from "@/lib/nexconn";
+import { startAudioCall } from "@/lib/nexconn/call";
 import { useRequireSession } from "@/lib/use-require-session";
 import { ChatThread } from "@/components/chat-thread";
 import { GetHelp } from "@/components/get-help";
@@ -73,7 +74,25 @@ export function Conversation() {
             <span lang={chat.listing.lang}>{chat.listing.title}</span> · {formatPrice(chat.listing.price, session.user.language)}
           </Link>
         </div>
-        <GetHelp channelId={chat.channelId} token={session.sessionToken} />
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => {
+              if (other) {
+                startAudioCall(other.id, other.displayName, session.user.displayName).catch((err) => {
+                  console.error("Start call failed:", err);
+                  alert(err?.message || "Could not place call. Check your microphone and connection.");
+                });
+              }
+            }}
+            title={`Call ${other.displayName}`}
+            className="flex min-h-tap items-center gap-1.5 rounded-full border border-border bg-surface px-3 py-1.5 text-xs font-semibold hover:bg-surface-elevated active:scale-95 transition"
+          >
+            <span>📞</span>
+            <span>Call</span>
+          </button>
+          <GetHelp channelId={chat.channelId} token={session.sessionToken} />
+        </div>
       </header>
 
       <ChatThread

@@ -63,7 +63,7 @@ Message:
 ${text}`;
 
   const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 2500); // 2.5s budget
+  const timeoutId = setTimeout(() => controller.abort(), 7000); // 7s budget for WAN Gemini calls
 
   try {
     const response = await fetch(url, {
@@ -106,6 +106,8 @@ function translateWithFallback(text: string, from: LangCode, to: LangCode): stri
   return `[${LANG_LABELS[to]}] ${text}`;
 }
 
+const TRANSLATION_CACHE = new Map<string, string>();
+
 /**
  * Main translation function with automatic failover and budget control.
  * Follows ARCHITECTURE §4.2: "Degrade, never block".
@@ -115,19 +117,27 @@ export async function translateText(text: string, from: LangCode, to: LangCode):
     return text;
   }
 
+  const cacheKey = `${from}:${to}:${text.trim().toLowerCase()}`;
+  if (TRANSLATION_CACHE.has(cacheKey)) {
+    return TRANSLATION_CACHE.get(cacheKey)!;
+  }
+
   const config = getConfig();
 
   // In test environment, use fast offline translation unless in live dev/production
   if (config.NODE_ENV !== 'test' && config.LLM_API_KEY) {
     try {
-      return await translateWithGemini(text, from, to, config.LLM_API_KEY, config.LLM_MODEL);
+      const translated = await translateWithGemini(text, from, to, config.LLM_API_KEY, config.LLM_MODEL);
+      TRANSLATION_CACHE.set(cacheKey, translated);
+      return translated;
     } catch (err) {
       console.warn(`[Translation] Gemini call failed or timed out (${from}->${to}):`, err instanceof Error ? err.message : err);
       // Fallback to local translation
     }
   }
 
-  return translateWithFallback(text, from, to);
+  const fallback = translateWithFallback(text, from, to);
+  return fallback;
 }
 
 /**
