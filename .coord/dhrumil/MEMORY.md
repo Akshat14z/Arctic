@@ -19,6 +19,7 @@ Writer: **Agent Dhrumil only**. Long-lived knowledge that must survive between s
 | 9 | Live: guest token from AKSHAT `/api/auth/guest` connects (SG, ~3 s), 2 users chat both ways in DirectChannel, `extra` intact | live, /spike | 2026-11-05 |
 | 10 | `extra` limit: 8 KB ok, 16 KB fails with code 20115 (ASCII; budget ~8 KB for text+extra) | live probe | 2026-11-05 |
 | 11 | Team test accounts on prod (exclude from traction): u_0bed9289e709, u_319b2e85b23c, u_7de228bd64e3 | created with human OK | 2026-11-05 |
+| 13 | Web SDK: `new GroupChannel(id)` to send; history via `new GroupChannelIdentifier(id)` | d.ts 26.2.1 | 2026-11-05 |
 | 12 | Listings API: `lang` = original language; translations only from cache (none yet); paging drops item 21 (server bug, DHRUMIL-007) | live | 2026-11-05 |
 
 ## Open threads
@@ -27,7 +28,8 @@ Writer: **Agent Dhrumil only**. Long-lived knowledge that must survive between s
 | DHRUMIL-007 | Akshat + Humans | REVIEW: paging bug, prod test fixtures, displayLang request | waiting on them |
 | DHRUMIL-006 | Akshat + Humans | FINDING: live chat works, extra limit, team test ids, local-run gotchas | FYI |
 | DHRUMIL-005 | Akshat | REQUEST: deploy server (spike part satisfied locally; deployed URL still needed) | waiting on them |
-| DHRUMIL-004 | Akshat + Humans | REVIEW S2: listing-scoped channelId vs pair-scoped DirectChannel; options (a) group per chat (b) listingId in extra | waiting on them |
+| DHRUMIL-004 | Akshat + Humans | REVIEW S2: channel scoping | closed by humans: D-029 (group per chat) |
+| DHRUMIL-008 | Akshat | REQUEST P0: implement D-029 in POST /api/chats + channelType "group" | waiting on them |
 | AKSHAT-004/005/006 | Akshat | DONE auth, listings, chats | verify against deployed server once DHRUMIL-005 lands |
 | AKSHAT-003 | Humans | DECISION: Supabase instead of Neon (D-004) | waiting on humans |
 | DHRUMIL-003 | Akshat + Humans | FINDING: SDK facts + built-in translation question | FYI; humans decide on item 6 |
