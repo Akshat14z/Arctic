@@ -147,3 +147,19 @@ Branch `dhrumil/DHRUMIL-T05-chat` (e93be59): inbox (`GET /api/chats`), conversat
 3. **Inbox `lastMessage`/`unreadCount`** stay empty until the webhook transcript (AKSHAT-T08) feeds them — fine for now, just confirming that's the plan.
 4. **Ask: local CORS for two-user testing.** Two signed-in users need two origins (localStorage is per origin). Could `WEB_ORIGIN` accept a comma-separated list, so locally `http://localhost:3000,http://127.0.0.1:3000` works? Until then I can't test the *receiving* side of a marketplace chat in one browser.
 5. **Test data FYI:** chat row `ch_u_7de228bd64e3_l_738472c3c01c` (team test 3 ↔ "Tokyo Gadgets" fixture listing) with one Hindi message. Safe to delete along with the other test rows.
+
+### DHRUMIL-010 · REQUEST · P1 · 2026-11-05
+**To:** Akshat
+**Task:** AKSHAT-T07 (unblocks DHRUMIL-T06 live, DHRUMIL-T07)
+**Subject:** What the "Get help" UI expects from the cases API (C6) — built against a mock that follows it
+
+DHRUMIL-T06 is on `dhrumil/DHRUMIL-T06-get-help` (547d055), against a per-route mock of `/api/cases*` only (everything else hits your real server). When you build AKSHAT-T07, these behaviours are what the UI relies on:
+
+1. **`POST /api/cases {channelId, reason, note?}` is idempotent per chat:** if the chat already has a case that isn't `resolved`, return that case (200) instead of creating another. Users tap "Get help" twice.
+2. **`case.groupChannelId` is a real Nexconn group** with buyer + seller as members when the response returns (the UI immediately opens `GroupChannel(groupChannelId)` and sends to it). Same `createGroupChannel` call as D-029.
+3. **`GET /api/cases/:id` works for the case's buyer and seller** (not just agents) — the case page polls it every 5 s for `status`, `agent`, `slaDueAt`, `resolution` until `resolved`. `transcript`/`summary` can be empty for non-agents if you prefer; I don't render them on the user side. 403 for anyone else.
+4. **System messages** (`case_opened`, `case_claimed`, `case_resolved`) as text messages whose `extra` is `HandshakeExtraV1` with `kind: "system"` and `system.text` in **each member's language** (at least `en`); the UI renders them centred, using `system.text[myLang] ?? system.text.en`.
+5. **`note`** (max 1,000) should reach the agent (summary or case detail) — users explain the problem there.
+6. **Nice to have:** `openCaseId?: string` on `ChatDetailResponse`, so the chat header can show "Help requested · View" instead of only "Get help".
+
+When it's live, tell me and I'll delete the `NOT_LIVE` entry in `apps/web/src/lib/api/client.ts` and the cases mock.
