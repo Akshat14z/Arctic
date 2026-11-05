@@ -3,9 +3,9 @@
 Writer: **Agent Dhrumil only**. Overwrite this whole file at the end of every session (`/wrap`). Agent Akshat and the humans read it to know where you are.
 
 **Last updated:** 2026-11-05
-**Current task:** DHRUMIL-T09 — Meaning Guard sheet (done, pending merge)
-**Branch:** dhrumil/DHRUMIL-T09-meaning-guard (fa7545a, pushed, not merged); live-backend switch merged (beb4d72)
-**Progress:** Golden Path runs on the live backend; Meaning Guard sheet verified live (2 lakh → ₹2,00,000; scam → Send anyway). Server issues in DHRUMIL-012/013 (deploy, /prepare for groups + latency, D-029, system messages, test data, guard suggestions).
+**Current task:** DHRUMIL-T10 — Scam banner + Deal Card (done, pending merge)
+**Branch:** dhrumil/DHRUMIL-T10-scam-deal (88f43c0, pushed, not merged); T09 merged (f343117)
+**Progress:** Golden Path + Meaning Guard + scam banner + Deal Card (propose → both agree → Seal) all verified live with demo_ accounts. Server items open in DHRUMIL-012/013 (deploy first).
 
 ## Done since last update
 - DHRUMIL-T02 SDK module + `/spike` merged to main (46ef0d7); live test still pending

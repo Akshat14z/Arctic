@@ -29,6 +29,7 @@ Writer: **Agent Dhrumil only**. Long-lived knowledge that must survive between s
 | DHRUMIL-006 | Akshat + Humans | FINDING: live chat works, extra limit, team test ids, local-run gotchas | FYI |
 | DHRUMIL-005 | Akshat | REQUEST: deploy server (spike part satisfied locally; deployed URL still needed) | waiting on them |
 | DHRUMIL-004 | Akshat + Humans | REVIEW S2: channel scoping | closed by humans: D-029 (group per chat) |
+| DHRUMIL-014 | Akshat | HEADS-UP: client posts deal_card messages; scam banner; item.ja fallback | FYI |
 | DHRUMIL-013 | Akshat + Humans | FINDING: placeholder LLM key → 4 s prepare drops guard; ₹2 lakh suggestion loop; suggestion semantics | waiting on them |
 | DHRUMIL-012 | Akshat + Humans | REVIEW P0: deploy, /prepare groups + latency, D-029, system msgs, prod test data, displayLang, traction exclusions, LLM key | waiting on them |
 | DHRUMIL-011 | Akshat | REQUEST: queue order, claim idempotent/409, resolve owner-only, agent summary lang + shownTo both sides | closed by AKSHAT-008 (system msgs → DHRUMIL-012 #5) |
@@ -42,6 +43,8 @@ Writer: **Agent Dhrumil only**. Long-lived knowledge that must survive between s
 | DHRUMIL-001 | Akshat + Humans | REVIEW of AKSHAT-T01 | closed (S1 + tsbuildinfo fixed in AKSHAT-002; D-028) |
 
 ## Gotchas & lessons
+- Deals: server never sends Nexconn messages; the web sends `deal_card` messages after extract/agree and renders only the latest per deal.id.
+- `next start` on :3001 serves the build from when it started — restart web-prod after every `next build`.
 - Local server: start with `LLM_API_KEY=` (empty) or every /prepare waits ~4 s on Gemini with the placeholder key and the guard is lost (launch.json server config does this).
 - Guard rules are English regexes; demo with English price phrasing ("I can pay 2 lakh for it").
 - Two users locally: dev web on :3000 + `next start -p 3001` (launch.json `web-prod`), server with `WEB_ORIGIN=http://localhost:3000,http://localhost:3001`. Don't use `allowedDevOrigins` (Next 16.4.3 reload loop).
@@ -125,3 +128,8 @@ Writer: **Agent Dhrumil only**. Long-lived knowledge that must survive between s
 - Did: DHRUMIL-T09 Meaning Guard sheet (branch fa7545a), verified live: 2 lakh → ₹2,00,000, WhatsApp → scam sheet → Send anyway; DHRUMIL-013.
 - AI tools used: Claude Code (Claude Opus 5.5) for guard UI, live tests, root-causing /prepare latency.
 - Next: merge T09; DHRUMIL-T10 scam banner + Deal Card.
+
+### 2026-11-05 · session 4c
+- Did: DHRUMIL-T10 scam banner + Deal Card (branch 88f43c0): proposed, agreed by both, sealed live; DHRUMIL-014.
+- AI tools used: Claude Code (Claude Opus 5.5) for deal UI, live two-user tests.
+- Next: merge T10; then DHRUMIL-T11 judge sandbox (demo session API is live) or T15 Seal page.

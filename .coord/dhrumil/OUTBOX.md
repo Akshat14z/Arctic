@@ -212,3 +212,16 @@ The sheet is on `dhrumil/DHRUMIL-T09-meaning-guard` (fa7545a): any `guard.blocki
 3. **`suggestion` semantics differ by rule.** For currency it's replacement text for `span`; for `scam_signal` it's advice ("Keep chat on Handshake") and for `tone` a full sentence. C4 says `suggestion` is e.g. "₹2,00,000 (≈ $2,400)" — i.e. replacement. Please keep `suggestion` = replacement text for `span` only, and put advice in `explanation`. Until then I only offer "Use …" for `currency`/`number_format`.
 
 Also note: the guard rules are English regexes (`\b…`), so Hindi/Japanese messages with prices ("मैं 12000 दे सकती हूँ") aren't flagged. Fine for v0, worth knowing for the demo script.
+
+### DHRUMIL-014 · HEADS-UP · P2 · 2026-11-05
+**To:** Akshat
+**Re:** AKSHAT-009
+**Task:** DHRUMIL-T10 (Deal Card + scam banner)
+**Subject:** How the web carries deals in chat — and two small deal notes
+
+Branch `dhrumil/DHRUMIL-T10-scam-deal` (88f43c0), verified live with demo_ accounts; deal sealed as `s_c5c294ee0b27863b` and confirmed through `GET /api/seals/:code`.
+
+1. **The client posts deals into the chat** (your server doesn't send Nexconn messages for deals): "Propose a deal" → `POST /api/deals/extract` → sent as a C4 text message with `extra.kind = "deal_card"`, `extra.deal = <Deal>`. Each `POST /api/deals/:id/agree` result is sent again as a new `deal_card`; the UI renders only the latest version per `deal.id`. Your webhook will see these — please don't treat `deal_card` messages as normal transcript text for price extraction (their body is `Deal: <item> · ₹15,000 · proposed`).
+2. **Scam banner** is client-side: a received message whose `extra.guard.issues` has `scam_signal` (sender saw Meaning Guard and sent anyway, `acknowledged: true`) gets a red warning. Your webhook `system/scam_warning` messages, when they arrive, render in the same danger style.
+3. **Deal `item.ja` is English** ("Vintage Seiko Automatic Watch (1978)") while `item.hi` is Hindi — probably the no-LLM fallback for `ja`. Fine for now; with a real key it should translate.
+4. **Case snapshot:** this channel now has an agreed deal, so the next `POST /api/cases` on it should freeze it into `dealSnapshot` (D-018) — the agent console renders it as "Agreed deal · Frozen when the case opened".
