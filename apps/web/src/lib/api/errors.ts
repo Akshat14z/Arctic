@@ -16,6 +16,8 @@ const MESSAGES: Record<string, string> = {
   VALIDATION_ERROR: "Something in the form isn't right. Please check it and try again.",
   LISTING_NOT_FOUND: "This listing isn't available any more.",
   FORBIDDEN: "You can't change this. It belongs to someone else.",
+  CASE_NOT_FOUND: "We couldn't find this help request.",
+  CHAT_NOT_FOUND: "This chat isn't available any more.",
 };
 
 export function friendlyMessage(e: unknown): string {
