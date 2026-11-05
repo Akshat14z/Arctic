@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import Link from "next/link";
 import { Geist } from "next/font/google";
+import { HtmlLang } from "./html-lang";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -22,9 +23,10 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    // ponytail: lang is "en" until onboarding (DHRUMIL-T03) knows the user's language.
+    // "en" in the static HTML; HtmlLang switches it to the user's language after hydration.
     <html lang="en" className={`${geistSans.variable} h-full antialiased`}>
       <body className="flex min-h-full flex-col font-sans">
+        <HtmlLang />
         <header className="border-b border-border bg-surface">
           <div className="mx-auto flex h-14 w-full max-w-2xl items-center px-4">
             <Link href="/" className="flex min-h-tap items-center text-lg font-semibold tracking-tight">
