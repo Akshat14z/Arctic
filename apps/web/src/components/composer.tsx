@@ -1,9 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { PreparedMessageSchema, type HandshakeExtraV1, type LangCode } from "@convocart/contracts";
+import { PreparedMessageSchema, type LangCode, type PreparedMessage } from "@convocart/contracts";
 import { api } from "@/lib/api/client";
 import { sendText, type ChannelRef, type ChatMessage } from "@/lib/nexconn";
+import { GuardSheet } from "./guard-sheet";
 
 // `extra` must stay under ~8 KB (DHRUMIL-006); Indic text is ~3 bytes/char and `tr` repeats it per language.
 const MAX = 1000;
@@ -19,8 +20,12 @@ type Props = {
 };
 
 /** Translation + Meaning Guard via /prepare; if it fails or is slow, send the original anyway (ARCHITECTURE §4.2). */
-async function prepare(channelId: string, text: string, lang: LangCode, token: string) {
-  const fallback = { messageText: text, extra: { v: 1, kind: "text", orig: { lang, text }, tr: {} } satisfies HandshakeExtraV1 };
+async function prepare(channelId: string, text: string, lang: LangCode, token: string): Promise<PreparedMessage> {
+  const fallback: PreparedMessage = {
+    messageText: text,
+    extra: { v: 1, kind: "text", orig: { lang, text }, tr: {} },
+    guard: { issues: [], blocking: false },
+  };
   try {
     const timeout = new Promise<null>((r) => setTimeout(() => r(null), PREPARE_BUDGET_MS));
     const call = api("/api/messages/prepare", {
@@ -29,7 +34,6 @@ async function prepare(channelId: string, text: string, lang: LangCode, token: s
       token,
       schema: PreparedMessageSchema,
     });
-    // ponytail: guard.blocking is ignored until the Meaning Guard sheet (DHRUMIL-T09) exists.
     return (await Promise.race([call, timeout])) ?? fallback;
   } catch {
     return fallback;
@@ -40,25 +44,50 @@ export function Composer({ channel, channelId, lang, token, disabled, onSent }: 
   const [draft, setDraft] = useState("");
   const [sending, setSending] = useState(false);
   const [failed, setFailed] = useState(false);
+  const [held, setHeld] = useState<PreparedMessage | null>(null); // waiting on the Meaning Guard sheet
   const text = draft.trim();
+
+  async function deliver(prepared: PreparedMessage, acknowledged: boolean) {
+    const extra = acknowledged ? { ...prepared.extra, guard: { issues: prepared.guard.issues, acknowledged: true } } : prepared.extra;
+    try {
+      onSent(await sendText(channel, prepared.messageText, JSON.stringify(extra)));
+      setDraft("");
+    } catch {
+      setFailed(true); // keep the draft so nothing is lost
+    }
+  }
 
   async function send() {
     if (!text || sending || disabled) return;
     setSending(true);
     setFailed(false);
-    try {
-      const { messageText, extra } = await prepare(channelId, text, lang, token);
-      onSent(await sendText(channel, messageText, JSON.stringify(extra)));
-      setDraft("");
-    } catch {
-      setFailed(true); // keep the draft so nothing is lost
-    } finally {
-      setSending(false);
-    }
+    const prepared = await prepare(channelId, text, lang, token);
+    if (prepared.guard.blocking) setHeld(prepared);
+    else await deliver(prepared, false);
+    setSending(false);
   }
 
   return (
     <div className="flex flex-col gap-1 border-t border-border bg-bg pt-3">
+      {held && (
+        <GuardSheet
+          text={held.messageText}
+          issues={held.guard.issues}
+          lang={lang}
+          onEdit={() => setHeld(null)}
+          onUseSuggestion={(span, suggestion) => {
+            setDraft((d) => d.replace(span, suggestion));
+            setHeld(null);
+          }}
+          onSendAnyway={async () => {
+            const p = held;
+            setHeld(null);
+            setSending(true);
+            await deliver(p, true);
+            setSending(false);
+          }}
+        />
+      )}
       {failed && (
         <p role="alert" className="text-sm text-danger">
           Couldn&apos;t send. Check your connection and tap Send again.
