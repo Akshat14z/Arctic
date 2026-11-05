@@ -90,6 +90,11 @@ export function Conversation() {
         channel={channel}
         channelId={chat.channelId}
         emptyText={`Say hello. ${other.displayName} reads your messages in their own language.`}
+        deals={{
+          myRole: chat.buyerId === me ? "buyer" : "seller",
+          names: { buyer: chat.buyer.displayName, seller: chat.seller.displayName },
+          canPropose: true,
+        }}
       />
     </section>
   );
