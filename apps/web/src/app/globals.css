@@ -1,63 +1,50 @@
+/* Hallmark · shape: Narrative Workflow (draw 661f1a, swapped from Stat-Led: no user numbers) · genre: editorial · theme: Newsprint (deal 3/3, seed marketplace-chat-where-buyers-88b4·9ab74f42·2026-11-05·r0) · redesign: full
+ * hero: Stage (/), swapped from Corridor: the signature is a picture · nav: banner over a retracting bar · footer: colophon block · imagery: screenshots (capture.mjs) · signature: the same message on two screens, Hindi and Japanese, ₹2,00,000 on both
+ * axes: light/slab-serif/warm · posture: restrained · contrast: pass · fold: pass · job: try · v2.0.0 */
+/* Hallmark · pre-emit critique: P4 H4 E4 S5 R4 V5 · weakest: E, the app screens keep their Tailwind layout until the app pass; the old token names map onto Newsprint and radii square off meanwhile */
 @import "tailwindcss";
+@import "./tokens.css";
+@import "./base.css" layer(base);
 
-/* Design tokens. Use the Tailwind names (bg-surface, text-muted, …), never raw colors. */
+/* Page-level tokens on top of Newsprint: next/font's generated families, Indic + Japanese fallbacks
+   (Zilla Slab and Spectral are Latin only), and the state tints the product needs. */
 :root {
-  --bg: #f7f6f3;
-  --surface: #ffffff;
-  --text: #1c1b19;
-  --muted: #5f5c56;
-  --border: #e3dfd8;
-  --brand: #0f766e;
-  --brand-fg: #ffffff;
-  --guard: #92400e; /* Meaning Guard / Tone Guard: clarify, not alarm */
-  --guard-bg: #fef3c7;
-  --danger: #b91c1c; /* scam shield, errors */
-  --danger-bg: #fee2e2;
-  --success: #166534; /* agreed deals, Seal */
-  --success-bg: #dcfce7;
+  --font-display: var(--font-zilla), "Noto Serif Devanagari", "Noto Serif JP", ui-serif, Georgia, serif;
+  --font-body: var(--font-spectral), "Noto Serif", "Noto Serif Devanagari", "Noto Serif Tamil", "Noto Serif Telugu",
+    "Noto Serif Kannada", "Noto Serif Bengali", "Hiragino Mincho ProN", "Noto Serif JP", ui-serif, Georgia, serif;
+  --font-outlier: var(--font-franklin), ui-sans-serif, sans-serif;
+  --color-guard-bg: oklch(91% 0.03 70);
+  --color-danger-bg: oklch(92% 0.035 27);
+  --color-success-bg: oklch(92% 0.035 150);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #121211;
-    --surface: #1c1c1a;
-    --text: #f1efe9;
-    --muted: #a8a49c;
-    --border: #2f2e2b;
-    --brand: #2dd4bf;
-    --brand-fg: #042f2e;
-    --guard: #fcd34d;
-    --guard-bg: #3a2a06;
-    --danger: #fca5a5;
-    --danger-bg: #3b1212;
-    --success: #86efac;
-    --success-bg: #0f2e1a;
-  }
-}
-
+/* The product's Tailwind names, resolved to Newsprint. */
 @theme inline {
-  --color-bg: var(--bg);
-  --color-surface: var(--surface);
-  --color-text: var(--text);
-  --color-muted: var(--muted);
-  --color-border: var(--border);
-  --color-brand: var(--brand);
-  --color-brand-fg: var(--brand-fg);
-  --color-guard: var(--guard);
-  --color-guard-bg: var(--guard-bg);
-  --color-danger: var(--danger);
-  --color-danger-bg: var(--danger-bg);
-  --color-success: var(--success);
-  --color-success-bg: var(--success-bg);
-  /* ponytail: Geist covers Latin only; Indic + Japanese fall back to the OS's Noto/system fonts.
-     Self-host Noto subsets via next/font if a phone renders tofu boxes. */
-  --font-sans: var(--font-geist-sans), "Noto Sans", "Noto Sans Devanagari", "Noto Sans Tamil",
-    "Noto Sans Telugu", "Noto Sans Kannada", "Noto Sans Bengali", "Hiragino Sans", "Noto Sans JP",
-    system-ui, sans-serif;
+  --color-bg: var(--color-paper);
+  --color-surface: var(--color-paper-2);
+  --color-text: var(--color-ink);
+  --color-muted: var(--color-muted);
+  --color-border: var(--color-rule);
+  --color-brand: var(--color-ink);
+  --color-brand-fg: var(--color-paper);
+  --color-accent: var(--color-accent);
+  --color-guard: var(--color-accent);
+  --color-guard-bg: var(--color-guard-bg);
+  --color-danger: var(--color-error);
+  --color-danger-bg: var(--color-danger-bg);
+  --color-success: var(--color-success);
+  --color-success-bg: var(--color-success-bg);
+  --font-sans: var(--font-body);
+  --font-serif: var(--font-body);
+  --font-display: var(--font-display);
+  --font-agate: var(--font-outlier);
   --spacing-tap: 2.75rem; /* 44px minimum tap target: min-h-tap */
+  /* Rules, never rounded boxes (Newsprint). rounded-full stays for chat bubbles and pills. */
+  --radius-xs: 0; --radius-sm: 0; --radius-md: 0; --radius-lg: 0; --radius-xl: 0; --radius-2xl: 0; --radius-3xl: 0;
 }
 
-body {
-  background: var(--bg);
-  color: var(--text);
-}
+/* The landing page brings its own masthead. */
+body:has([data-landing]) [data-app-chrome] { display: none; }
+
+/* Product screenshots are not photographs: no mono treatment. */
+[data-slot][data-kind="product"] > img { filter: none; object-fit: cover; object-position: top center; }
