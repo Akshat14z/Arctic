@@ -18,6 +18,8 @@ const MESSAGES: Record<string, string> = {
   FORBIDDEN: "You can't change this. It belongs to someone else.",
   CASE_NOT_FOUND: "We couldn't find this help request.",
   CHAT_NOT_FOUND: "This chat isn't available any more.",
+  CASE_ALREADY_CLAIMED: "Another agent took this case.",
+  BAD_AGENT_CODE: "That access code isn't right.",
 };
 
 export function friendlyMessage(e: unknown): string {

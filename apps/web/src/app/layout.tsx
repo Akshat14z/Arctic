@@ -45,7 +45,8 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
             </nav>
           </div>
         </header>
-        <main className="mx-auto flex w-full max-w-2xl flex-1 flex-col px-4 py-6">{children}</main>
+        {/* Pages opt into a wide layout (the agent console) with a data-wide root element. */}
+        <main className="mx-auto flex w-full max-w-2xl flex-1 flex-col px-4 py-6 has-[[data-wide]]:max-w-6xl">{children}</main>
       </body>
     </html>
   );
