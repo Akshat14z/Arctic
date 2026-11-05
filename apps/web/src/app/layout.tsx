@@ -36,6 +36,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
               <Link href="/listings" className="flex min-h-tap items-center rounded-lg px-3 hover:bg-bg">
                 Browse
               </Link>
+              <Link href="/chats" className="flex min-h-tap items-center rounded-lg px-3 hover:bg-bg">
+                Chats
+              </Link>
               <Link href="/listings/new" className="flex min-h-tap items-center rounded-lg bg-brand px-3 text-brand-fg">
                 Sell
               </Link>

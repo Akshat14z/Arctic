@@ -1,14 +1,61 @@
 "use client";
 
 import Link from "next/link";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { ListingDetailResponseSchema, type Listing } from "@convocart/contracts";
+import { ChatCreateResponseSchema, ListingDetailResponseSchema, type Listing } from "@convocart/contracts";
 import { api, ApiError, friendlyMessage } from "@/lib/api/client";
 import { formatPrice, localeFor } from "@/lib/format";
 import { LANGUAGES } from "@/lib/languages";
 import { useSession } from "@/lib/session";
 import { DemoBadge } from "@/components/listing-card";
+
+/** Opens (or reuses) the buyer's chat for this listing. Guests sign in first and come back here. */
+function ChatWithSeller({ listingId }: { listingId: string }) {
+  const session = useSession();
+  const router = useRouter();
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function open() {
+    if (!session) {
+      router.push(`/onboarding?next=${encodeURIComponent(`/listings/${listingId}`)}`);
+      return;
+    }
+    setBusy(true);
+    setError(null);
+    try {
+      const chat = await api("/api/chats", {
+        method: "POST",
+        body: { listingId },
+        token: session.sessionToken,
+        schema: ChatCreateResponseSchema,
+      });
+      router.push(`/chats/${encodeURIComponent(chat.channelId)}`);
+    } catch (e) {
+      setError(friendlyMessage(e));
+      setBusy(false);
+    }
+  }
+
+  return (
+    <div className="flex flex-col gap-2">
+      <button
+        type="button"
+        onClick={open}
+        disabled={busy}
+        className="min-h-tap rounded-lg bg-brand px-4 font-medium text-brand-fg disabled:opacity-50"
+      >
+        {busy ? "Opening chat…" : "Chat with seller"}
+      </button>
+      {error && (
+        <p role="alert" className="text-sm text-danger">
+          {error}
+        </p>
+      )}
+    </div>
+  );
+}
 
 export function ListingDetail() {
   const { id } = useParams<{ id: string }>();
@@ -84,6 +131,8 @@ export function ListingDetail() {
       <p lang={listing.lang} className="whitespace-pre-line text-pretty">
         {listing.description}
       </p>
+
+      {!mine && <ChatWithSeller listingId={listing.id} />}
 
       <div className="flex items-center justify-between gap-3 border-t border-border pt-4 text-sm text-muted">
         <span>{mine ? "This is your listing." : listing.seller ? `Sold by ${listing.seller.displayName}` : null}</span>

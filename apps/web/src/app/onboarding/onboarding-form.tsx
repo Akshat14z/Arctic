@@ -26,7 +26,9 @@ export function OnboardingForm() {
   }, [session, router]);
 
   // Default to the browser's preferred language, after mount so server and client markup match.
-  useEffect(() => setLanguage((l) => l ?? preferredLanguage(navigator.languages)), []);
+  useEffect(() => {
+    setLanguage((l) => l ?? preferredLanguage(navigator.languages));
+  }, []);
   const chosen = language ?? "en";
   const displayName = name.trim();
 
