@@ -32,6 +32,14 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
             <Link href="/" className="flex min-h-tap items-center text-lg font-semibold tracking-tight">
               Handshake
             </Link>
+            <nav className="ml-auto flex items-center gap-1 text-sm font-medium">
+              <Link href="/listings" className="flex min-h-tap items-center rounded-lg px-3 hover:bg-bg">
+                Browse
+              </Link>
+              <Link href="/listings/new" className="flex min-h-tap items-center rounded-lg bg-brand px-3 text-brand-fg">
+                Sell
+              </Link>
+            </nav>
           </div>
         </header>
         <main className="mx-auto flex w-full max-w-2xl flex-1 flex-col px-4 py-6">{children}</main>

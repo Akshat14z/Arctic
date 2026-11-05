@@ -14,6 +14,8 @@ const MESSAGES: Record<string, string> = {
   NEXCONN_TOKEN_ERROR: "Chat is having trouble starting. Please try again in a moment.",
   UNAUTHORIZED: "Your session ended. Please sign in again.",
   VALIDATION_ERROR: "Something in the form isn't right. Please check it and try again.",
+  LISTING_NOT_FOUND: "This listing isn't available any more.",
+  FORBIDDEN: "You can't change this. It belongs to someone else.",
 };
 
 export function friendlyMessage(e: unknown): string {
