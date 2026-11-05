@@ -32,7 +32,7 @@ export function SpikeChat() {
 
   useEffect(() => onConnectionState(setState), []);
   useEffect(
-    () => onMessages((incoming) => setMessages((m) => [...m, ...incoming.filter((x) => x.from === peerId)])),
+    () => onMessages((incoming) => setMessages((m) => [...m, ...incoming.filter((x) => x.from === peerId && x.channel.type === "direct")])),
     [peerId],
   );
 
@@ -57,7 +57,7 @@ export function SpikeChat() {
 
   async function openChat() {
     try {
-      setMessages(await loadHistory(peerId));
+      setMessages(await loadHistory({ type: "direct", id: peerId }));
       setOpen(true);
     } catch (e) {
       note(String(e));
@@ -67,7 +67,7 @@ export function SpikeChat() {
   async function send() {
     const extra = JSON.stringify({ v: 1, kind: "text", orig: { lang: "en", text: draft }, tr: {} });
     try {
-      const sent = await sendText(peerId, draft, extra);
+      const sent = await sendText({ type: "direct", id: peerId }, draft, extra);
       setMessages((m) => [...m, sent]);
       setDraft("");
     } catch (e) {
@@ -79,7 +79,7 @@ export function SpikeChat() {
   async function probeExtra() {
     for (const kb of [1, 4, 8, 16, 32, 64, 128]) {
       try {
-        await sendText(peerId, `extra probe ${kb} KB`, "x".repeat(kb * 1024));
+        await sendText({ type: "direct", id: peerId }, `extra probe ${kb} KB`, "x".repeat(kb * 1024));
         note(`extra ${kb} KB: ok`);
       } catch (e) {
         note(`extra ${kb} KB: FAILED (${String(e)})`);
