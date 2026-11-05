@@ -3,7 +3,7 @@
 Writer: **Agent Dhrumil only**. Long-lived knowledge that must survive between sessions. Keep it tidy: update facts in place, but append to the session log.
 
 ## Last read of Agent Akshat's outbox
-`AKSHAT-006` ← update to the last message ID you read (e.g. `AKSHAT-012`) at the end of every `/start`.
+`AKSHAT-009` ← update to the last message ID you read (e.g. `AKSHAT-012`) at the end of every `/start`.
 
 ## Verified facts (SDK behavior, APIs, limits, gotchas)
 | # | Fact | How verified | Date |
@@ -29,8 +29,9 @@ Writer: **Agent Dhrumil only**. Long-lived knowledge that must survive between s
 | DHRUMIL-006 | Akshat + Humans | FINDING: live chat works, extra limit, team test ids, local-run gotchas | FYI |
 | DHRUMIL-005 | Akshat | REQUEST: deploy server (spike part satisfied locally; deployed URL still needed) | waiting on them |
 | DHRUMIL-004 | Akshat + Humans | REVIEW S2: channel scoping | closed by humans: D-029 (group per chat) |
-| DHRUMIL-011 | Akshat | REQUEST: queue order, claim idempotent/409, resolve owner-only, agent summary lang + shownTo both sides | waiting on them |
-| DHRUMIL-010 | Akshat | REQUEST: cases API behaviours for Get help (idempotent, real group, user GET, system msgs, note, openCaseId) | waiting on them |
+| DHRUMIL-012 | Akshat + Humans | REVIEW P0: deploy, /prepare groups + latency, D-029, system msgs, prod test data, displayLang, traction exclusions, LLM key | waiting on them |
+| DHRUMIL-011 | Akshat | REQUEST: queue order, claim idempotent/409, resolve owner-only, agent summary lang + shownTo both sides | closed by AKSHAT-008 (system msgs → DHRUMIL-012 #5) |
+| DHRUMIL-010 | Akshat | REQUEST: cases API behaviours for Get help (idempotent, real group, user GET, system msgs, note, openCaseId) | closed by AKSHAT-008 (system msgs → DHRUMIL-012 #5) |
 | DHRUMIL-009 | Akshat | HEADS-UP: chat UI ready for D-029; asks: prepare shape, lastMessage via T08, CORS list | waiting on them (#4) |
 | DHRUMIL-008 | Akshat | REQUEST P0: implement D-029 in POST /api/chats + channelType "group" | waiting on them |
 | AKSHAT-004/005/006 | Akshat | DONE auth, listings, chats | verify against deployed server once DHRUMIL-005 lands |
@@ -40,6 +41,8 @@ Writer: **Agent Dhrumil only**. Long-lived knowledge that must survive between s
 | DHRUMIL-001 | Akshat + Humans | REVIEW of AKSHAT-T01 | closed (S1 + tsbuildinfo fixed in AKSHAT-002; D-028) |
 
 ## Gotchas & lessons
+- Two users locally: dev web on :3000 + `next start -p 3001` (launch.json `web-prod`), server with `WEB_ORIGIN=http://localhost:3000,http://localhost:3001`. Don't use `allowedDevOrigins` (Next 16.4.3 reload loop).
+- Demo sign-in for tests: `POST /api/demo/session {as: buyer|seller|agent}` → fixed demo_ users (Priya hi, Kenji ja, Sarah en). No new accounts.
 - One origin = one session: signing in as an agent replaces the user session in that browser (the sign-in page says so).
 - Wide pages: put `data-wide` on the page root; `<main>` widens via `has-[[data-wide]]:max-w-6xl`.
 - Per-route mocks: `NOT_LIVE` prefixes in `lib/api/client.ts` go to `mocks/api.ts` even when the real server is set.
@@ -108,3 +111,9 @@ Writer: **Agent Dhrumil only**. Long-lived knowledge that must survive between s
 - Did: DHRUMIL-T07 agent console (branch 2ae6e6a): sign-in (real), queue, claim, case view with summary/deal/"what each side saw", resolve; DHRUMIL-011.
 - AI tools used: Claude Code (Claude Opus 5.5) for console UI, mock, end-to-end browser test.
 - Next: merge T07; then DHRUMIL-T08 Golden Path polish once AKSHAT-T06/T07/T08 + deploy land.
+
+### 2026-11-05 · session 4
+- Did: pulled AKSHAT-T06…T15; removed all web mocks + openCaseId header (branch fa40e03); full live Golden Path with demo_ accounts on two origins; DHRUMIL-012 REVIEW.
+- Learned: /prepare 404s for case groups and takes ~4 s; no system messages; prod DB full of test cases; allowedDevOrigins loop.
+- AI tools used: Claude Code (Claude Opus 5.5) for integration, live two-user testing, review.
+- Next: merge live-backend branch; DHRUMIL-T09 Meaning Guard sheet (guard.blocking now real); DHRUMIL-T08 polish once deployed.
