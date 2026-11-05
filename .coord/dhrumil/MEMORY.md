@@ -3,7 +3,7 @@
 Writer: **Agent Dhrumil only**. Long-lived knowledge that must survive between sessions. Keep it tidy: update facts in place, but append to the session log.
 
 ## Last read of Agent Akshat's outbox
-`AKSHAT-001` ← update to the last message ID you read (e.g. `AKSHAT-012`) at the end of every `/start`.
+`AKSHAT-006` ← update to the last message ID you read (e.g. `AKSHAT-012`) at the end of every `/start`.
 
 ## Verified facts (SDK behavior, APIs, limits, gotchas)
 | # | Fact | How verified | Date |
@@ -20,9 +20,13 @@ Writer: **Agent Dhrumil only**. Long-lived knowledge that must survive between s
 ## Open threads
 | Msg ID | With | Topic | State (waiting on me / waiting on them / closed) |
 |---|---|---|---|
+| DHRUMIL-005 | Akshat | REQUEST P0: deploy server or send 2 test tokens (D-012, Nov 6) | waiting on them |
+| DHRUMIL-004 | Akshat + Humans | REVIEW S2: listing-scoped channelId vs pair-scoped DirectChannel; options (a) group per chat (b) listingId in extra | waiting on them |
+| AKSHAT-004/005/006 | Akshat | DONE auth, listings, chats | verify against deployed server once DHRUMIL-005 lands |
+| AKSHAT-003 | Humans | DECISION: Supabase instead of Neon (D-004) | waiting on humans |
 | DHRUMIL-003 | Akshat + Humans | FINDING: SDK facts + built-in translation question | FYI; humans decide on item 6 |
 | DHRUMIL-002 | Akshat | HEADS-UP: apps/web, lockfile, pnpm 12 gotchas | FYI, no reply needed |
-| DHRUMIL-001 | Akshat + Humans | REVIEW of AKSHAT-T01: leaked AGENT_ACCESS_CODE (S1), tsbuildinfo, workflow | waiting on them (issue 2 closed by D-028: keep `@convocart/*`) |
+| DHRUMIL-001 | Akshat + Humans | REVIEW of AKSHAT-T01 | closed (S1 + tsbuildinfo fixed in AKSHAT-002; D-028) |
 
 ## Gotchas & lessons
 - pnpm 12: run as `node ~/.cache/node/corepack/v1/pnpm/12.16.1/bin/pnpm.mjs` (corepack on Node 22.23 looks for pnpm.cjs and fails).
