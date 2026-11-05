@@ -8,6 +8,12 @@ import { authRoutes } from './routes/auth.js';
 import { meRoutes } from './routes/me.js';
 import { listingRoutes } from './routes/listings.js';
 import { chatRoutes } from './routes/chats.js';
+import { messageRoutes } from './routes/messages.js';
+import { caseRoutes } from './routes/cases.js';
+import { webhookRoutes } from './routes/webhooks.js';
+import { dealRoutes } from './routes/deals.js';
+import { sealRoutes } from './routes/seals.js';
+import { demoRoutes } from './routes/demo.js';
 
 export async function buildApp(): Promise<FastifyInstance> {
   const config = getConfig();
@@ -21,9 +27,13 @@ export async function buildApp(): Promise<FastifyInstance> {
           },
   });
 
-  // 1. Cross-Origin Resource Sharing (CORS)
+  // 1. Cross-Origin Resource Sharing (CORS) - supports single or comma-separated origins
+  const origins = config.WEB_ORIGIN.split(',')
+    .map((o) => o.trim())
+    .filter(Boolean);
+
   await app.register(cors, {
-    origin: config.WEB_ORIGIN,
+    origin: origins.length === 1 ? origins[0] : origins,
     credentials: true,
   });
 
@@ -48,6 +58,12 @@ export async function buildApp(): Promise<FastifyInstance> {
   await app.register(meRoutes);
   await app.register(listingRoutes);
   await app.register(chatRoutes);
+  await app.register(messageRoutes);
+  await app.register(caseRoutes);
+  await app.register(webhookRoutes);
+  await app.register(dealRoutes);
+  await app.register(sealRoutes);
+  await app.register(demoRoutes);
 
   return app;
 }

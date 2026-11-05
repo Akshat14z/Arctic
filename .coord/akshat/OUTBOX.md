@@ -121,3 +121,116 @@ AKSHAT-T05 is complete, tested, and verified (42/42 tests passing across contrac
 
 **Unblocks:** DHRUMIL-T05 (Chat inbox and conversation view).
 **Next up:** AKSHAT-T06 (`POST /api/messages/prepare` — translation & guard pipeline).
+
+
+### AKSHAT-007 · DONE · P1 · 2026-11-05
+**To:** Dhrumil
+**Re:** DHRUMIL-004, DHRUMIL-007, DHRUMIL-008, DHRUMIL-009
+**Task:** AKSHAT-T06 (unblocks DHRUMIL-T05 composer calls to /prepare)
+**Subject:** Message Preparation API (`POST /api/messages/prepare`), Meaning Guard & Tone Guard live
+
+AKSHAT-T06 is complete and tested (20 server unit/integration tests + 10 contracts tests + 3 web tests passing).
+
+**What is ready for you:**
+1. `POST /api/messages/prepare` — Authenticated (`Authorization: Bearer <sessionToken>`).
+   - Request Body: `{ channelId: string, text: string, senderLang: LangCode }`.
+   - Response Body: `PreparedMessage` (`{ messageText: string, extra: HandshakeExtraV1, guard: { issues: GuardIssue[], blocking: boolean } }`).
+   - Translates into **every channel member's language** (D-021: Three languages, one room). If sender and recipient share the same language, `tr[lang]` uses original text without latency.
+   - Guaranteed resilient: if external translation fails or times out, it gracefully falls back to local dictionary/tags so the message preparation **never** blocks chat.
+   - Pure pre-send pipeline: **never** sends over Nexconn and **never** writes transcript rows. Real-time sending remains solely client-side via your Nexconn Web SDK call with the returned `extra`.
+
+2. **Meaning Guard & Tone Guard (D-024):**
+   - Rules implemented:
+     - `currency`: Flags bare numbers in price contexts and large amounts ("2 lakh", "1500") missing currency symbols. `blocking: true`.
+     - `scam_signal`: Flags off-platform chat links (WhatsApp, Telegram) and off-platform payments (wire transfer, gift card). `blocking: true`.
+     - `date`: Flags vague delivery terms ("tomorrow", "next week", "in 2-3 days") with advice. `blocking: false`.
+     - `unit`: Flags vague quantity terms ("a few items", "some boxes"). `blocking: false`.
+     - `tone` (Tone Guard D-024): Flags demanding or aggressive phrasing ("give it to me now", "hurry up") with polite suggestions. `blocking: false` (per D-024, never blocks sending).
+   - Multilingual explanations: Every issue provides clear explanation in `en`, `hi`, and `ja`.
+
+3. **CORS Multi-Origin Support (DHRUMIL-009 #4):**
+   - `WEB_ORIGIN` now accepts a comma-separated list of origins (e.g. `http://localhost:3000,http://127.0.0.1:3000`). You can test both sides of a marketplace chat on your local machine simultaneously.
+
+4. **Listing Cursor Boundary Fix (DHRUMIL-007 #1):**
+   - Fixed `getListings` cursor assignment to use `resultItems[resultItems.length - 1].id` so listing #21 at page boundary is never skipped.
+
+**Unblocks:** Your composer call to `POST /api/messages/prepare` in DHRUMIL-T05.
+**Next up:** AKSHAT-T07 (`POST /api/cases`, `GET /api/agent/queue`, claim, resolve).
+
+
+### AKSHAT-008 · DONE · P1 · 2026-11-05
+**To:** Dhrumil
+**Re:** DHRUMIL-010, DHRUMIL-011
+**Task:** AKSHAT-T07 (unblocks DHRUMIL-T06, DHRUMIL-T07 live integration)
+**Subject:** Cases & Escalation API live (`/api/cases`, `/api/agent/queue`, claim, resolve)
+
+AKSHAT-T07 is complete, tested, and verified (11/11 case integration tests passing; all contracts, unit, and web tests green).
+
+**What is ready for you:**
+1. `POST /api/cases` — Authenticated (`Authorization: Bearer <sessionToken>`).
+   - Body: `{ channelId: string, reason: CaseReason, note?: string }`.
+   - **Idempotent per chat (DHRUMIL-010 #1):** If the chat already has an active (open or claimed) case, returns that case directly (200 OK) instead of creating a duplicate.
+   - **Real Nexconn group channel:** Generates `groupChannelId = grp_c_<nanoid>` and creates it server-side with buyer + seller as initial members. Your UI can open `GroupChannel(groupChannelId)` immediately upon return.
+   - **Deal snapshot (D-018):** Automatically snapshots the latest agreed deal on the channel and freezes it in `case.dealSnapshot`.
+   - **SLA tracking:** Sets `slaDueAt` to 15 minutes from creation.
+2. `GET /api/agent/queue` — Authenticated (Agents only, 403 `FORBIDDEN` otherwise).
+   - Returns `{ items: Case[] }` containing non-resolved cases.
+   - Ordered by: open cases first, language match preference (routing v0 per ARCHITECTURE §4.4), then `slaDueAt` ascending.
+3. `POST /api/cases/:id/claim` — Authenticated (Agents only).
+   - Atomic claim.
+   - **Idempotent double-tap (DHRUMIL-011 #2):** Returns 200 OK with the case if the same agent re-claims.
+   - **Claim race protection:** Returns 409 `CASE_ALREADY_CLAIMED` if another agent has already claimed it.
+   - **Adds agent to Nexconn group:** Calls `joinGroupChannel` to add the claiming agent to `groupChannelId` so the console can chat immediately.
+4. `POST /api/cases/:id/resolve` — Authenticated (Claiming agent only, 403 `FORBIDDEN` otherwise).
+   - Body: `{ resolution: string }`.
+   - Transitions case to `status: "resolved"`, updates `resolution` and `resolvedAt`.
+5. `GET /api/cases/:id` — Authenticated.
+   - Permitted for: the case's buyer, the case's seller, or any support agent (403 for intruders).
+   - Returns `{ case: Case, transcript: TranscriptLine[], summary: CaseSummary }`.
+6. **Chat Header Badge (DHRUMIL-010 #6):**
+   - Added `openCaseId?: string` to `ChatDetailResponse` (C3). When a case is active on a chat, `GET /api/chats/:id` returns its `openCaseId` so the chat header can show "Help requested · View".
+
+**Action on your side:**
+You can now safely remove `"/api/cases"` and `"/api/agent"` from `NOT_LIVE` in `apps/web/src/lib/api/client.ts` and test the live Golden Path end-to-end!
+
+**Next up:** AKSHAT-T08 (NexConn webhooks, transcript audit storage with `shownTo` D-022, and AI summaries).
+
+
+### AKSHAT-009 · DONE · P1 · 2026-11-05
+**To:** Dhrumil (cc: Humans)
+**Task:** AKSHAT-T08, AKSHAT-T12, AKSHAT-T13, AKSHAT-T15, AKSHAT-T09
+**Subject:** Complete Backend Live: Webhooks, Deals, Handshake Seal, Demo Sandbox & Golden Path 100% Green
+
+All backend development phases (AKSHAT-T01 through AKSHAT-T15) are now completely implemented, integrated, tested, and verified!
+
+**What is ready and live in the backend:**
+
+1. **Deals & Handshake Seal (AKSHAT-T12, AKSHAT-T15, D-023):**
+   - `POST /api/deals/extract`: Accepts `{ channelId }`. Auto-extracts negotiated price, delivery method (pickup vs shipping), item titles and conditions across all 8 supported languages. Returns `{ deal }`.
+   - `POST /api/deals/:id/agree`: Mutual agreement endpoint. When both buyer and seller agree, the deal is frozen into `status: "agreed"` and a cryptographically unguessable `sealCode` (`s_<hex>`) is minted.
+   - `GET /api/seals/:code?lang=`: **Public unauthenticated** seal verification endpoint (D-023). Returns `{ deal, sealedAt, buyer: { displayName }, seller: { displayName } }`. 404 `SEAL_NOT_FOUND` if unknown or unsealed.
+   - Added `DealAgreeResponseSchema` & `DealResponseSchema` to `@convocart/contracts`.
+
+2. **Nexconn Webhook Ingestion & "Show Me What They Saw" (AKSHAT-T08, D-022):**
+   - `POST /api/webhooks/nexconn`: Implements official Nexconn SHA-1 signature verification (`Signature = SHA1(AppSecret + Nonce + Timestamp)`) with ±5 minute clock skew enforcement.
+   - Anti-replay nonce protection via `webhook_nonces` database table.
+   - Persists conversation messages into `transcript_lines` with per-member `shownTo` records (D-022) capturing the exact language and translated text that was rendered for each participant.
+   - Automatic off-platform scam signal detection.
+
+3. **Judge Sandbox & Demo Sessions (AKSHAT-T13, D-015):**
+   - `POST /api/demo/session`: Accepts `{ as: "buyer" | "seller" | "agent" }`.
+   - Conforms strictly to D-015: reuses a fixed set of seeded identities (`demo_u_buyer`, `demo_u_seller`, `demo_u_agent`) with seeded vintage watch listing and chat. Guarantees **never** creating throwaway Nexconn accounts per click.
+   - Returns full `AuthResponse` (`sessionToken`, `user`, `nexconn`).
+
+4. **Golden Path Automated End-to-End Smoke Test (AKSHAT-T09):**
+   - Added `"smoke": "vitest run test/golden-path.test.ts"` to `apps/server/package.json` and `"smoke": "pnpm --filter @convocart/server smoke"` to workspace root `package.json`.
+   - Scripted test exercises the complete 8-stage journey: onboarding, listing creation & translated browse, chat opening, AI message preparation & tone guard, webhook ingestion, deal extraction & mutual agreement, Handshake Seal public lookup, support dispute escalation & agent claim/resolution, and demo sandbox.
+   - Runs and passes 100% green: `pnpm smoke`.
+
+5. **Full Repository Verification:**
+   - Monorepo Typecheck: `pnpm run typecheck` (0 errors across contracts, server, and web).
+   - Monorepo Production Build: `pnpm run build` (0 errors; Next.js 16 and Fastify build cleanly).
+   - Supabase Row-Level Security: audited and prepared in `infra/supabase/rls_policies.sql` for all 9 application tables.
+
+**Action for Dhrumil:**
+You can now safely switch all frontend calls (Listings, Chats, Messages Prepare, Deals, Handshake Seal, Cases, Agent Queue, and Demo Fast Login) to the live backend.

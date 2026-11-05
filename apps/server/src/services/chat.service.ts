@@ -187,6 +187,14 @@ export async function getChatById(
     throw new AppError('FORBIDDEN', 'You are not authorized to view this conversation', 403, false);
   }
 
+  const openCase = await prisma.case.findFirst({
+    where: {
+      channelId,
+      status: { in: ['open', 'claimed'] },
+    },
+    select: { id: true },
+  });
+
   return {
     channelId: chat.channelId,
     channelType: 'direct',
@@ -196,6 +204,7 @@ export async function getChatById(
     buyer: formatUser(chat.buyer),
     seller: formatUser(chat.seller),
     listing: formatListing(chat.listing),
+    openCaseId: openCase?.id,
     createdAt: chat.createdAt.toISOString(),
   };
 }

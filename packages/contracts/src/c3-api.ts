@@ -120,7 +120,7 @@ export type ChatCreateRequest = z.infer<typeof ChatCreateRequestSchema>;
 
 export const ChatCreateResponseSchema = z.object({
   channelId: z.string().min(1),
-  channelType: z.literal('direct'),
+  channelType: z.enum(['direct', 'group']).default('direct'),
   seller: UserSchema,
   listing: ListingSchema,
 });
@@ -128,13 +128,14 @@ export type ChatCreateResponse = z.infer<typeof ChatCreateResponseSchema>;
 
 export const ChatDetailResponseSchema = z.object({
   channelId: z.string().min(1),
-  channelType: z.literal('direct'),
+  channelType: z.enum(['direct', 'group']).default('direct'),
   listingId: z.string().min(1),
   buyerId: z.string().min(1),
   sellerId: z.string().min(1),
   buyer: UserSchema,
   seller: UserSchema,
   listing: ListingSchema,
+  openCaseId: z.string().optional(),
   createdAt: z.string().datetime(),
 });
 export type ChatDetailResponse = z.infer<typeof ChatDetailResponseSchema>;
@@ -182,6 +183,16 @@ export const ExtractDealResponseSchema = z.object({
   deal: DealSchema.nullable(),
 });
 export type ExtractDealResponse = z.infer<typeof ExtractDealResponseSchema>;
+
+export const DealAgreeResponseSchema = z.object({
+  deal: DealSchema,
+});
+export type DealAgreeResponse = z.infer<typeof DealAgreeResponseSchema>;
+
+export const DealResponseSchema = z.object({
+  deal: DealSchema,
+});
+export type DealResponse = z.infer<typeof DealResponseSchema>;
 
 export const SealDetailQuerySchema = z.object({
   lang: LangCodeSchema.optional(),

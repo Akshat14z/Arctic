@@ -46,15 +46,17 @@ The Nexconn user id **equals** our `User.id` (to be verified in AKSHAT-T02 — `
 | `GET /api/chats` | – | `{ items: ChatSummary[] }` | `IMPLEMENTED`. Inbox view for authenticated user (buyer or seller) |
 | `GET /api/chats/:id` | – | `ChatDetailResponse` | `IMPLEMENTED`. Full conversation detail (403 for non-participants) |
 
-| `POST /api/messages/prepare` | `{ channelId, text, senderLang }` | `PreparedMessage` (see C4) | Translation + Meaning Guard. **Called before every send.** |
-| `POST /api/deals/extract` | `{ channelId }` | `{ deal: Deal \| null }` | Phase 2 |
-| `GET /api/seals/:code?lang=` | – | `{ deal, sealedAt, buyer: { displayName }, seller: { displayName } }` | **Public, no auth.** 404 if unknown (D-023) |
-| `POST /api/cases` | `{ channelId, reason: CaseReason, note? }` | `{ case: Case }` | Escalation. Creates the 3-way group. |
-| `GET /api/agent/queue` | – | `{ items: Case[] }` | Agents only |
-| `POST /api/cases/:id/claim` | – | `{ case }` | Agents only. 409 if already claimed. |
-| `POST /api/cases/:id/resolve` | `{ resolution: string }` | `{ case }` | Agents only |
-| `GET /api/cases/:id` | – | `{ case, transcript: TranscriptLine[], summary: CaseSummary }` | Bilingual transcript |
-| `POST /api/demo/session` | `{ as: "buyer" \| "seller" \| "agent" }` | same as `/api/auth/guest` | Judge sandbox, seeded data. Phase 3. |
+| `POST /api/messages/prepare` | `{ channelId, text, senderLang }` | `PreparedMessage` (see C4) | `IMPLEMENTED`. Translation into all member languages (D-021) + Meaning Guard (D-024). |
+| `POST /api/webhooks/nexconn` | Nexconn webhook payload | `{ received: true, stored: boolean, scamWarning?: boolean }` | `IMPLEMENTED`. Ingests message, de-dupes, anti-replay, computes `shownTo` records (D-022) |
+| `POST /api/deals/extract` | `{ channelId }` | `{ deal: Deal \| null }` | `IMPLEMENTED`. Auto-detects negotiated price, shipping, item & conditions in 8 languages |
+| `POST /api/deals/:id/agree` | – | `{ deal: Deal }` | `IMPLEMENTED`. Mutual agreement: when both agree, mints Handshake Seal (`sealCode`) |
+| `GET /api/seals/:code?lang=` | – | `{ deal, sealedAt, buyer: { displayName }, seller: { displayName } }` | `IMPLEMENTED`. **Public, no auth.** 404 if unknown or unsealed (D-023) |
+| `POST /api/cases` | `{ channelId, reason: CaseReason, note? }` | `{ case: Case }` | `IMPLEMENTED`. Escalation. Idempotent. Creates 3-way Nexconn group, freezes `dealSnapshot` (D-018) |
+| `GET /api/agent/queue` | – | `{ items: Case[] }` | `IMPLEMENTED`. Agents only |
+| `POST /api/cases/:id/claim` | – | `{ case }` | `IMPLEMENTED`. Agents only. 409 if already claimed |
+| `POST /api/cases/:id/resolve` | `{ resolution: string }` | `{ case }` | `IMPLEMENTED`. Agents only |
+| `GET /api/cases/:id` | – | `{ case, transcript: TranscriptLine[], summary: CaseSummary }` | `IMPLEMENTED`. Bilingual transcript |
+| `POST /api/demo/session` | `{ as: "buyer" \| "seller" \| "agent" }` | same as `/api/auth/guest` | `IMPLEMENTED`. Judge sandbox, seeded data (D-015) |
 
 ## C4. Message payload — `STABLE` (`extra` verified)
 
@@ -162,3 +164,4 @@ Akshat receives Nexconn's `message:send` webhook for: transcript storage, scam d
 | 3 | Server user token generation via `userManagementApi.issueAccessToken({ userId, name })` returning `result.accessToken` | Akshat | `node_modules/@nexconn/server-sdk/dist/api.d.ts` |
 | 4 | Server-side group creation supported via `groupChannelManagementApi.createGroupChannel({ channelId, name, owner, userIds })` | Akshat | `node_modules/@nexconn/server-sdk/dist/api.d.ts` |
 | 5 | Server client requires `setPrimaryBackupDomains(primary, backup)` before sending requests | Akshat | `node_modules/@nexconn/server-sdk/dist/configuration.d.ts` |
+| 6 | `extra` size limit: 8 KB sends fine; 16 KB fails with error code 20115. Text + `extra` budget is ~8 KB. | Dhrumil | DHRUMIL-006 spike probe |

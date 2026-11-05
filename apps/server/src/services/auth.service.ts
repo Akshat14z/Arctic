@@ -49,7 +49,7 @@ export function formatUser(dbUser: DbUserLike): User {
   };
 }
 
-async function obtainNexconnToken(userId: string, displayName: string): Promise<string> {
+export async function obtainNexconnToken(userId: string, displayName: string): Promise<string> {
   const config = getConfig();
 
   if (config.NEXCONN_APP_KEY && config.NEXCONN_APP_SECRET) {

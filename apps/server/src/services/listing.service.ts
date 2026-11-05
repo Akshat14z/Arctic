@@ -146,9 +146,8 @@ export async function getListings(
   let resultItems = items;
 
   if (items.length > pageSize) {
-    const nextItem = items[pageSize];
-    nextCursor = nextItem.id;
     resultItems = items.slice(0, pageSize);
+    nextCursor = resultItems[resultItems.length - 1].id;
   }
 
   return {

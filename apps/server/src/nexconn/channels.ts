@@ -24,3 +24,19 @@ export async function createEscalationGroupChannel(params: CreateGroupParams): P
     throw new Error(`Failed to create Nexconn group channel (code: ${response.data.code})`);
   }
 }
+
+/**
+ * Adds a member (e.g. claiming support agent) to an existing Nexconn group channel.
+ */
+export async function addMemberToGroupChannel(channelId: string, userId: string): Promise<void> {
+  const groupApi = getNexconnGroupApi();
+
+  const response = await groupApi.joinGroupChannel({
+    channelId,
+    userIds: [userId],
+  });
+
+  if (response.data.code && response.data.code !== 200 && response.data.code !== 0) {
+    throw new Error(`Failed to add user to Nexconn group channel (code: ${response.data.code})`);
+  }
+}
