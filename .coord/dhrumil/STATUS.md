@@ -2,26 +2,27 @@
 
 Writer: **Agent Dhrumil only**. Overwrite this whole file at the end of every session (`/wrap`). Agent Akshat and the humans read it to know where you are.
 
-**Last updated:** 2026-11-04
-**Current task:** DHRUMIL-T02 — client SDK spike (two browsers chat in a DirectChannel)
-**Branch:** dhrumil/DHRUMIL-T02-sdk-spike (794b8e0, pushed, not merged)
-**Progress:** SDK module + `/spike` page built and verified up to Nexconn's servers (fake credentials rejected with 31004). The live two-user test needs a real App Key + two tokens.
+**Last updated:** 2026-11-05
+**Current task:** DHRUMIL-T03 — Onboarding: name + language → guest session
+**Branch:** dhrumil/DHRUMIL-T03-onboarding (761402b, pushed, not merged)
+**Progress:** Onboarding works end to end against a contract-shaped mock: sign-in, refresh-safe session, sign out, friendly network error, safe `?next=` redirect. Checked on phone width, light + dark. Swaps to the real `/api/auth/guest` as soon as the server URL exists.
 
 ## Done since last update
-- DHRUMIL-T01 merged to main (22aa19f); Vercel deploy still pending (human)
-- `apps/web/src/lib/nexconn/` — connect, listeners with cleanup, sendText with `extra`, history
-- `/spike` test page (404 in production) with an `extra` size probe
-- DHRUMIL-003 FINDING: 8 SDK facts, incl. built-in translation
+- DHRUMIL-T02 SDK module + `/spike` merged to main (46ef0d7); live test still pending
+- DHRUMIL-T03 onboarding (branch above): `/onboarding`, `lib/api` client (zod-validated, friendly errors), `lib/session`, home signed-in state, `<html lang>`
+- DHRUMIL-004 REVIEW (chat channel scoping, S2) and DHRUMIL-005 REQUEST (deploy server, P0)
 
 ## Blocked on
-- H-02: production Nexconn app (App Key) + two user tokens — humans. **D-012 deadline is tonight (Nov 4).**
-- Not blocked on Akshat for code; token issuing (AKSHAT-T02/T03) would also unblock it.
+- DHRUMIL-005: deployed server URL (or 2 test tokens) — needed for the DHRUMIL-T02 live test before the D-012 deadline (night of Nov 6) and to drop the auth mock
+- DHRUMIL-004: decision on chat channel scoping before DHRUMIL-T05's conversation view
 
 ## Mocks in use
 | Mock | Replaces | Remove when |
 |---|---|---|
-| Pasted App Key/token in `/spike` | `/api/auth/guest` credentials | AKSHAT-T03 lands |
+| `apps/web/src/mocks/api.ts` (`POST /api/auth/guest`, `GET /api/me`) | real server | server deployed → set `NEXT_PUBLIC_API_URL` |
+| Pasted App Key/token in `/spike` | `/api/auth/guest` credentials | server deployed |
 
 ## Next up
-1. Finish DHRUMIL-T02 live test (needs H-02), record `extra` size limit, merge
-2. DHRUMIL-T03 onboarding against a contract-shaped mock of `/api/auth/guest`
+1. Merge DHRUMIL-T03; point `NEXT_PUBLIC_API_URL` at the deployed server and re-test
+2. DHRUMIL-T02 live two-browser test (+ `extra` size)
+3. DHRUMIL-T04 listings UI (Akshat's routes are ready, AKSHAT-005)

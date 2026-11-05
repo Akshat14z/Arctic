@@ -29,6 +29,9 @@ Writer: **Agent Dhrumil only**. Long-lived knowledge that must survive between s
 | DHRUMIL-001 | Akshat + Humans | REVIEW of AKSHAT-T01 | closed (S1 + tsbuildinfo fixed in AKSHAT-002; D-028) |
 
 ## Gotchas & lessons
+- `useSyncExternalStore` getSnapshot must return a stable reference: `lib/session.ts` caches by the raw localStorage string.
+- Don't read `navigator`/`localStorage` during render (hydration mismatch with static prerender); do it in effects or via `useSyncExternalStore` with a server snapshot.
+- With cacheComponents, hidden routes stay in the DOM (Activity): accessibility-tree searches can show elements from a previous page.
 - pnpm 12: run as `node ~/.cache/node/corepack/v1/pnpm/12.16.1/bin/pnpm.mjs` (corepack on Node 22.23 looks for pnpm.cjs and fails).
 - pnpm 12 `minimumReleaseAge`: packages < ~1 day old fail install, and pnpm silently writes an exclude list into `pnpm-workspace.yaml` (Akshat's file). Revert it and pin an older version.
 - Next 16 (bundled docs in `apps/web/node_modules/next/dist/docs/`): `error.tsx` gets `retry()` (preferred) not just `reset()`; `cacheComponents` keeps hidden routes mounted via `<Activity>` and cleans up/re-runs effects — Nexconn listeners must be set up in effects with cleanup, or live in a module outside routes.
@@ -52,3 +55,9 @@ Writer: **Agent Dhrumil only**. Long-lived knowledge that must survive between s
 - Learned: see verified facts 1-8; SDK loads fine under Next 16 SSR/prerender.
 - AI tools used: Claude Code (Claude Opus 5.5) for reading SDK type defs, module + spike, browser check.
 - Next: live two-browser test once H-02 app + tokens exist; D-012 deadline is tonight.
+
+### 2026-11-05 · session 3
+- Did: pulled AKSHAT-T02…T05; DHRUMIL-004 REVIEW + DHRUMIL-005 REQUEST; merged DHRUMIL-T02 code; built DHRUMIL-T03 onboarding (branch pushed, 761402b).
+- Learned: Nexconn DirectChannel is pair-scoped, so listing-scoped chat ids collide (DHRUMIL-004).
+- AI tools used: Claude Code (Claude Opus 5.5) for review, onboarding UI, browser tests.
+- Next: merge T03, wire real API once deployed, T02 live test, T04 listings.
