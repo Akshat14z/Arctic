@@ -97,8 +97,8 @@ sequenceDiagram
 
 ### 4.1 Open a chat (Golden Path step 3)
 1. Buyer taps **Chat with seller** → `POST /api/chats {listingId}`.
-2. Server returns the existing chat for (buyer, listing) or creates a row; `channelId` is a **direct** channel between buyer and seller. ⚠️ UNVERIFIED whether a direct channel must be created server-side or exists implicitly once one side sends.
-3. Web opens the channel, loads history from Nexconn, and renders it.
+2. Server returns the existing chat for (buyer, listing), or creates the row **and a Nexconn group channel** (`createGroupChannel`, members buyer + seller, id = `channelId`) (D-029). One conversation per buyer + listing, never shared across listings.
+3. Web opens `GroupChannel(channelId)`, loads history from Nexconn, and renders it. (A `DirectChannel` would be keyed by the user pair only, so it isn't used for marketplace chats.)
 
 ### 4.2 Send and read a message (the heart of the product)
 
