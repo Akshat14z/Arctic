@@ -6,8 +6,8 @@ import { ApiError } from "./errors";
 export { ApiError, friendlyMessage } from "./errors";
 
 const BASE = process.env.NEXT_PUBLIC_API_URL;
-// MOCK: routes the server doesn't have yet. Remove "/api/cases" when AKSHAT-T07 lands.
-const NOT_LIVE = ["/api/cases"];
+// MOCK: routes the server doesn't have yet. Remove these when AKSHAT-T07/T08 land (DHRUMIL-010).
+const NOT_LIVE = ["/api/cases", "/api/agent"];
 
 type Options<S extends z.ZodTypeAny> = {
   method?: "GET" | "POST" | "PATCH" | "DELETE";

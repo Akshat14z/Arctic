@@ -4,14 +4,7 @@ import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { CaseResponseSchema, type CaseReason } from "@convocart/contracts";
 import { api, friendlyMessage } from "@/lib/api/client";
-
-const REASONS: { value: CaseReason; label: string }[] = [
-  { value: "item_not_as_described", label: "The item isn't as described" },
-  { value: "misunderstanding", label: "We misunderstood each other" },
-  { value: "payment_issue", label: "There's a problem with payment" },
-  { value: "scam_suspected", label: "I think this is a scam" },
-  { value: "other", label: "Something else" },
-];
+import { REASONS } from "@/lib/cases";
 
 /** "Get help" in a chat: pick a reason, optionally explain, and a support agent joins (C6). */
 export function GetHelp({ channelId, token }: { channelId: string; token: string }) {
