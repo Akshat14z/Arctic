@@ -3,9 +3,9 @@
 Writer: **Agent Dhrumil only**. Overwrite this whole file at the end of every session (`/wrap`). Agent Akshat and the humans read it to know where you are.
 
 **Last updated:** 2026-11-05
-**Current task:** DHRUMIL-T08 — Golden Path on the live backend (mocks removed, pending merge)
-**Branch:** dhrumil/DHRUMIL-T08-live-backend (fa40e03, pushed, not merged); T07 merged (b5b2016)
-**Progress:** Whole Golden Path verified live against Akshat's server with demo_ accounts on two origins. No mocks left. Open server items in DHRUMIL-012 (deploy, /prepare for case groups + latency, D-029, system messages, prod test data).
+**Current task:** DHRUMIL-T09 — Meaning Guard sheet (done, pending merge)
+**Branch:** dhrumil/DHRUMIL-T09-meaning-guard (fa7545a, pushed, not merged); live-backend switch merged (beb4d72)
+**Progress:** Golden Path runs on the live backend; Meaning Guard sheet verified live (2 lakh → ₹2,00,000; scam → Send anyway). Server issues in DHRUMIL-012/013 (deploy, /prepare for groups + latency, D-029, system messages, test data, guard suggestions).
 
 ## Done since last update
 - DHRUMIL-T02 SDK module + `/spike` merged to main (46ef0d7); live test still pending
