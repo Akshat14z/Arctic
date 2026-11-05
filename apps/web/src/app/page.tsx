@@ -1,10 +1,5 @@
-import { SUPPORTED_LANGUAGES } from "@convocart/contracts";
-
-// Each language's own name for itself, e.g. "हिन्दी", "தமிழ்", "日本語".
-const languages = SUPPORTED_LANGUAGES.map((code) => ({
-  code,
-  name: new Intl.DisplayNames([code], { type: "language" }).of(code) ?? code,
-}));
+import { LANGUAGES } from "@/lib/languages";
+import { HomeActions } from "./home-actions";
 
 export default function Home() {
   return (
@@ -20,14 +15,14 @@ export default function Home() {
       </div>
 
       <ul className="flex flex-wrap gap-2" aria-label="Supported languages">
-        {languages.map(({ code, name }) => (
+        {LANGUAGES.map(({ code, native }) => (
           <li key={code} lang={code} className="rounded-full border border-border bg-surface px-3 py-1 text-sm">
-            {name}
+            {native}
           </li>
         ))}
       </ul>
 
-      <p className="text-sm text-muted">Sign-in is coming soon.</p>
+      <HomeActions />
     </section>
   );
 }
