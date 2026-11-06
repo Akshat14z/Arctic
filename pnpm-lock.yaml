@@ -215,6 +215,9 @@ importers:
       '@convocart/contracts':
         specifier: workspace:*
         version: link:../../packages/contracts
+      '@nexconn/call':
+        specifier: 26.2.1
+        version: 26.2.1(@nexconn/chat@26.2.1(@nexconn/engine@26.2.1))(@nexconn/engine@26.2.1)
       '@nexconn/chat':
         specifier: 26.2.1
         version: 26.2.1(@nexconn/engine@26.2.1)
@@ -642,6 +645,12 @@ packages:
     cpu: [x64]
     os: [linux]
     libc: [glibc]
+
+  '@nexconn/call@26.2.1':
+    resolution: {integrity: sha512-hGizg9GGBokmwlYK9fm4HViUaV2J39HmW5yJb4r8MXom+KlLNvJSiYQolrcdFBzjfWDiA0HGdPvf1Z1NOZmOPQ==}
+    peerDependencies:
+      '@nexconn/chat': 26.2.0
+      '@nexconn/engine': 26.2.0
 
   '@nexconn/chat@26.2.1':
     resolution: {integrity: sha512-o1yBPQIBrSsVJcqq9rrh35yLymRFOuv7L2uYg+OKwWlmJVYot5p5h6igixnjcoSbGqvVYrVdCN+M8V89N0Heiw==}
@@ -1488,6 +1497,9 @@ packages:
     resolution: {integrity: sha512-0eJJY6hXLGf1udHwfNftBqH+g73EU4B504nZeKpz1sYRKafAghwxEJunB2O7rDZkL4PGfsMVnTXZ2EjibbqcsA==}
     engines: {node: '>=14.0.0'}
 
+  pako@2.2.0:
+    resolution: {integrity: sha512-zJq6RP/5q+TO2OpFV3FHzlPnFjmkb7Nc99a5SNjJE+uu/PkpChs+NIZSSzbBoD+6kjiISXjfYdwj1ZRQ81dz/w==}
+
   pathe@2.0.3:
     resolution: {integrity: sha512-WUjGcAqP1gQacoQe+OBJsFA7Ld4DyXuUIjZ5cc75cLHvJ7dtNsTugphxIADwspS+AraAUePCKrSVtPLFj/F88w==}
 
@@ -1588,6 +1600,10 @@ packages:
     engines: {node: '>=18.0.0', npm: '>=8.0.0'}
     hasBin: true
 
+  rtcpeerconnection-shim@1.2.15:
+    resolution: {integrity: sha512-C6DxhXt7bssQ1nHb154lqeL0SXz5Dx4RczXZu2Aa/L1NJFnEVDxFwCBo3fqtuljhHIGceg5JKBV4XJ0gW5JKyw==}
+    engines: {node: '>=6.0.0', npm: '>=3.10.0'}
+
   safe-regex2@5.1.2:
     resolution: {integrity: sha512-tAtCGFPPP02VroDVzp4daGi6bC7jWG+41D47GKf18FeH/ubvKQHT9VmhAkvtjNOmJwqtApzWeUpEhkyEYULvmw==}
     hasBin: true
@@ -1598,6 +1614,9 @@ packages:
 
   scheduler@0.28.0:
     resolution: {integrity: sha512-juorfCmIkIw8tT+p5BXSm6PJjQF/ycEYmKyzURCIt/RaZIhL+PulbQ9Yu2z1HdOJDdqDTlxA1+xKBmHXJsczAw==}
+
+  sdp@2.12.0:
+    resolution: {integrity: sha512-jhXqQAQVM+8Xj5EjJGVweuEzgtGWb3tmEEpl3CLP3cStInSbVHSg0QWOGQzNq8pSID4JkpeV2mPqlMDLrm0/Vw==}
 
   secure-json-parse@4.1.1:
     resolution: {integrity: sha512-lnd81MQEZKjhW/Gd2TQqdd4XP6QYNdDW/EP+I7nTrFHP9y2LmaGPIHk9xsnzcOiEr1c39c/e84xFgGviQKBTRw==}
@@ -1784,6 +1803,10 @@ packages:
         optional: true
       jsdom:
         optional: true
+
+  webrtc-adapter@7.7.1:
+    resolution: {integrity: sha512-TbrbBmiQBL9n0/5bvDdORc6ZfRY/Z7JnEj+EYOD1ghseZdpJ+nF2yx14k3LgQKc7JZnG7HAcL+zHnY25So9d7A==}
+    engines: {node: '>=6.0.0', npm: '>=3.10.0'}
 
   why-is-node-running@2.3.0:
     resolution: {integrity: sha512-hUrmaWBdVDcxvYqnyh09zunKzROWjbZTiNy8dBEjkS7ehEDQibXJ7XvlmtbwuTclUiIyN+CyXQD4Vmko8fNm8w==}
@@ -2043,6 +2066,13 @@ snapshots:
 
   '@napi-rs/lzma-linux-x64-gnu@1.5.1':
     optional: true
+
+  '@nexconn/call@26.2.1(@nexconn/chat@26.2.1(@nexconn/engine@26.2.1))(@nexconn/engine@26.2.1)':
+    dependencies:
+      '@nexconn/chat': 26.2.1(@nexconn/engine@26.2.1)
+      '@nexconn/engine': 26.2.1
+      pako: 2.2.0
+      webrtc-adapter: 7.7.1
 
   '@nexconn/chat@26.2.1(@nexconn/engine@26.2.1)':
     dependencies:
@@ -2794,6 +2824,8 @@ snapshots:
 
   on-exit-leak-free@2.1.2: {}
 
+  pako@2.2.0: {}
+
   pathe@2.0.3: {}
 
   pathval@2.0.1: {}
@@ -2916,6 +2948,10 @@ snapshots:
       '@rollup/rollup-win32-x64-msvc': 4.67.4
       fsevents: 2.3.3
 
+  rtcpeerconnection-shim@1.2.15:
+    dependencies:
+      sdp: 2.12.0
+
   safe-regex2@5.1.2:
     dependencies:
       ret: 0.5.1
@@ -2923,6 +2959,8 @@ snapshots:
   safe-stable-stringify@2.5.0: {}
 
   scheduler@0.28.0: {}
+
+  sdp@2.12.0: {}
 
   secure-json-parse@4.1.1: {}
 
@@ -3180,6 +3218,11 @@ snapshots:
       - terser
       - tsx
       - yaml
+
+  webrtc-adapter@7.7.1:
+    dependencies:
+      rtcpeerconnection-shim: 1.2.15
+      sdp: 2.12.0
 
   why-is-node-running@2.3.0:
     dependencies:

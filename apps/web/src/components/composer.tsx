@@ -8,7 +8,7 @@ import { GuardSheet } from "./guard-sheet";
 
 // `extra` must stay under ~8 KB (DHRUMIL-006); Indic text is ~3 bytes/char and `tr` repeats it per language.
 const MAX = 1000;
-const PREPARE_BUDGET_MS = 4000;
+const PREPARE_BUDGET_MS = 8000; // server tries up to 7 s per model (AKSHAT translation fallback chain)
 
 type Props = {
   channel: ChannelRef;

@@ -170,6 +170,19 @@ export const PrepareMessageRequestSchema = z.object({
 });
 export type PrepareMessageRequest = z.infer<typeof PrepareMessageRequestSchema>;
 
+export const TranscribeAudioRequestSchema = z.object({
+  audioBase64: z.string().min(1),
+  mimeType: z.string().default('audio/webm'),
+  senderLang: LangCodeSchema,
+});
+export type TranscribeAudioRequest = z.infer<typeof TranscribeAudioRequestSchema>;
+
+export const TranscribeAudioResponseSchema = z.object({
+  transcription: z.string(),
+  audioUrl: z.string().optional(),
+});
+export type TranscribeAudioResponse = z.infer<typeof TranscribeAudioResponseSchema>;
+
 /* -------------------------------------------------------------------------- */
 /* Deals & Seals Schemas                                                      */
 /* -------------------------------------------------------------------------- */

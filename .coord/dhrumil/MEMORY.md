@@ -18,7 +18,7 @@ Writer: **Agent Dhrumil only**. Long-lived knowledge that must survive between s
 | 8 | `GroupChannel.createGroup` exists client-side | d.ts | 2026-11-04 |
 | 9 | Live: guest token from AKSHAT `/api/auth/guest` connects (SG, ~3 s), 2 users chat both ways in DirectChannel, `extra` intact | live, /spike | 2026-11-05 |
 | 10 | `extra` limit: 8 KB ok, 16 KB fails with code 20115 (ASCII; budget ~8 KB for text+extra) | live probe | 2026-11-05 |
-| 11 | Team test accounts on prod (exclude from traction): u_0bed9289e709, u_319b2e85b23c, u_7de228bd64e3 | created with human OK | 2026-11-05 |
+| 11 | Team accounts on prod (exclude from traction): users u_0bed9289e709, u_319b2e85b23c, u_7de228bd64e3, u_535ef98f9bc0, u_eb6263e6305a (the last was one more than approved: capture script re-created per run); agent u_agent_eb668508c2e8 | created with human OK | 2026-11-05 |
 | 13 | Web SDK: `new GroupChannel(id)` to send; history via `new GroupChannelIdentifier(id)` | d.ts 26.2.1 | 2026-11-05 |
 | 12 | Listings API: `lang` = original language; translations only from cache (none yet); paging drops item 21 (server bug, DHRUMIL-007) | live | 2026-11-05 |
 
@@ -29,6 +29,7 @@ Writer: **Agent Dhrumil only**. Long-lived knowledge that must survive between s
 | DHRUMIL-006 | Akshat + Humans | FINDING: live chat works, extra limit, team test ids, local-run gotchas | FYI |
 | DHRUMIL-005 | Akshat | REQUEST: deploy server (spike part satisfied locally; deployed URL still needed) | waiting on them |
 | DHRUMIL-004 | Akshat + Humans | REVIEW S2: channel scoping | closed by humans: D-029 (group per chat) |
+| DHRUMIL-015 | Akshat + Humans | REQUEST P0: Gemini timeout/model; D-029 blocks clean demo captures; test data | waiting on them |
 | DHRUMIL-014 | Akshat | HEADS-UP: client posts deal_card messages; scam banner; item.ja fallback | FYI |
 | DHRUMIL-013 | Akshat + Humans | FINDING: placeholder LLM key → 4 s prepare drops guard; ₹2 lakh suggestion loop; suggestion semantics | waiting on them |
 | DHRUMIL-012 | Akshat + Humans | REVIEW P0: deploy, /prepare groups + latency, D-029, system msgs, prod test data, displayLang, traction exclusions, LLM key | waiting on them |
@@ -43,6 +44,9 @@ Writer: **Agent Dhrumil only**. Long-lived knowledge that must survive between s
 | DHRUMIL-001 | Akshat + Humans | REVIEW of AKSHAT-T01 | closed (S1 + tsbuildinfo fixed in AKSHAT-002; D-028) |
 
 ## Gotchas & lessons
+- Capture scripts that create accounts must persist and reuse the session (scratchpad JSON); never re-run a creating script without that.
+- Gemini from here: 3.5-flash 5–56 s, flash-lite-latest ~2 s; server timeout 2.5 s → flaky translations until Akshat raises it. Local server runs with LLM_MODEL=gemini-flash-lite-latest (launch.json).
+- Memory edits: assert every replace matched; two earlier edits silently didn't.
 - Deals: server never sends Nexconn messages; the web sends `deal_card` messages after extract/agree and renders only the latest per deal.id.
 - `next start` on :3001 serves the build from when it started — restart web-prod after every `next build`.
 - Local server: start with `LLM_API_KEY=` (empty) or every /prepare waits ~4 s on Gemini with the placeholder key and the guard is lost (launch.json server config does this).

@@ -100,6 +100,6 @@ describe('Translation Service Unit Tests', () => {
     const tr = await translateForRecipients(text, 'en', ['hi', 'ja']);
     expect(tr.hi).toBeDefined();
     expect(tr.ja).toBeDefined();
-  });
+  }, 15000);
 });
 
