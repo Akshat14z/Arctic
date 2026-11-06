@@ -3,12 +3,13 @@
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { ChatCreateResponseSchema, ListingDetailResponseSchema, type Listing } from "@convocart/contracts";
+import { ChatCreateResponseSchema, ListingDetailResponseSchema, type LangCode, type Listing } from "@convocart/contracts";
 import { api, ApiError, friendlyMessage } from "@/lib/api/client";
 import { formatPrice, localeFor } from "@/lib/format";
-import { LANGUAGES } from "@/lib/languages";
+import { LANGUAGES, preferredLanguage } from "@/lib/languages";
 import { useSession } from "@/lib/session";
 import { DemoBadge } from "@/components/listing-card";
+import { ShareListing } from "@/components/share-listing";
 
 /** Opens (or reuses) the buyer's chat for this listing. Guests sign in first and come back here. */
 function ChatWithSeller({ listingId }: { listingId: string }) {
@@ -60,12 +61,15 @@ function ChatWithSeller({ listingId }: { listingId: string }) {
 export function ListingDetail() {
   const { id } = useParams<{ id: string }>();
   const session = useSession();
-  const lang = session?.user.language ?? "en";
+  // Guests (often arriving from a WhatsApp link) read in their browser's language until they pick one.
+  const [guestLang, setGuestLang] = useState<LangCode | null>(null);
+  useEffect(() => setGuestLang(preferredLanguage(navigator.languages)), []);
+  const lang = session?.user.language ?? guestLang ?? "en";
   const [listing, setListing] = useState<Listing | null>(null);
   const [error, setError] = useState<{ text: string; notFound: boolean } | null>(null);
   const [attempt, setAttempt] = useState(0);
 
-  const hydrated = session !== undefined;
+  const hydrated = session !== undefined && (session !== null || guestLang !== null);
   useEffect(() => {
     if (!hydrated) return; // wait for the session so we fetch once, in the right language
     let live = true;
@@ -105,6 +109,7 @@ export function ListingDetail() {
 
   const mine = session?.user.id === listing.sellerId;
   const original = listing.lang !== lang ? LANGUAGES.find((l) => l.code === listing.lang) : undefined;
+  const textLang = original ? lang : listing.lang; // the server translates title + description for ?lang=
 
   return (
     <article className="flex flex-col gap-5">
@@ -115,7 +120,7 @@ export function ListingDetail() {
 
       <div className="flex flex-col gap-2">
         <div className="flex items-start gap-2">
-          <h1 lang={listing.lang} className="text-2xl font-semibold tracking-tight text-balance">
+          <h1 lang={textLang} className="text-2xl font-semibold tracking-tight text-balance">
             {listing.title}
           </h1>
           {listing.isDemo && <DemoBadge />}
@@ -128,11 +133,13 @@ export function ListingDetail() {
         )}
       </div>
 
-      <p lang={listing.lang} className="whitespace-pre-line text-pretty">
+      <p lang={textLang} className="whitespace-pre-line text-pretty">
         {listing.description}
       </p>
 
       {!mine && <ChatWithSeller listingId={listing.id} />}
+
+      <ShareListing listing={listing} lang={lang} mine={mine} />
 
       <div className="flex items-center justify-between gap-3 border-t border-border pt-4 text-sm text-muted">
         <span>{mine ? "This is your listing." : listing.seller ? `Sold by ${listing.seller.displayName}` : null}</span>
