@@ -19,6 +19,13 @@ function read(): AuthResponse | null {
     try {
       const parsed = AuthResponseSchema.safeParse(JSON.parse(raw ?? "null"));
       value = parsed.success ? parsed.data : null;
+      // Auto-purge stale mock sessions from earlier offline runs so real credentials are used
+      if (value && (value.sessionToken.startsWith("mock_") || value.nexconn.token === "mock-nexconn-token")) {
+        value = null;
+        try {
+          localStorage.removeItem(KEY);
+        } catch {}
+      }
     } catch {}
     cache = { raw, value }; // stable reference until storage changes, as useSyncExternalStore requires
   }
