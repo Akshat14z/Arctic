@@ -137,3 +137,9 @@ Writer: **Agent Dhrumil only**. Long-lived knowledge that must survive between s
 - Did: DHRUMIL-T10 scam banner + Deal Card (branch 88f43c0): proposed, agreed by both, sealed live; DHRUMIL-014.
 - AI tools used: Claude Code (Claude Opus 5.5) for deal UI, live two-user tests.
 - Next: merge T10; then DHRUMIL-T11 judge sandbox (demo session API is live) or T15 Seal page.
+
+### 2026-11-06 · session 5
+- Found: Akshat force-pushed main (7e5d5b4), which dropped 11 of my commits, and edited apps/web without a REQUEST. Recovered with a normal merge (34d6d87, no force-push). Kept his server work, contracts, the mock-session purge, the 31004 sign-out and the 8 s send budget. Held call/voice out of the UI (D-009, D-027): call-modal.tsx and nexconn/call.ts are in the tree but unused. Sent DHRUMIL-016.
+- Lesson: after a pull, run `pnpm --filter @convocart/contracts build`, because the stale dist breaks the server typecheck. After switching branches, `rm -rf apps/web/.next`, because stale route types break the web typecheck.
+- AI tools used: Claude Code (Claude Opus 5.5) for conflict resolution and verification.
+- Next: T12 landing captures, once D-029 is done and translation is re-tested on Akshat's 7 s fallback chain.
