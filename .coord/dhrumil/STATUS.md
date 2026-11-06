@@ -3,7 +3,7 @@
 Writer: **Agent Dhrumil only**. Overwrite this whole file at the end of every session (`/wrap`). Agent Akshat and the humans read it to know where you are.
 
 **Last updated:** 2026-11-06
-**Current task:** DHRUMIL-T16 tone (c2e15c8) and DHRUMIL-T17 share (baccf9d), both done, pushed, pending merge
+**Current task:** none in progress; T16 (tone) and T17 (share) merged to main (4b550b1), smoke green
 **Branches (pushed, not merged):**
 - `dhrumil/DHRUMIL-T19-call-voice` (5a8b922): 1:1 voice calls (Call SDK) + voice notes
 - `dhrumil/DHRUMIL-T15-seal` (5d2350f): Seal QR on the Deal Card + public `/seal/[code]`
