@@ -20,17 +20,28 @@ type Props = {
   voice?: boolean;
   text: string;
   issues: GuardIssue[];
+  /** False when only non-blocking issues (tone, D-024) made us pause: then the choice is softer vs. as is. */
+  blocking: boolean;
   lang: LangCode;
   onEdit: () => void;
   onUseSuggestion: (span: string, suggestion: string) => void;
   onSendAnyway: () => void;
+  onSendSofter?: (text: string) => void;
 };
 
-/** Meaning Guard (DHRUMIL-T09): shown before a message /prepare marked as blocking is sent. */
-export function GuardSheet({ voice, text, issues, lang, onEdit, onUseSuggestion, onSendAnyway }: Props) {
+/** The message with each flagged harsh phrase swapped for the server's softer wording (DHRUMIL-T16). */
+export function softerText(text: string, issues: GuardIssue[]): string | null {
+  const tone = issues.filter((i) => i.kind === "tone" && i.suggestion);
+  return tone.length ? tone.reduce((t, i) => t.replace(i.span, i.suggestion!), text) : null;
+}
+
+/** Meaning Guard (DHRUMIL-T09): shown before a blocking message is sent, or a harsh-sounding one (T16). */
+export function GuardSheet({ voice, text, issues, blocking, lang, onEdit, onUseSuggestion, onSendAnyway, onSendSofter }: Props) {
   const dialog = useRef<HTMLDialogElement>(null);
   const scam = issues.some((i) => i.kind === "scam_signal");
   const first = issues.find((i) => i.kind === "scam_signal") ?? issues[0];
+  const softer = voice ? null : softerText(text, issues);
+  const toneOnly = !blocking && !!softer && !!onSendSofter;
 
   useEffect(() => {
     dialog.current?.showModal();
@@ -51,7 +62,11 @@ export function GuardSheet({ voice, text, issues, lang, onEdit, onUseSuggestion,
           <h2 id="guard-title" className={`text-lg font-semibold ${scam ? "text-danger" : ""}`}>
             {(first && TITLES[first.kind]) ?? "Check before sending"}
           </h2>
-          <p className="text-sm text-muted">The other person reads a translation. Make sure it means what you mean.</p>
+          <p className="text-sm text-muted">
+            {toneOnly
+              ? "The other person reads a translation, and blunt words can land even harder. Nothing here is wrong to send."
+              : "The other person reads a translation. Make sure it means what you mean."}
+          </p>
         </div>
 
         <blockquote lang={lang} className="rounded-lg border-l-4 border-border bg-bg px-3 py-2">
@@ -79,6 +94,20 @@ export function GuardSheet({ voice, text, issues, lang, onEdit, onUseSuggestion,
                 <p lang={lang} className="mt-1 text-sm text-text">
                   {issue.explanation[lang] ?? issue.explanation.en}
                 </p>
+                {issue.kind === "tone" && softer && (
+                  <p lang={lang} className="mt-2 text-sm text-text">
+                    Softer: <q>{softer}</q>
+                  </p>
+                )}
+                {issue.kind === "tone" && softer && !toneOnly && issue.suggestion && (
+                  <button
+                    type="button"
+                    onClick={() => onUseSuggestion(issue.span, issue.suggestion!)}
+                    className="mt-2 min-h-tap rounded-lg border border-current px-3 text-sm font-medium"
+                  >
+                    Use softer wording
+                  </button>
+                )}
                 {suggestion && (
                   <button
                     type="button"
@@ -93,6 +122,21 @@ export function GuardSheet({ voice, text, issues, lang, onEdit, onUseSuggestion,
           })}
         </ul>
 
+        {toneOnly ? (
+          <div className="flex flex-col gap-2">
+            <button type="button" autoFocus onClick={() => onSendSofter!(softer!)} className="min-h-tap rounded-lg bg-brand px-4 font-medium text-brand-fg">
+              Send softer version
+            </button>
+            <div className="flex gap-2">
+              <button type="button" onClick={onEdit} className="min-h-tap flex-1 rounded-lg border border-border px-4 font-medium">
+                Edit message
+              </button>
+              <button type="button" onClick={onSendAnyway} className="min-h-tap flex-1 rounded-lg border border-border px-4 font-medium">
+                Send as is
+              </button>
+            </div>
+          </div>
+        ) : (
         <div className="flex gap-2">
           <button type="button" autoFocus onClick={onEdit} className="min-h-tap flex-1 rounded-lg bg-brand px-4 font-medium text-brand-fg">
             {voice ? "Don't send" : "Edit message"}
@@ -105,6 +149,7 @@ export function GuardSheet({ voice, text, issues, lang, onEdit, onUseSuggestion,
             Send anyway
           </button>
         </div>
+        )}
       </div>
     </dialog>
   );
