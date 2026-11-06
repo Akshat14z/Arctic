@@ -143,3 +143,10 @@ Writer: **Agent Dhrumil only**. Long-lived knowledge that must survive between s
 - Lesson: after a pull, run `pnpm --filter @convocart/contracts build`, because the stale dist breaks the server typecheck. After switching branches, `rm -rf apps/web/.next`, because stale route types break the web typecheck.
 - AI tools used: Claude Code (Claude Opus 5.5) for conflict resolution and verification.
 - Next: T12 landing captures, once D-029 is done and translation is re-tested on Akshat's 7 s fallback chain.
+
+### 2026-11-06 · session 5b
+- Did: DHRUMIL-T19 calls + voice notes (5a8b922) on my human's request (D-009/D-027 change proposed in DHRUMIL-017); DHRUMIL-T15 Seal UI (5d2350f); DHRUMIL-018 REQUEST.
+- Verified facts (@nexconn/call 26.2.1 index.d.ts): `NCCallEngine.install()` once, BEFORE `NCEngine.initialize()`; `NCCallEngine.initialize({})` is a singleton; handler requires onCallReceived/onCallConnected/onCallEnded; `NCCallUser.userId` is a property (not getUserId()); `startCall({calleeIds:[id], callType: NCCallType.SINGLE, mediaType: NCCallMediaType.AUDIO, extra})` → `{code, callId?, busyLineUserList?}`; code 80006 = VoIP service not enabled for the App Key (our current state).
+- Lessons: in dev, Next's error badge (bottom-left) covers the mic button after an SDK console.error, so puppeteer must click through the DOM. Akshat's config loads the root .env with override, which beats launch-env WEB_ORIGIN (3001 blocked by CORS). Server is now on :4000 (.env.local updated). `Date.now()` in useState breaks prerender under Cache Components.
+- Test data: 2 voice notes in the demo buyer/seller chat (one shows the "[JA]" fallback).
+- AI tools used: Claude Code (Claude Opus 5.5) for Call SDK verification, call/voice/seal UI, puppeteer live tests.
