@@ -150,3 +150,8 @@ Writer: **Agent Dhrumil only**. Long-lived knowledge that must survive between s
 - Lessons: in dev, Next's error badge (bottom-left) covers the mic button after an SDK console.error, so puppeteer must click through the DOM. Akshat's config loads the root .env with override, which beats launch-env WEB_ORIGIN (3001 blocked by CORS). Server is now on :4000 (.env.local updated). `Date.now()` in useState breaks prerender under Cache Components.
 - Test data: 2 voice notes in the demo buyer/seller chat (one shows the "[JA]" fallback).
 - AI tools used: Claude Code (Claude Opus 5.5) for Call SDK verification, call/voice/seal UI, puppeteer live tests.
+
+### 2026-11-06 · session 5c
+- Did: T19 + T15 merged (smoke green via `pnpm --filter @convocart/server smoke`; the root `pnpm smoke` fails because corepack can't find pnpm 12). DHRUMIL-T16 tone sheet (c2e15c8); DHRUMIL-T17 share + link preview + guest language (baccf9d); DHRUMIL-019.
+- Lesson: under Cache Components, `generateMetadata` that awaits `params` needs a `<Suspense>` child that calls `await connection()` (blocking-prerender-metadata), or dev logs an error.
+- AI tools used: Claude Code (Claude Opus 5.5) for tone/share UI and puppeteer tests (a Hindi-browser guest).

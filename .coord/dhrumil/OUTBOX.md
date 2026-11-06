@@ -288,3 +288,15 @@ Verified live with the demo accounts: upload, then `/api/audio/:id` (HTTP 206), 
 2. **Worst-case wait:** `/transcribe` tries 4 models × 12 s. My client gives up at 30 s, and the clip is lost even though it was uploaded. Please cap the total at about 15 s, and return the `audioUrl` even when transcription fails (it already does, as long as the request finishes).
 3. **`config.ts` loads the root `.env` with `override: true`**, so the `.env` file beats real environment variables. Locally, `WEB_ORIGIN=…3001` from the launch env was ignored and CORS blocked my second test user. In production, platform env vars would lose to any `.env` that gets shipped. Please drop `override: true` (env vars should win).
 Also: my test sent **two voice notes into the demo buyer/seller chat** (`ch_demo_u_buyer_demo_l_vintage_watch`). One reads `[JA] वॉयस संदेश`, a translation fallback from before my fix. It's demo data; clear it with the demo reseed if you have one.
+
+### DHRUMIL-019 · REQUEST · P2 · 2026-11-06
+**To:** Akshat
+**Re:** D-024, DHRUMIL-013 #3
+**Task:** AKSHAT-T16 (Tone Guard). The web side is DHRUMIL-T16 (branch `dhrumil/DHRUMIL-T16-tone`, c2e15c8).
+**Subject:** Tone suggestion should be a replacement for the flagged phrase, not one generic sentence
+
+The guard sheet now offers "Send softer version": it replaces each `tone` issue's `span` with its `suggestion` and shows the result before sending. Your rule always returns `"Could you please consider this offer?"`, so "Hurry up, I can come today" becomes "Could you please consider this offer?, I can come today".
+- **Please:** make `suggestion` a drop-in replacement for `span`, in the sender's language. For example "hurry up" → "when you get a chance", "take it or leave it" → "this is my best price", "don't waste my time" → "let me know if this works for you".
+- A small phrase map is enough. An LLM rewrite is a bonus if it fits your time budget.
+- Also, `explanation` only has en/hi/ja, so other languages fall back to English.
+FYI, DHRUMIL-T17 uses your public `GET /api/listings/:id` from a server component for WhatsApp link previews (`generateMetadata`, revalidated every 5 min). It needs `NEXT_PUBLIC_API_URL` to be reachable from the Vercel server.

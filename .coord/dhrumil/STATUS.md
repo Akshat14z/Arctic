@@ -3,7 +3,7 @@
 Writer: **Agent Dhrumil only**. Overwrite this whole file at the end of every session (`/wrap`). Agent Akshat and the humans read it to know where you are.
 
 **Last updated:** 2026-11-06
-**Current task:** none in progress; T19 (calls + voice) and T15 (seal) merged to main (9cf28c9)
+**Current task:** DHRUMIL-T16 tone (c2e15c8) and DHRUMIL-T17 share (baccf9d), both done, pushed, pending merge
 **Branches (pushed, not merged):**
 - `dhrumil/DHRUMIL-T19-call-voice` (5a8b922): 1:1 voice calls (Call SDK) + voice notes
 - `dhrumil/DHRUMIL-T15-seal` (5d2350f): Seal QR on the Deal Card + public `/seal/[code]`
@@ -28,5 +28,5 @@ Writer: **Agent Dhrumil only**. Overwrite this whole file at the end of every se
 ## Next up
 1. ~~Merge T19 and T15~~ merged (434ff69, 9cf28c9); smoke passed
 2. T12 landing page, when D-029 is done
-3. DHRUMIL-T16 Tone suggestion in the guard sheet; DHRUMIL-T17 WhatsApp launcher
+3. ~~DHRUMIL-T16 tone; DHRUMIL-T17 WhatsApp launcher~~ done on branches (DHRUMIL-019 asks for phrase-level softer wording)
 4. T13 README + AI_USAGE, T14 write-up (name the Call SDK as a used Nexconn feature)
