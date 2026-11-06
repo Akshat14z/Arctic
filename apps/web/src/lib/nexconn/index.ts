@@ -19,6 +19,7 @@ import {
   type TextMessageContent,
 } from "@nexconn/chat";
 import type { NexconnCredentials } from "@convocart/contracts";
+import { installCalls } from "./call";
 
 export type ConnectionState = "connected" | "connecting" | "disconnected" | "suspended";
 
@@ -70,6 +71,7 @@ function toChatMessage(m: Message): ChatMessage | null {
 /** Initializes once per App Key, then connects. Resolves to our user id (= Nexconn user id, C2). */
 export async function connect({ appKey, token, area }: NexconnCredentials): Promise<string> {
   if (initializedKey !== appKey) {
+    await installCalls(); // the Call SDK must be installed before NCEngine.initialize()
     NCEngine.initialize({
       appKey,
       areaCode: AreaCode[area as keyof typeof AreaCode] ?? AreaCode.SG,
