@@ -29,10 +29,6 @@ function cleanupAudioStore(): void {
 export async function transcribeAudio(input: TranscribeAudioRequest): Promise<TranscribeAudioResponse> {
   const config = getConfig();
 
-  if (!config.LLM_API_KEY) {
-    throw new AppError('LLM_NOT_CONFIGURED', 'Speech transcription requires LLM_API_KEY to be set in environment', 503, false);
-  }
-
   // Strip data URL prefix if present (e.g. data:audio/webm;codecs=opus;base64,...)
   let base64Data = input.audioBase64.trim();
   let mimeType = (input.mimeType || 'audio/webm').trim();
@@ -80,8 +76,18 @@ export async function transcribeAudio(input: TranscribeAudioRequest): Promise<Tr
     console.warn('[Voice] Failed to buffer audio for playback:', err);
   }
 
-  const model = config.LLM_MODEL || 'gemini-3.5-flash-lite';
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${config.LLM_API_KEY}`;
+  // If no LLM key configured, return buffered audio immediately
+  if (!config.LLM_API_KEY) {
+    return {
+      transcription: '',
+      audioUrl,
+    };
+  }
+
+  const primaryModel = config.LLM_MODEL.includes('3.5') ? 'gemini-2.0-flash' : config.LLM_MODEL;
+  const candidateModels = Array.from(
+    new Set([primaryModel, 'gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-2.0-flash-lite'])
+  ).filter(Boolean);
 
   const prompt = `You are a real-time speech transcription engine for Handshake, a cross-language marketplace.
 Listen to this audio recording carefully. Transcribe the spoken words verbatim in the language with code '${input.senderLang}'.
@@ -91,63 +97,68 @@ Guidelines:
 - If the speech is faint or brief, output what was spoken.
 - If there is only background noise or silence, return nothing.`;
 
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 15000); // 15s budget for audio upload + transcription
+  let transcription = '';
 
-  try {
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        contents: [
-          {
-            parts: [
-              {
-                inlineData: {
-                  mimeType: geminiMimeType,
-                  data: base64Data,
+  for (const model of candidateModels) {
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${config.LLM_API_KEY}`;
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 12000); // 12s budget per candidate
+
+    try {
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [
+            {
+              parts: [
+                {
+                  inlineData: {
+                    mimeType: geminiMimeType,
+                    data: base64Data,
+                  },
                 },
-              },
-              {
-                text: prompt,
-              },
-            ],
+                {
+                  text: prompt,
+                },
+              ],
+            },
+          ],
+          generationConfig: {
+            temperature: 0.1,
+            maxOutputTokens: 1024,
           },
-        ],
-        generationConfig: {
-          temperature: 0.1,
-          maxOutputTokens: 1024,
-        },
-      }),
-      signal: controller.signal,
-    });
+        }),
+        signal: controller.signal,
+      });
 
-    if (!response.ok) {
-      const errText = await response.text();
-      console.error(`[Voice] Gemini transcription API error (${response.status}):`, errText);
-      throw new Error(`Gemini transcription API error (${response.status}): ${errText}`);
-    }
+      if (!response.ok) {
+        const errText = await response.text();
+        console.warn(`[Voice] Model ${model} returned ${response.status}: ${errText}. Trying next fallback model.`);
+        continue;
+      }
 
-    const data = (await response.json()) as any;
-    const parts = data?.candidates?.[0]?.content?.parts;
-    let transcription = '';
-    if (Array.isArray(parts)) {
-      for (const part of parts) {
-        if (typeof part?.text === 'string' && part.text.trim()) {
-          transcription = part.text.trim();
+      const data = (await response.json()) as any;
+      const parts = data?.candidates?.[0]?.content?.parts;
+      if (Array.isArray(parts)) {
+        for (const part of parts) {
+          if (typeof part?.text === 'string' && part.text.trim()) {
+            transcription = part.text.trim();
+          }
         }
       }
+      break; // Successfully transcribed
+    } catch (err: unknown) {
+      const errMsg = err instanceof Error ? err.message : String(err);
+      console.warn(`[Voice] Model ${model} transcription attempt failed: ${errMsg}`);
+    } finally {
+      clearTimeout(timeoutId);
     }
-
-    return {
-      transcription,
-      audioUrl,
-    };
-  } catch (err: unknown) {
-    const errMsg = err instanceof Error ? err.message : String(err);
-    console.error('[Voice] Transcription failed:', errMsg);
-    throw new AppError('TRANSCRIPTION_FAILED', `Audio transcription failed: ${errMsg}`, 502, true);
-  } finally {
-    clearTimeout(timeoutId);
   }
+
+  // Gracefully return audioUrl and transcription (degrade, never block)
+  return {
+    transcription,
+    audioUrl,
+  };
 }

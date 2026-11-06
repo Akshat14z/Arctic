@@ -5,9 +5,9 @@ import { ApiError } from "./errors";
 
 export { ApiError, friendlyMessage } from "./errors";
 
-const BASE = process.env.NEXT_PUBLIC_API_URL;
-// MOCK: routes the server doesn't have yet. Remove these when AKSHAT-T07/T08 land (DHRUMIL-010).
-const NOT_LIVE = ["/api/cases", "/api/agent"];
+const BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000";
+// MOCK: routes the server doesn't have yet. All routes are live on server.
+const NOT_LIVE: string[] = [];
 
 type Options<S extends z.ZodTypeAny> = {
   method?: "GET" | "POST" | "PATCH" | "DELETE";

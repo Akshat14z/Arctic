@@ -35,7 +35,16 @@ const ConfigSchema = z.object({
       const candidate = val || process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY;
       return candidate === 'your_llm_api_key_here' ? undefined : candidate;
     }),
-  LLM_MODEL: z.string().default('gemini-3.5-flash-lite'),
+  LLM_MODEL: z
+    .string()
+    .default('gemini-2.0-flash')
+    .transform((val) => {
+      const candidate = (val || '').trim();
+      if (candidate.includes('3.5')) {
+        return candidate.includes('lite') ? 'gemini-2.0-flash-lite' : 'gemini-2.0-flash';
+      }
+      return candidate || 'gemini-2.0-flash';
+    }),
 });
 
 export type Config = z.infer<typeof ConfigSchema>;

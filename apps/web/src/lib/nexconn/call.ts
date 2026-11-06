@@ -138,6 +138,24 @@ export async function initCallEngine(): Promise<NCCallEngine | null> {
   return engineInstance;
 }
 
+function callCodeToMessage(code: number): string {
+  switch (code) {
+    case 80006:
+      return "VoIP / Voice calling service is not enabled for this NexConn App Key. Please enable Call/VoIP service in your NexConn Developer Console.";
+    case 80012:
+      return "Chat is currently disconnected. Please wait for reconnection.";
+    case 80002:
+      return "Already on an active call.";
+    case 80101:
+      return "Microphone is unavailable or closed. Please allow microphone permissions.";
+    case 80007:
+    case 80010:
+      return "Invalid recipient user.";
+    default:
+      return `Failed to place call (code ${code})`;
+  }
+}
+
 export function subscribeCallState(callback: (state: CallState) => void): () => void {
   stateListeners.add(callback);
   callback(currentCallState);
@@ -185,8 +203,9 @@ export async function startAudioCall(targetUserId: string, targetName: string, m
     });
 
     if (res.code !== NCCallCode.SUCCESS) {
-      notifyEnded(`Call failed (code ${res.code})`);
-      throw new Error(`Failed to place call (code ${res.code})`);
+      const msg = callCodeToMessage(res.code);
+      notifyEnded(msg);
+      throw new Error(msg);
     }
 
     if (res.busyLineUserList && res.busyLineUserList.length > 0) {
@@ -202,8 +221,9 @@ export async function startAudioCall(targetUserId: string, targetName: string, m
     });
 
     return res.callId || "";
-  } catch (err) {
-    notifyEnded("Call failed");
+  } catch (err: unknown) {
+    const errMsg = err instanceof Error ? err.message : "Call failed";
+    notifyEnded(errMsg);
     throw err;
   }
 }
@@ -237,8 +257,9 @@ export async function acceptIncomingCall(callId: string): Promise<void> {
   const { NCCallCode } = await import("@nexconn/call");
   const res = await engine.acceptCall({ callId });
   if (res.code !== NCCallCode.SUCCESS) {
-    notifyEnded(`Could not accept (code ${res.code})`);
-    throw new Error(`Failed to accept call (code ${res.code})`);
+    const msg = callCodeToMessage(res.code);
+    notifyEnded(msg);
+    throw new Error(msg);
   }
 }
 

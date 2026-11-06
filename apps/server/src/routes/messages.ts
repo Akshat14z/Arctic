@@ -59,6 +59,7 @@ export const messageRoutes: FastifyPluginAsync = async (app) => {
     reply.header('Accept-Ranges', 'bytes');
     reply.header('Content-Type', record.mimeType);
     reply.header('Cache-Control', 'public, max-age=86400');
+    reply.header('Access-Control-Allow-Origin', '*');
 
     if (rangeHeader) {
       const parts = rangeHeader.replace(/bytes=/, '').split('-');

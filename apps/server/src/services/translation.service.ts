@@ -50,7 +50,10 @@ async function translateWithGemini(
   apiKey: string,
   model: string
 ): Promise<string> {
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+  const primaryModel = model.includes('3.5') ? 'gemini-2.0-flash' : model;
+  const candidateModels = Array.from(
+    new Set([primaryModel, 'gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-2.0-flash-lite'])
+  ).filter(Boolean);
 
   const prompt = `You are a real-time translation engine for Handshake, a cross-language marketplace.
 Translate the following message directly from language code '${from}' to '${to}'.
@@ -62,36 +65,43 @@ Guidelines:
 Message:
 ${text}`;
 
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 7000); // 7s budget for WAN Gemini calls
+  for (const candidate of candidateModels) {
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/${candidate}:generateContent?key=${apiKey}`;
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 7000); // 7s budget per candidate model
 
-  try {
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        contents: [{ parts: [{ text: prompt }] }],
-        generationConfig: {
-          temperature: 0.2,
-          maxOutputTokens: 256,
-        },
-      }),
-      signal: controller.signal,
-    });
+    try {
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: prompt }] }],
+          generationConfig: {
+            temperature: 0.2,
+            maxOutputTokens: 256,
+          },
+        }),
+        signal: controller.signal,
+      });
 
-    if (!response.ok) {
-      throw new Error(`Gemini API error: ${response.status} ${response.statusText}`);
+      if (!response.ok) {
+        console.warn(`[Translation] Model ${candidate} returned ${response.status}. Trying next fallback model.`);
+        continue;
+      }
+
+      const data = (await response.json()) as any;
+      const candidateText = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+      if (candidateText && typeof candidateText === 'string') {
+        return candidateText.trim();
+      }
+    } catch (err: unknown) {
+      console.warn(`[Translation] Model ${candidate} attempt failed:`, err instanceof Error ? err.message : err);
+    } finally {
+      clearTimeout(timeoutId);
     }
-
-    const data = (await response.json()) as any;
-    const candidateText = data?.candidates?.[0]?.content?.parts?.[0]?.text;
-    if (candidateText && typeof candidateText === 'string') {
-      return candidateText.trim();
-    }
-    throw new Error('Empty response from Gemini API');
-  } finally {
-    clearTimeout(timeoutId);
   }
+
+  throw new Error('All Gemini candidate translation models failed or returned empty response');
 }
 
 /**
