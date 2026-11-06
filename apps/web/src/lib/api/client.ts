@@ -6,6 +6,9 @@ export { ApiError, friendlyMessage } from "./errors";
 
 const BASE = process.env.NEXT_PUBLIC_API_URL;
 
+/** Absolute URL for a server path (e.g. a voice note's `/api/audio/:id`), for <audio src>. */
+export const apiUrl = (path: string) => (/^(https?:|blob:|data:)/.test(path) ? path : `${BASE ?? ""}${path}`);
+
 type Options<S extends z.ZodTypeAny> = {
   method?: "GET" | "POST" | "PATCH" | "DELETE";
   body?: unknown;

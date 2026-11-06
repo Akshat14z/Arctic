@@ -6,9 +6,11 @@ import type { ChatMessage } from "@/lib/nexconn";
 import { LANGUAGES } from "@/lib/languages";
 import { localeFor } from "@/lib/format";
 import { parseExtra, pickDisplay } from "@/lib/render";
+import { apiUrl } from "@/lib/api/client";
 
 export function MessageBubble({ message, lang }: { message: ChatMessage; lang: LangCode }) {
   const [showOriginal, setShowOriginal] = useState(false);
+  const [audioGone, setAudioGone] = useState(false);
   const extra = parseExtra(message.extra);
   const time = new Date(message.sentAt).toLocaleTimeString(localeFor(lang), { hour: "numeric", minute: "2-digit" });
 
@@ -37,6 +39,22 @@ export function MessageBubble({ message, lang }: { message: ChatMessage; lang: L
           message.mine ? "rounded-br-md bg-brand text-brand-fg" : "rounded-bl-md border border-border bg-surface"
         }`}
       >
+        {extra?.kind === "voice_note" && extra.audioUrl && (
+          <span className="mb-1 flex flex-col gap-1">
+            {audioGone ? (
+              <span className="text-sm opacity-80">This voice recording is no longer available.</span>
+            ) : (
+              <audio
+                controls
+                preload="metadata"
+                src={apiUrl(extra.audioUrl)}
+                onError={() => setAudioGone(true)}
+                aria-label={`Voice note${extra.audioDurationSec ? `, ${extra.audioDurationSec} seconds` : ""}`}
+                className="h-10 w-64 max-w-full"
+              />
+            )}
+          </span>
+        )}
         {shown.text}
       </div>
       {scam && (

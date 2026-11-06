@@ -16,6 +16,8 @@ const TITLES: Partial<Record<GuardIssue["kind"], string>> = {
 };
 
 type Props = {
+  /** A voice note can't be edited: no "Use …" fixes, and "Edit" becomes "Don't send". */
+  voice?: boolean;
   text: string;
   issues: GuardIssue[];
   lang: LangCode;
@@ -25,7 +27,7 @@ type Props = {
 };
 
 /** Meaning Guard (DHRUMIL-T09): shown before a message /prepare marked as blocking is sent. */
-export function GuardSheet({ text, issues, lang, onEdit, onUseSuggestion, onSendAnyway }: Props) {
+export function GuardSheet({ voice, text, issues, lang, onEdit, onUseSuggestion, onSendAnyway }: Props) {
   const dialog = useRef<HTMLDialogElement>(null);
   const scam = issues.some((i) => i.kind === "scam_signal");
   const first = issues.find((i) => i.kind === "scam_signal") ?? issues[0];
@@ -62,7 +64,7 @@ export function GuardSheet({ text, issues, lang, onEdit, onUseSuggestion, onSend
             // "Use …" replaces the flagged words, so only offer it where the suggestion is replacement text (amounts).
             // "2 lakh" → "₹2,00,000": exact, and free of the word the rule flags (the server's "₹2 lakh" is flagged again).
             const replaceable = issue.kind === "currency" || issue.kind === "number_format";
-            const suggestion = amount !== null ? formatPrice({ amount, currency: "INR" }, lang) : replaceable ? issue.suggestion : undefined;
+            const suggestion = voice ? undefined : amount !== null ? formatPrice({ amount, currency: "INR" }, lang) : replaceable ? issue.suggestion : undefined;
             const danger = issue.kind === "scam_signal";
             return (
               <li key={`${issue.kind}-${i}`} className={`rounded-lg p-3 ${danger ? "bg-danger-bg text-danger" : "bg-guard-bg text-guard"}`}>
@@ -93,7 +95,7 @@ export function GuardSheet({ text, issues, lang, onEdit, onUseSuggestion, onSend
 
         <div className="flex gap-2">
           <button type="button" autoFocus onClick={onEdit} className="min-h-tap flex-1 rounded-lg bg-brand px-4 font-medium text-brand-fg">
-            Edit message
+            {voice ? "Don't send" : "Edit message"}
           </button>
           <button
             type="button"
