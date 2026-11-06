@@ -10,7 +10,7 @@ import {
 import { api } from "@/lib/api/client";
 import { sendText, type ChannelRef, type ChatMessage } from "@/lib/nexconn";
 import { useVoiceRecorder, type Recording } from "@/lib/use-voice-recorder";
-import { GuardSheet } from "./guard-sheet";
+import { GuardSheet, softerText } from "./guard-sheet";
 
 // `extra` must stay under ~8 KB (DHRUMIL-006); Indic text is ~3 bytes/char and `tr` repeats it per language.
 const MAX = 1000;
@@ -120,12 +120,13 @@ export function Composer({ channel, channelId, lang, token, disabled, onSent }: 
   const recorder = useVoiceRecorder(MAX_VOICE_SEC, (r) => void sendVoice(r));
   const recording = recorder.seconds !== null;
 
-  async function send() {
-    if (!text || sending || disabled || recording) return;
+  async function send(body = text) {
+    if (!body || sending || disabled || recording) return;
     setSending(true);
     setFailed(null);
-    const prepared = await prepare(channelId, text, lang, token);
-    if (prepared.guard.blocking) setHeld(prepared);
+    const prepared = await prepare(channelId, body, lang, token);
+    // Pause for blocking issues, and for harsh tone (D-024: never blocking, but offer a softer version).
+    if (prepared.guard.blocking || softerText(body, prepared.guard.issues)) setHeld(prepared);
     else await deliver(prepared, false);
     setSending(false);
   }
@@ -137,6 +138,7 @@ export function Composer({ channel, channelId, lang, token, disabled, onSent }: 
           voice={held.extra.kind === "voice_note"}
           text={held.messageText}
           issues={held.guard.issues}
+          blocking={held.guard.blocking}
           lang={lang}
           onEdit={() => setHeld(null)}
           onUseSuggestion={(span, suggestion) => {
@@ -149,6 +151,11 @@ export function Composer({ channel, channelId, lang, token, disabled, onSent }: 
             setSending(true);
             await deliver(p, true);
             setSending(false);
+          }}
+          onSendSofter={(softer) => {
+            setHeld(null);
+            setDraft(softer); // if sending fails, the softer draft stays to retry
+            void send(softer);
           }}
         />
       )}
