@@ -9,7 +9,9 @@ import { prisma } from '../db/prisma.js';
 import { formatUser } from './auth.service.js';
 import { formatListing } from './listing.service.js';
 import { AppError } from '../errors.js';
+import { ensureChatGroupChannel } from '../nexconn/channels.js';
 
+/** The chat's id, also its Nexconn group id (D-029). */
 export function generateDirectChannelId(buyerId: string, listingId: string): string {
   return `ch_${buyerId}_${listingId}`;
 }
@@ -52,9 +54,10 @@ export async function createOrGetChat(
   });
 
   if (existing) {
+    await ensureChatGroupChannel({ channelId: existing.channelId, name: existing.listing.title, buyerId, sellerId: existing.sellerId });
     return {
       channelId: existing.channelId,
-      channelType: 'direct',
+      channelType: 'group',
       seller: formatUser(existing.seller),
       listing: formatListing(existing.listing),
     };
@@ -79,9 +82,10 @@ export async function createOrGetChat(
       },
     });
 
+    await ensureChatGroupChannel({ channelId: created.channelId, name: created.listing.title, buyerId, sellerId: created.sellerId });
     return {
       channelId: created.channelId,
-      channelType: 'direct',
+      channelType: 'group',
       seller: formatUser(created.seller),
       listing: formatListing(created.listing),
     };
@@ -102,9 +106,10 @@ export async function createOrGetChat(
           },
         },
       });
+      await ensureChatGroupChannel({ channelId: fallback.channelId, name: fallback.listing.title, buyerId, sellerId: fallback.sellerId });
       return {
         channelId: fallback.channelId,
-        channelType: 'direct',
+        channelType: 'group',
         seller: formatUser(fallback.seller),
         listing: formatListing(fallback.listing),
       };
@@ -195,9 +200,10 @@ export async function getChatById(
     select: { id: true },
   });
 
+  await ensureChatGroupChannel({ channelId: chat.channelId, name: chat.listing.title, buyerId: chat.buyerId, sellerId: chat.sellerId });
   return {
     channelId: chat.channelId,
-    channelType: 'direct',
+    channelType: 'group',
     listingId: chat.listingId,
     buyerId: chat.buyerId,
     sellerId: chat.sellerId,

@@ -1,5 +1,6 @@
 import type { LangCode } from '@convocart/contracts';
 import { getConfig } from '../config.js';
+import { geminiGenerate } from './gemini.js';
 
 export interface ITranslationService {
   translate(text: string, from: LangCode, to: LangCode): Promise<string>;
@@ -39,69 +40,28 @@ const LANG_LABELS: Record<LangCode, string> = {
   mr: 'MR',
 };
 
-/**
- * Translates text using Google Gemini LLM API when configured.
- * Implements a strict timeout budget so chat preparation never hangs.
- */
-async function translateWithGemini(
-  text: string,
-  from: LangCode,
-  to: LangCode,
-  apiKey: string,
-  model: string
-): Promise<string> {
-  const primaryModel = model.includes('3.5') ? 'gemini-2.0-flash' : model;
-  const candidateModels = Array.from(
-    new Set([primaryModel, 'gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-2.0-flash-lite'])
-  ).filter(Boolean);
-
+/** Translates with Gemini (model chain + per-model budget in gemini.ts). */
+async function translateWithGemini(text: string, from: LangCode, to: LangCode): Promise<string> {
   const prompt = `You are a real-time translation engine for Handshake, a cross-language marketplace.
 Translate the following message directly from language code '${from}' to '${to}'.
 Guidelines:
-- Preserve currency figures, numbers, and proper nouns.
+- Keep every amount and currency symbol exactly as written: "₹14,000" stays "₹14,000". Never convert currencies or units.
+- Preserve numbers and proper nouns.
 - Keep the natural, concise conversational tone of buyer-seller negotiation.
 - Output ONLY the translated text without extra formatting, explanations, or quotes.
 
 Message:
 ${text}`;
+  const out = await geminiGenerate([{ text: prompt }], { maxOutputTokens: 512, timeoutMs: 3500 });
+  // Meaning check: every rupee amount in the source must survive word for word (a model once turned ₹14,000 into 14,000円).
+  const missing = rupeeAmounts(text).filter((amt) => !out.replace(/\s/g, '').includes(amt));
+  if (missing.length) throw new Error(`translation changed an amount (${missing.join(', ')})`);
+  return out;
+}
 
-  for (const candidate of candidateModels) {
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/${candidate}:generateContent?key=${apiKey}`;
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 7000); // 7s budget per candidate model
-
-    try {
-      const response = await fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: prompt }] }],
-          generationConfig: {
-            temperature: 0.2,
-            maxOutputTokens: 256,
-          },
-        }),
-        signal: controller.signal,
-      });
-
-      if (!response.ok) {
-        console.warn(`[Translation] Model ${candidate} returned ${response.status}. Trying next fallback model.`);
-        continue;
-      }
-
-      const data = (await response.json()) as any;
-      const candidateText = data?.candidates?.[0]?.content?.parts?.[0]?.text;
-      if (candidateText && typeof candidateText === 'string') {
-        return candidateText.trim();
-      }
-    } catch (err: unknown) {
-      console.warn(`[Translation] Model ${candidate} attempt failed:`, err instanceof Error ? err.message : err);
-    } finally {
-      clearTimeout(timeoutId);
-    }
-  }
-
-  throw new Error('All Gemini candidate translation models failed or returned empty response');
+/** "₹14,000", "Rs 500", "INR 2,00,000" → the digits with their ₹ form, e.g. ["₹14,000"]. */
+export function rupeeAmounts(text: string): string[] {
+  return [...text.matchAll(/(?:₹|\bRs\.?|\bINR)\s?(\d[\d,]*(?:\.\d+)?)/gi)].map((m) => `₹${m[1]}`).filter((a) => text.includes(a));
 }
 
 /**
@@ -122,7 +82,7 @@ const TRANSLATION_CACHE = new Map<string, string>();
  * Main translation function with automatic failover and budget control.
  * Follows ARCHITECTURE §4.2: "Degrade, never block".
  */
-export async function translateText(text: string, from: LangCode, to: LangCode): Promise<string> {
+export async function translateText(text: string, from: LangCode, to: LangCode): Promise<string | null> {
   if (from === to || !text.trim()) {
     return text;
   }
@@ -137,12 +97,14 @@ export async function translateText(text: string, from: LangCode, to: LangCode):
   // In test environment, use fast offline translation unless in live dev/production
   if (config.NODE_ENV !== 'test' && config.LLM_API_KEY) {
     try {
-      const translated = await translateWithGemini(text, from, to, config.LLM_API_KEY, config.LLM_MODEL);
+      const translated = await translateWithGemini(text, from, to);
       TRANSLATION_CACHE.set(cacheKey, translated);
       return translated;
     } catch (err) {
-      console.warn(`[Translation] Gemini call failed or timed out (${from}->${to}):`, err instanceof Error ? err.message : err);
-      // Fallback to local translation
+      console.warn(`[Translation] Gemini failed (${from}->${to}):`, err instanceof Error ? err.message : err);
+      // Never show a fake "[JA] …" translation to a real reader: leave the language out, the reader sees the original.
+      const dict = COMMON_DICTIONARY[text.trim().toLowerCase()]?.[to];
+      return dict ?? null;
     }
   }
 
@@ -152,7 +114,7 @@ export async function translateText(text: string, from: LangCode, to: LangCode):
 
 /**
  * Translates message text into each recipient's language.
- * Guarantees every requested recipient language is populated in the returned record.
+ * A language whose translation failed is left out, so its reader sees the original (C4 render rule).
  */
 export async function translateForRecipients(
   text: string,
@@ -165,7 +127,8 @@ export async function translateForRecipients(
   await Promise.all(
     uniqueLangs.map(async (targetLang) => {
       try {
-        translations[targetLang] = await translateText(text, senderLang, targetLang);
+        const t = await translateText(text, senderLang, targetLang);
+        if (t !== null) translations[targetLang] = t;
       } catch (err) {
         console.warn(`[Translation] Failed to translate for ${targetLang}, falling back to original:`, err);
         translations[targetLang] = text;

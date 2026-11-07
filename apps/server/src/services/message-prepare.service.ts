@@ -53,6 +53,10 @@ export async function prepareMessage(
     recipientLangs.push(input.senderLang);
   }
 
+  // Also English, the support agents' working language (Golden Path step 5: an English-only agent reads the
+  // whole conversation). translateText returns the text unchanged when the sender already wrote English.
+  if (input.senderLang !== 'en' && !recipientLangs.includes('en')) recipientLangs.push('en');
+
   // 4. Translate into all recipient languages in parallel
   const tr = await translateForRecipients(input.text, input.senderLang, recipientLangs);
 

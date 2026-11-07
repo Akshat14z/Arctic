@@ -39,7 +39,9 @@ const DEMO_USERS: Record<'buyer' | 'seller' | 'agent', DemoUserDefinition> = {
 };
 
 const DEMO_LISTING_ID = 'demo_l_vintage_watch';
-const DEMO_CHANNEL_ID = 'ch_demo_u_buyer_demo_l_vintage_watch';
+// Bump the suffix to give the demo chat a fresh, empty Nexconn conversation (Nexconn keeps history per id,
+// and server-side history can't be edited on our plan). _2: reset after D-029 moved chats to groups.
+const DEMO_CHANNEL_ID = 'ch_demo_watch_2';
 
 /**
  * Seeds baseline demo data (fixed users, sample listing, and active chat).
@@ -118,7 +120,11 @@ export async function seedDemoEnvironment(): Promise<void> {
     },
   });
 
-  // 5. Ensure demo chat exists
+  // 5. Ensure demo chat exists (renaming an older demo chat row moves its deals and cases with it: FK cascade)
+  await prisma.chat.updateMany({
+    where: { buyerId: DEMO_USERS.buyer.id, listingId: DEMO_LISTING_ID, NOT: { channelId: DEMO_CHANNEL_ID } },
+    data: { channelId: DEMO_CHANNEL_ID },
+  });
   await prisma.chat.upsert({
     where: { channelId: DEMO_CHANNEL_ID },
     update: {},

@@ -5,7 +5,7 @@ import {
 } from '@convocart/contracts';
 import { authenticate } from '../middleware/auth.js';
 import { prepareMessage } from '../services/message-prepare.service.js';
-import { transcribeAudio, audioStore } from '../services/voice.service.js';
+import { transcribeAudio, getVoiceClip } from '../services/voice.service.js';
 
 export const messageRoutes: FastifyPluginAsync = async (app) => {
   /**
@@ -33,6 +33,7 @@ export const messageRoutes: FastifyPluginAsync = async (app) => {
     '/api/messages/transcribe',
     {
       preHandler: [authenticate],
+      bodyLimit: 5 * 1024 * 1024, // base64 of up to 3 MB of audio
     },
     async (request, reply) => {
       const parsedBody = TranscribeAudioRequestSchema.parse(request.body);
@@ -48,12 +49,13 @@ export const messageRoutes: FastifyPluginAsync = async (app) => {
    */
   app.get('/api/audio/:id', async (request, reply) => {
     const { id } = request.params as { id: string };
-    const record = audioStore.get(id);
+    const record = /^[0-9a-f-]{36}$/i.test(id) ? await getVoiceClip(id) : null;
     if (!record) {
       return reply.status(404).send({ error: 'Audio file not found' });
     }
+    const buffer = Buffer.from(record.data);
 
-    const total = record.buffer.length;
+    const total = buffer.length;
     const rangeHeader = request.headers.range;
 
     reply.header('Accept-Ranges', 'bytes');
@@ -76,11 +78,11 @@ export const messageRoutes: FastifyPluginAsync = async (app) => {
       reply.status(206);
       reply.header('Content-Range', `bytes ${start}-${end}/${total}`);
       reply.header('Content-Length', chunkSize);
-      return reply.send(record.buffer.subarray(start, end + 1));
+      return reply.send(buffer.subarray(start, end + 1));
     }
 
     reply.status(200);
     reply.header('Content-Length', total);
-    return reply.send(record.buffer);
+    return reply.send(buffer);
   });
 };

@@ -44,7 +44,7 @@ describe('Chat Infrastructure API Integration (AKSHAT-T05)', { timeout: 25000 },
   }
 
   describe('POST /api/chats (Create or Get Conversation)', () => {
-    it('creates a new direct conversation between buyer and seller', async () => {
+    it('creates a new conversation (its own group, D-029) between buyer and seller', async () => {
       const seller = await createTestUser('Seller Ramesh', 'hi');
       const buyer = await createTestUser('Buyer Amit', 'en');
       const listing = await createTestListing(seller.sessionToken, 'iPhone 14 Pro 128GB', 62000);
@@ -62,7 +62,7 @@ describe('Chat Infrastructure API Integration (AKSHAT-T05)', { timeout: 25000 },
       const data = response.json();
 
       expect(data.channelId).toBe(`ch_${buyer.user.id}_${listing.id}`);
-      expect(data.channelType).toBe('direct');
+      expect(data.channelType).toBe('group'); // D-029: one Nexconn group per buyer+listing chat
       expect(data.seller).toBeDefined();
       expect(data.seller.id).toBe(seller.user.id);
       expect(data.seller.displayName).toBe('Seller Ramesh');
@@ -217,7 +217,7 @@ describe('Chat Infrastructure API Integration (AKSHAT-T05)', { timeout: 25000 },
       expect(buyerRes.statusCode).toBe(200);
       const detail = buyerRes.json();
       expect(detail.channelId).toBe(channelId);
-      expect(detail.channelType).toBe('direct');
+      expect(detail.channelType).toBe('group'); // D-029
       expect(detail.buyer.id).toBe(buyer.user.id);
       expect(detail.seller.id).toBe(seller.user.id);
       expect(detail.listing.id).toBe(listing.id);

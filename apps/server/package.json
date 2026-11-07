@@ -13,7 +13,8 @@
     "test": "vitest run",
     "smoke": "vitest run test/golden-path.test.ts",
     "db:generate": "prisma generate",
-    "db:validate": "prisma validate"
+    "db:validate": "prisma validate",
+    "db:push:test": "tsx test/push-test-schema.ts"
   },
   "dependencies": {
     "@convocart/contracts": "workspace:*",
