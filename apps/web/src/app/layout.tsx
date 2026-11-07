@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Libre_Franklin, Spectral, Zilla_Slab } from "next/font/google";
 import { AppChrome } from "./app-chrome";
 import { HtmlLang } from "./html-lang";
+import { CallModal } from "@/components/call-modal";
 import "./globals.css";
 
 // Newsprint: Zilla Slab heads, Spectral body, Libre Franklin agate for figures. Only the weights used.
@@ -29,6 +30,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       <body className="flex min-h-full flex-col font-sans">
         <HtmlLang />
         <AppChrome>{children}</AppChrome>
+        <CallModal />
       </body>
     </html>
   );

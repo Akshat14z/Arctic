@@ -137,3 +137,26 @@ Writer: **Agent Dhrumil only**. Long-lived knowledge that must survive between s
 - Did: DHRUMIL-T10 scam banner + Deal Card (branch 88f43c0): proposed, agreed by both, sealed live; DHRUMIL-014.
 - AI tools used: Claude Code (Claude Opus 5.5) for deal UI, live two-user tests.
 - Next: merge T10; then DHRUMIL-T11 judge sandbox (demo session API is live) or T15 Seal page.
+
+### 2026-11-06 · session 5
+- Found: Akshat force-pushed main (7e5d5b4), which dropped 11 of my commits, and edited apps/web without a REQUEST. Recovered with a normal merge (34d6d87, no force-push). Kept his server work, contracts, the mock-session purge, the 31004 sign-out and the 8 s send budget. Held call/voice out of the UI (D-009, D-027): call-modal.tsx and nexconn/call.ts are in the tree but unused. Sent DHRUMIL-016.
+- Lesson: after a pull, run `pnpm --filter @convocart/contracts build`, because the stale dist breaks the server typecheck. After switching branches, `rm -rf apps/web/.next`, because stale route types break the web typecheck.
+- AI tools used: Claude Code (Claude Opus 5.5) for conflict resolution and verification.
+- Next: T12 landing captures, once D-029 is done and translation is re-tested on Akshat's 7 s fallback chain.
+
+### 2026-11-06 · session 5b
+- Did: DHRUMIL-T19 calls + voice notes (5a8b922) on my human's request (D-009/D-027 change proposed in DHRUMIL-017); DHRUMIL-T15 Seal UI (5d2350f); DHRUMIL-018 REQUEST.
+- Verified facts (@nexconn/call 26.2.1 index.d.ts): `NCCallEngine.install()` once, BEFORE `NCEngine.initialize()`; `NCCallEngine.initialize({})` is a singleton; handler requires onCallReceived/onCallConnected/onCallEnded; `NCCallUser.userId` is a property (not getUserId()); `startCall({calleeIds:[id], callType: NCCallType.SINGLE, mediaType: NCCallMediaType.AUDIO, extra})` → `{code, callId?, busyLineUserList?}`; code 80006 = VoIP service not enabled for the App Key (our current state).
+- Lessons: in dev, Next's error badge (bottom-left) covers the mic button after an SDK console.error, so puppeteer must click through the DOM. Akshat's config loads the root .env with override, which beats launch-env WEB_ORIGIN (3001 blocked by CORS). Server is now on :4000 (.env.local updated). `Date.now()` in useState breaks prerender under Cache Components.
+- Test data: 2 voice notes in the demo buyer/seller chat (one shows the "[JA]" fallback).
+- AI tools used: Claude Code (Claude Opus 5.5) for Call SDK verification, call/voice/seal UI, puppeteer live tests.
+
+### 2026-11-06 · session 5c
+- Did: T19 + T15 merged (smoke green via `pnpm --filter @convocart/server smoke`; the root `pnpm smoke` fails because corepack can't find pnpm 12). DHRUMIL-T16 tone sheet (c2e15c8); DHRUMIL-T17 share + link preview + guest language (baccf9d); DHRUMIL-019.
+- Lesson: under Cache Components, `generateMetadata` that awaits `params` needs a `<Suspense>` child that calls `await connection()` (blocking-prerender-metadata), or dev logs an error.
+- AI tools used: Claude Code (Claude Opus 5.5) for tone/share UI and puppeteer tests (a Hindi-browser guest).
+
+### 2026-11-07 · session 6
+- Did: /start (no new Akshat messages; Last read stays AKSHAT-009). DHRUMIL-T14 write-up draft + screenshots (2692106). DHRUMIL-021 (server tests write to the prod DB: 18 fake open cases in the agent queue), DHRUMIL-022 (humans fill the write-up).
+- Lesson: DON'T run `pnpm test` / smoke for apps/server until Akshat isolates the test DB. Nexconn is mocked there, but Postgres is the real one.
+- AI tools used: Claude Code (Claude Opus 5.5) for the write-up draft, claim checks against code, puppeteer screenshots.

@@ -10,6 +10,7 @@ import type { ChannelRef } from "@/lib/nexconn";
 import { useRequireSession } from "@/lib/use-require-session";
 import { ChatThread } from "@/components/chat-thread";
 import { GetHelp } from "@/components/get-help";
+import { CallButton } from "@/components/call-button";
 
 export function Conversation() {
   const { id } = useParams<{ id: string }>();
@@ -73,6 +74,7 @@ export function Conversation() {
             <span lang={chat.listing.lang}>{chat.listing.title}</span> · {formatPrice(chat.listing.price, session.user.language)}
           </Link>
         </div>
+        <CallButton peerId={other.id} peerName={other.displayName} myName={session.user.displayName} />
         {chat.openCaseId ? (
           <Link
             href={`/cases/${encodeURIComponent(chat.openCaseId)}`}

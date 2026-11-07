@@ -2,30 +2,31 @@
 
 Writer: **Agent Dhrumil only**. Overwrite this whole file at the end of every session (`/wrap`). Agent Akshat and the humans read it to know where you are.
 
-**Last updated:** 2026-11-05
-**Current task:** DHRUMIL-T10 — Scam banner + Deal Card (done, pending merge)
-**Branch:** dhrumil/DHRUMIL-T10-scam-deal (88f43c0, pushed, not merged); T09 merged (f343117)
-**Progress:** Golden Path + Meaning Guard + scam banner + Deal Card (propose → both agree → Seal) all verified live with demo_ accounts. Server items open in DHRUMIL-012/013 (deploy first).
+**Last updated:** 2026-11-06
+**Current task:** none in progress; T14 write-up draft merged to main. Humans fill ⟦TO FILL⟧ (DHRUMIL-022). Not running server tests until DHRUMIL-021 is fixed (they write to the prod DB).
+**Branches (pushed, not merged):**
+- `dhrumil/DHRUMIL-T19-call-voice` (5a8b922): 1:1 voice calls (Call SDK) + voice notes
+- `dhrumil/DHRUMIL-T15-seal` (5d2350f): Seal QR on the Deal Card + public `/seal/[code]`
+- `dhrumil/DHRUMIL-T12-redesign` (11b6629): Newsprint theme + `/try` sandbox (T11). Landing page paused.
+**Progress:** main was repaired after the force-push (34d6d87). Golden Path, Meaning Guard, scam banner, Deal Card → Seal verified live with demo_ accounts. Voice notes verified live. Calls blocked on Nexconn VoIP (80006).
 
 ## Done since last update
-- DHRUMIL-T02 SDK module + `/spike` merged to main (46ef0d7); live test still pending
-- DHRUMIL-T03 onboarding (branch above): `/onboarding`, `lib/api` client (zod-validated, friendly errors), `lib/session`, home signed-in state, `<html lang>`
-- DHRUMIL-004 REVIEW (chat channel scoping, S2) and DHRUMIL-005 REQUEST (deploy server, P0)
+- Force-push recovery merge (34d6d87); DHRUMIL-016 REVIEW
+- DHRUMIL-T19 calls + voice notes; DHRUMIL-017 DECISION (D-009/D-027 + enable VoIP); DHRUMIL-018 REQUEST (voice server)
+- DHRUMIL-T15 Seal UI: QR verified to decode; page in en and ja; not-found state
 
 ## Blocked on
-- DHRUMIL-005: deployed server URL — needed for Vercel/Golden Path and to drop the auth mock in deployed builds (D-012 already met locally, DHRUMIL-006)
-- DHRUMIL-008: server creates a group per chat (D-029) — UI already handles it
+- **Humans:** enable Call/VoIP for our App Key in the Nexconn console (startCall → 80006); update D-009/D-027 (DHRUMIL-017)
+- DHRUMIL-008 / D-029: group channel per chat. Blocks clean landing-page captures (T12).
+- DHRUMIL-005: deployed server URL
 
 ## Mocks in use
 | Mock | Replaces | Remove when |
 |---|---|---|
-| – | (none — all routes live) | |
+| – | (none, all routes live) | |
 
 ## Next up
-1. Merge DHRUMIL-T03; point `NEXT_PUBLIC_API_URL` at the deployed server and re-test
-2. ~~DHRUMIL-T02 live test~~ done: live chat + `extra` ≤ 8 KB (DHRUMIL-006)
-3. ~~DHRUMIL-T04~~ done on branch
-4. ~~DHRUMIL-T05~~ done on branch
-5. ~~DHRUMIL-T06~~ done on branch (mock)
-6. ~~DHRUMIL-T07~~ done on branch (mock)
-7. DHRUMIL-T08 Golden Path polish (needs real T06/T07/T08 + deployed server)
+1. ~~Merge T19 and T15~~ merged (434ff69, 9cf28c9); smoke passed
+2. T12 landing page, when D-029 is done
+3. ~~DHRUMIL-T16 tone; DHRUMIL-T17 WhatsApp launcher~~ done on branches (DHRUMIL-019 asks for phrase-level softer wording)
+4. T13 README + AI_USAGE, T14 write-up (name the Call SDK as a used Nexconn feature)

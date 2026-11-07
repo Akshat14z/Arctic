@@ -2,7 +2,9 @@
 
 import { useState } from "react";
 import type { Deal, LangCode } from "@convocart/contracts";
+import Link from "next/link";
 import { formatPrice, localeFor } from "@/lib/format";
+import { SealQr, useSealUrl } from "./seal-qr";
 
 export type DealRole = "buyer" | "seller";
 
@@ -101,11 +103,24 @@ export function DealCard({ deal, lang, myRole, names, onAgree }: Props) {
           Couldn&apos;t record your agreement. Try again.
         </p>
       )}
-      {agreed && deal.sealCode && (
-        <p className="rounded-lg bg-success-bg px-3 py-2 text-sm text-success">
-          Handshake Seal <code className="font-mono">{deal.sealCode}</code>: both sides agreed to exactly this.
-        </p>
-      )}
+      {agreed && deal.sealCode && <SealBlock code={deal.sealCode} />}
     </article>
+  );
+}
+
+/** Handshake Seal (DHRUMIL-T15, D-023): show the QR at pickup; scanning it opens the verified deal. */
+function SealBlock({ code }: { code: string }) {
+  const url = useSealUrl(code);
+  return (
+    <div className="flex items-center gap-3 rounded-lg bg-success-bg p-3 text-sm text-success">
+      <SealQr url={url} size={96} />
+      <div className="flex min-w-0 flex-col gap-1">
+        <p className="font-semibold">Handshake Seal</p>
+        <p>Both sides agreed to exactly this. Show the code at pickup: scanning it opens the verified deal.</p>
+        <Link href={`/seal/${encodeURIComponent(code)}`} className="min-h-6 font-medium underline underline-offset-2">
+          Open the seal <span className="font-mono">{code}</span>
+        </Link>
+      </div>
+    </div>
   );
 }
