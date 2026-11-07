@@ -31,12 +31,13 @@ export function Inbox() {
 
   return (
     <section className="flex flex-col gap-4">
-      <h1 className="text-2xl font-semibold tracking-tight">Chats</h1>
+      <h1 className="page-title">Chats</h1>
+      <hr className="rule-double" />
 
       {error && (
-        <div role="alert" className="flex items-center justify-between gap-3 rounded-lg bg-danger-bg px-3 py-2 text-danger">
+        <div role="alert" className="note note-error flex items-center justify-between gap-3">
           <span>{error}</span>
-          <button type="button" onClick={() => setAttempt((n) => n + 1)} className="min-h-tap font-medium underline">
+          <button type="button" onClick={() => setAttempt((n) => n + 1)} className="btn btn-quiet shrink-0">
             Try again
           </button>
         </div>
@@ -45,45 +46,45 @@ export function Inbox() {
       {!items && !error && (
         <ul aria-busy className="flex flex-col gap-2">
           {[0, 1, 2].map((i) => (
-            <li key={i} className="h-[72px] animate-pulse rounded-xl bg-surface" />
+            <li key={i} className="skeleton h-[76px]" />
           ))}
         </ul>
       )}
 
       {items?.length === 0 && (
-        <div className="flex flex-col items-start gap-3 rounded-xl border border-dashed border-border p-6">
-          <p className="font-medium">No chats yet.</p>
+        <div className="well flex flex-col items-start gap-3 px-4 py-6">
+          <h2 className="item-title">No chats yet.</h2>
           <p className="text-muted">Find something you like and tap “Chat with seller”.</p>
-          <Link href="/listings" className="inline-flex min-h-tap items-center rounded-lg bg-brand px-4 font-medium text-brand-fg">
+          <Link href="/listings" className="btn btn-primary">
             Browse listings
           </Link>
         </div>
       )}
 
       {items && items.length > 0 && (
-        <ul className="flex flex-col gap-2">
+        <ul className="flex flex-col border-b border-border">
           {items.map((c) => (
-            <li key={c.channelId}>
+            <li key={c.channelId} className="border-t border-border first:border-t-0">
               <Link
                 href={`/chats/${encodeURIComponent(c.channelId)}`}
-                className="flex items-center gap-3 rounded-xl border border-border bg-surface p-3 hover:border-brand"
+                className="flex items-center gap-3 py-3 transition-colors hover:bg-surface"
               >
                 <div className="min-w-0 flex-1">
                   <div className="flex items-baseline justify-between gap-2">
-                    <p className="truncate font-medium">{c.otherUser.displayName}</p>
+                    <h2 className="item-title truncate">{c.otherUser.displayName}</h2>
                     {c.lastMessage && (
-                      <time dateTime={c.lastMessage.at} className="shrink-0 text-xs text-muted">
+                      <time dateTime={c.lastMessage.at} className="agate shrink-0 text-sm text-muted">
                         {new Date(c.lastMessage.at).toLocaleDateString(localeFor(lang), { day: "numeric", month: "short" })}
                       </time>
                     )}
                   </div>
-                  <p lang={c.listing.lang} className="truncate text-sm text-muted">
+                  <p lang={c.listing.lang} className="meta truncate">
                     {c.listing.title}
                   </p>
-                  {c.lastMessage && <p className="truncate text-sm">{c.lastMessage.text}</p>}
+                  {c.lastMessage && <p className="mt-0.5 truncate">{c.lastMessage.text}</p>}
                 </div>
                 {c.unreadCount > 0 && (
-                  <span className="rounded-full bg-brand px-2 py-0.5 text-xs font-semibold text-brand-fg" aria-label={`${c.unreadCount} unread`}>
+                  <span className="agate min-w-6 shrink-0 bg-brand px-1.5 py-0.5 text-center text-sm text-brand-fg" aria-label={`${c.unreadCount} unread`}>
                     {c.unreadCount}
                   </span>
                 )}

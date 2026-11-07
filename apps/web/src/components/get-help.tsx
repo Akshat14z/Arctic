@@ -40,7 +40,7 @@ export function GetHelp({ channelId, token }: { channelId: string; token: string
       <button
         type="button"
         onClick={() => dialog.current?.showModal()}
-        className="min-h-tap shrink-0 rounded-lg border border-border bg-surface px-3 text-sm font-medium"
+        className="btn btn-secondary shrink-0 text-sm"
       >
         Get help
       </button>
@@ -48,24 +48,25 @@ export function GetHelp({ channelId, token }: { channelId: string; token: string
       <dialog
         ref={dialog}
         aria-labelledby="get-help-title"
-        className="m-auto w-[min(100%-2rem,28rem)] rounded-2xl border border-border bg-surface p-0 text-text backdrop:bg-black/40"
+        className="m-auto w-[min(100%-2rem,28rem)] border-y-4 border-double border-text bg-bg p-0 text-text backdrop:bg-text/40"
       >
         <form onSubmit={submit} className="flex flex-col gap-4 p-5">
           <div className="flex flex-col gap-1">
-            <h2 id="get-help-title" className="text-lg font-semibold">
+            <h2 id="get-help-title" className="section-title">
               Get help from Handshake
             </h2>
-            <p className="text-sm text-muted">
+            <p className="meta">
               A support agent joins this chat and sees the whole conversation in both languages.
             </p>
           </div>
+          <hr className="rule-double" />
 
-          <fieldset className="flex flex-col gap-2">
-            <legend className="mb-1 font-medium">What&apos;s wrong?</legend>
+          <fieldset className="flex flex-col">
+            <legend className="label mb-2">What&apos;s wrong?</legend>
             {REASONS.map((r) => (
               <label
                 key={r.value}
-                className="flex min-h-tap cursor-pointer items-center gap-3 rounded-lg border border-border px-3 has-[:checked]:border-brand has-[:checked]:ring-2 has-[:checked]:ring-brand"
+                className="flex min-h-tap cursor-pointer items-center gap-3 border-b border-border px-1 first-of-type:border-t hover:bg-surface has-[:checked]:bg-surface has-[:checked]:font-semibold"
               >
                 <input
                   type="radio"
@@ -73,7 +74,7 @@ export function GetHelp({ channelId, token }: { channelId: string; token: string
                   value={r.value}
                   checked={reason === r.value}
                   onChange={() => setReason(r.value)}
-                  className="accent-[var(--brand)]"
+                  className="size-4 shrink-0 accent-text"
                 />
                 {r.label}
               </label>
@@ -81,20 +82,20 @@ export function GetHelp({ channelId, token }: { channelId: string; token: string
           </fieldset>
 
           <label className="flex flex-col gap-2">
-            <span className="font-medium">
-              Anything the agent should know? <span className="font-normal text-muted">(optional)</span>
+            <span className="label">
+              Anything the agent should know? <span className="hint">(optional)</span>
             </span>
             <textarea
               rows={3}
               maxLength={1000}
               value={note}
               onChange={(e) => setNote(e.target.value)}
-              className="rounded-lg border border-border bg-bg px-3 py-2 text-base"
+              className="field"
             />
           </label>
 
           {error && (
-            <p role="alert" className="rounded-lg bg-danger-bg px-3 py-2 text-sm text-danger">
+            <p role="alert" className="note note-error">
               {error}
             </p>
           )}
@@ -103,14 +104,15 @@ export function GetHelp({ channelId, token }: { channelId: string; token: string
             <button
               type="button"
               onClick={() => dialog.current?.close()}
-              className="min-h-tap flex-1 rounded-lg border border-border px-4 font-medium"
+              className="btn btn-secondary flex-1"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={!reason || busy}
-              className="min-h-tap flex-1 rounded-lg bg-brand px-4 font-medium text-brand-fg disabled:opacity-50"
+              aria-busy={busy}
+              className="btn btn-primary flex-1"
             >
               {busy ? "Asking…" : "Ask for help"}
             </button>

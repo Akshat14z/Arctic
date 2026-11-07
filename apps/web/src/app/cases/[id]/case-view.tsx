@@ -8,31 +8,32 @@ import { api, ApiError, friendlyMessage } from "@/lib/api/client";
 import { LANGUAGES } from "@/lib/languages";
 import { useRequireSession } from "@/lib/use-require-session";
 import { ChatThread } from "@/components/chat-thread";
+import { reasonLabel } from "@/lib/cases";
 
 const POLL_MS = 5000; // D-011: polling in v0
 
 function Status({ c }: { c: Case }) {
   if (c.status === "resolved") {
     return (
-      <div className="rounded-xl bg-success-bg p-4 text-success">
+      <div role="status" className="note note-success">
         <p className="font-semibold">Resolved</p>
-        {c.resolution && <p className="mt-1 text-text">{c.resolution}</p>}
+        {c.resolution && <p className="mt-1">{c.resolution}</p>}
       </div>
     );
   }
   if (c.status === "claimed" && c.agent) {
     return (
-      <div className="rounded-xl border border-brand bg-surface p-4">
+      <div role="status" className="note">
         <p className="font-semibold">{c.agent.displayName} from Handshake support is helping</p>
-        <p className="mt-1 text-sm text-muted">They can read everything in this chat, in every language.</p>
+        <p className="meta mt-1">They can read everything in this chat, in every language.</p>
       </div>
     );
   }
   const minutes = Math.ceil((Date.parse(c.slaDueAt) - Date.now()) / 60_000);
   return (
-    <div className="rounded-xl bg-guard-bg p-4 text-guard">
+    <div role="status" className="note note-guard">
       <p className="font-semibold">An agent is on the way</p>
-      <p className="mt-1 text-sm">
+      <p className="mt-1">
         {minutes > 0
           ? `Usually within ${minutes} minute${minutes === 1 ? "" : "s"}. You can keep writing here meanwhile.`
           : "This is taking longer than usual. We haven't forgotten you."}
@@ -44,13 +45,13 @@ function Status({ c }: { c: Case }) {
 function Person({ user, role, me }: { user?: User; role: string; me: boolean }) {
   const lang = user && LANGUAGES.find((l) => l.code === user.language);
   return (
-    <li className="flex items-baseline justify-between gap-3">
-      <span className="truncate">
+    <li className="flex items-baseline justify-between gap-3 border-b border-border py-2">
+      <span className="min-w-0 truncate">
         {user ? user.displayName : "Joining soon…"} {me && <span className="text-muted">(you)</span>}
-        <span className="block text-xs text-muted">{role}</span>
+        <span className="meta block">{role}</span>
       </span>
       {lang && (
-        <span lang={lang.code} className="shrink-0 text-sm text-muted">
+        <span lang={lang.code} className="meta shrink-0">
           reads {lang.native}
         </span>
       )}
@@ -90,14 +91,14 @@ export function CaseView() {
   if (error && !c) {
     return (
       <section className="flex flex-1 flex-col items-start justify-center gap-4">
-        <h1 className="text-2xl font-semibold">{error.notFound ? "Help request not found" : "Couldn't open this help request"}</h1>
+        <h1 className="page-title">{error.notFound ? "Help request not found" : "Couldn't open this help request"}</h1>
         <p className="text-muted">{error.text}</p>
         {error.notFound ? (
-          <Link href="/chats" className="inline-flex min-h-tap items-center rounded-lg bg-brand px-4 font-medium text-brand-fg">
+          <Link href="/chats" className="btn btn-primary">
             Your chats
           </Link>
         ) : (
-          <button type="button" onClick={() => setAttempt((n) => n + 1)} className="min-h-tap rounded-lg bg-brand px-4 font-medium text-brand-fg">
+          <button type="button" onClick={() => setAttempt((n) => n + 1)} className="btn btn-primary">
             Try again
           </button>
         )}
@@ -105,20 +106,21 @@ export function CaseView() {
     );
   }
 
-  if (!session || !c) return <div aria-busy className="h-72 animate-pulse rounded-xl bg-surface" />;
+  if (!session || !c) return <CaseSkeleton />;
   const me = session.user.id;
 
   return (
     <section className="-my-6 flex min-h-[calc(100dvh-3.5rem)] flex-col">
       <header className="sticky top-0 z-10 flex items-center gap-3 border-b border-border bg-bg py-3">
-        <Link
-          href={`/chats/${encodeURIComponent(c.channelId)}`}
-          aria-label="Back to the chat"
-          className="flex min-h-tap min-w-tap items-center justify-center rounded-lg text-xl"
-        >
-          ‹
+        <Link href={`/chats/${encodeURIComponent(c.channelId)}`} aria-label="Back to the chat" className="btn btn-icon shrink-0">
+          <svg aria-hidden="true" viewBox="0 0 20 20" className="size-5" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M12.5 4l-6 6 6 6" strokeLinecap="square" />
+          </svg>
         </Link>
-        <h1 className="font-semibold">Help request</h1>
+        <div className="min-w-0">
+          <h1 className="item-title">Help request</h1>
+          <p className="meta truncate">{reasonLabel(c.reason)}</p>
+        </div>
       </header>
 
       <div className="flex flex-col gap-3 pt-4">
@@ -128,14 +130,14 @@ export function CaseView() {
             Couldn&apos;t refresh the status. Retrying…
           </p>
         )}
-        <details className="rounded-xl border border-border bg-surface p-4">
-          <summary className="min-h-6 cursor-pointer font-medium">Who&apos;s in this chat</summary>
-          <ul className="mt-3 flex flex-col gap-2">
+        <details className="border-b border-border">
+          <summary className="min-h-tap cursor-pointer py-2.5">Who&apos;s in this chat</summary>
+          <ul className="border-t border-border">
             <Person user={c.buyer} role="Buyer" me={c.buyer.id === me} />
             <Person user={c.seller} role="Seller" me={c.seller.id === me} />
             <Person user={c.agent} role="Handshake support" me={c.agent?.id === me} />
           </ul>
-          <p className="mt-3 text-xs text-muted">Everyone reads every message in their own language.</p>
+          <p className="meta py-2">Everyone reads every message in their own language.</p>
         </details>
       </div>
 
@@ -147,5 +149,16 @@ export function CaseView() {
           closedText={resolved ? "This help request is resolved. Go back to the chat to keep talking." : undefined}
         />
     </section>
+  );
+}
+
+/** Loading: header, status strip and thread, ruled. */
+export function CaseSkeleton() {
+  return (
+    <div aria-busy="true" aria-label="Loading the help request" className="flex flex-col gap-4">
+      <div className="skeleton h-12" />
+      <div className="skeleton h-20" />
+      <div className="skeleton h-48" />
+    </div>
   );
 }

@@ -8,6 +8,7 @@ import { ListingDetail } from "./listing-detail";
 /** Link preview for WhatsApp and other chat apps (D-025): title, price and photo instead of a bare URL. */
 export async function generateMetadata({ params }: PageProps<"/listings/[id]">): Promise<Metadata> {
   const { id } = await params;
+  await connection(); // per-request: the fetch below must not run during prerender (blocking-prerender-current-time)
   try {
     const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/listings/${encodeURIComponent(id)}`, { next: { revalidate: 300 } });
     const parsed = ListingDetailResponseSchema.safeParse(await res.json());
@@ -34,7 +35,7 @@ async function Dynamic() {
 // Cache Components: URL data (useParams) must sit under Suspense so the static shell can prerender.
 export default function ListingPage() {
   return (
-    <Suspense fallback={<div aria-busy className="h-72 animate-pulse rounded-xl bg-surface" />}>
+    <Suspense fallback={<div aria-busy className="skeleton aspect-[4/3] w-full" />}>
       <ListingDetail />
       <Dynamic />
     </Suspense>

@@ -44,7 +44,7 @@ function useElapsed(startedAt?: number) {
   return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
 }
 
-const btn = "min-h-tap flex-1 rounded-lg px-4 font-medium disabled:opacity-50";
+const btn = "btn flex-1";
 
 /** Global: rings for incoming calls on any page once signed in, and shows the active call. */
 export function CallModal() {
@@ -71,20 +71,20 @@ export function CallModal() {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 p-4 sm:items-center">
+    <div className="fixed inset-0 z-50 flex items-end justify-center bg-text/40 p-4 sm:items-center">
       <section
         role="dialog"
         aria-modal="true"
         aria-labelledby="call-title"
-        className="flex w-full max-w-sm flex-col gap-4 rounded-2xl border border-border bg-surface p-5 text-text"
+        className="flex w-full max-w-sm flex-col gap-4 border border-text bg-bg p-5 text-text"
       >
         {call.status === "ended" ? (
-          <p id="call-title" role="status" className="text-center text-lg font-semibold">
+          <p id="call-title" role="status" className="text-center text-lg font-medium">
             {call.reason}
           </p>
         ) : (
           <div className="flex flex-col gap-1 text-center" aria-live="polite">
-            <p className="text-sm text-muted">
+            <p className="meta">
               {call.status === "incoming"
                 ? "Incoming voice call"
                 : call.status === "outgoing"
@@ -93,31 +93,31 @@ export function CallModal() {
                     ? "Connecting…"
                     : "On a voice call"}
             </p>
-            <h2 id="call-title" className="truncate text-xl font-semibold">
+            <h2 id="call-title" className="section-title mx-auto truncate">
               {call.peerName}
             </h2>
             {call.status === "connected" && (
-              <p className="font-mono text-2xl tabular-nums" aria-label={`Call time ${elapsed}`}>
+              <p className="agate text-2xl" aria-label={`Call time ${elapsed}`}>
                 {elapsed}
               </p>
             )}
-            <p className="text-xs text-muted">Voice is not translated. Use the chat for prices and deal terms.</p>
+            <p className="meta">Voice is not translated. Use the chat for prices and deal terms.</p>
           </div>
         )}
 
         {call.status === "incoming" && (
           <div className="flex gap-2">
-            <button type="button" disabled={pending} onClick={act(() => hangUp(call.callId))} className={`${btn} border border-danger text-danger`}>
+            <button type="button" disabled={pending} onClick={act(() => hangUp(call.callId))} className={`${btn} btn-danger`}>
               Decline
             </button>
-            <button type="button" autoFocus disabled={pending} onClick={act(() => acceptCall(call.callId))} className={`${btn} bg-brand text-brand-fg`}>
+            <button type="button" autoFocus disabled={pending} onClick={act(() => acceptCall(call.callId))} className={`${btn} btn-primary`}>
               Accept
             </button>
           </div>
         )}
 
         {(call.status === "outgoing" || call.status === "connecting") && (
-          <button type="button" autoFocus disabled={pending} onClick={act(() => hangUp(call.callId))} className={`${btn} bg-danger text-surface`}>
+          <button type="button" autoFocus disabled={pending} onClick={act(() => hangUp(call.callId))} className={`${btn} btn-primary`}>
             Cancel
           </button>
         )}
@@ -128,11 +128,11 @@ export function CallModal() {
               type="button"
               aria-pressed={call.muted}
               onClick={() => void setMuted(!call.muted)}
-              className={`${btn} border ${call.muted ? "border-danger bg-danger-bg text-danger" : "border-border"}`}
+              className={`${btn} ${call.muted ? "btn-danger bg-danger-bg" : "btn-secondary"}`}
             >
               {call.muted ? "Unmute" : "Mute"}
             </button>
-            <button type="button" autoFocus disabled={pending} onClick={act(() => hangUp(call.callId))} className={`${btn} bg-danger text-surface`}>
+            <button type="button" autoFocus disabled={pending} onClick={act(() => hangUp(call.callId))} className={`${btn} btn-primary`}>
               Hang up
             </button>
           </div>

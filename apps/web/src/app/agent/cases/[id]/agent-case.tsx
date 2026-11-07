@@ -18,33 +18,37 @@ import { LANGUAGES } from "@/lib/languages";
 import { useRequireAgent } from "@/lib/use-require-agent";
 import { ChatThread } from "@/components/chat-thread";
 
-const card = "rounded-xl border border-border bg-surface p-4";
 const langName = (code: LangCode) => LANGUAGES.find((l) => l.code === code)?.native ?? code;
 
 function DealCard({ deal, lang }: { deal: Deal; lang: LangCode }) {
   const pick = <T,>(r: Partial<Record<LangCode, T>>) => r[lang] ?? r.en ?? Object.values(r)[0];
   const when = (iso?: string) => (iso ? new Date(iso).toLocaleString(localeFor(lang), { day: "numeric", month: "short", hour: "numeric", minute: "2-digit" }) : "not yet");
   return (
-    <div className={card}>
-      <div className="flex items-baseline justify-between gap-3">
-        <h2 className="font-semibold">Agreed deal</h2>
-        <span className="text-xs text-muted">Frozen when the case opened</span>
-      </div>
-      <p className="mt-2">{pick(deal.item)}</p>
-      <p className="text-lg font-semibold">
+    <section className="flex flex-col gap-2 border-t border-border pt-4">
+      <h2 className="item-title">Agreed deal</h2>
+      <p className="meta">Frozen when the case opened</p>
+      <p>{pick(deal.item)}</p>
+      <p className="agate text-xl">
         {formatPrice(deal.price, lang)}
-        {deal.quantity > 1 && <span className="text-sm font-normal text-muted"> × {deal.quantity}</span>}
+        {deal.quantity > 1 && <span className="text-sm text-muted"> × {deal.quantity}</span>}
       </p>
-      {deal.delivery && <p className="text-sm text-muted">{deal.delivery.method === "pickup" ? "Pickup" : "Shipping"}{deal.delivery.date && ` · ${deal.delivery.date}`}</p>}
+      {deal.delivery && (
+        <p className="meta">
+          {deal.delivery.method === "pickup" ? "Pickup" : "Shipping"}
+          {deal.delivery.date && <>, <span className="agate">{deal.delivery.date}</span></>}
+        </p>
+      )}
       {(pick(deal.conditions) ?? []).length > 0 && (
-        <ul className="mt-2 list-disc pl-5 text-sm">
+        <ul className="list-disc pl-5 text-sm">
           {pick(deal.conditions)?.map((c) => <li key={c}>{c}</li>)}
         </ul>
       )}
-      <p className="mt-2 text-xs text-muted">
-        Buyer agreed {when(deal.agreedBy.buyer)} · Seller agreed {when(deal.agreedBy.seller)}
+      <p className="meta">
+        Buyer agreed <span className="agate">{when(deal.agreedBy.buyer)}</span>
+        <br />
+        Seller agreed <span className="agate">{when(deal.agreedBy.seller)}</span>
       </p>
-    </div>
+    </section>
   );
 }
 
@@ -54,12 +58,13 @@ function Transcript({ detail, lang }: { detail: CaseDetailResponse; lang: LangCo
   const people: User[] = [c.buyer, c.seller];
   const nameOf = (id: string) => people.find((p) => p.id === id)?.displayName ?? "Someone";
   const time = (iso: string) => new Date(iso).toLocaleTimeString(localeFor(lang), { hour: "numeric", minute: "2-digit" });
+  const cols = "grid gap-x-6 gap-y-1 md:grid-cols-[9rem_minmax(0,1fr)_minmax(0,1fr)]";
 
   return (
-    <div className={card}>
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        <h2 className="font-semibold">Conversation before the case</h2>
-        <div role="group" aria-label="Transcript view" className="flex rounded-lg border border-border text-sm">
+    <section className="flex flex-col gap-3">
+      <div className="flex flex-wrap items-end justify-between gap-2">
+        <h2 className="section-title">Conversation before the case</h2>
+        <div role="group" aria-label="Transcript view" className="flex border border-border">
           {(
             [
               ["mine", "In my language"],
@@ -71,7 +76,7 @@ function Transcript({ detail, lang }: { detail: CaseDetailResponse; lang: LangCo
               type="button"
               aria-pressed={view === v}
               onClick={() => setView(v)}
-              className={`min-h-tap rounded-lg px-3 ${view === v ? "bg-brand text-brand-fg" : ""}`}
+              className={`btn px-3 text-sm not-first:border-l-border ${view === v ? "bg-surface font-medium underline underline-offset-4" : "text-muted hover:bg-surface"}`}
             >
               {label}
             </button>
@@ -80,41 +85,61 @@ function Transcript({ detail, lang }: { detail: CaseDetailResponse; lang: LangCo
       </div>
 
       {transcript.length === 0 ? (
-        <p className="mt-3 text-sm text-muted">No messages recorded yet.</p>
+        <p className="meta border-y border-border py-6">No messages recorded yet.</p>
       ) : (
-        <ol className="mt-3 flex flex-col gap-3">
-          {transcript.map((t) => (
-            <li key={t.at + t.from} className="flex flex-col gap-1">
-              <p className="text-xs text-muted">
-                {nameOf(t.from)} · {time(t.at)} · wrote in <span lang={t.orig.lang}>{langName(t.orig.lang)}</span>
-              </p>
-              {view === "mine" ? (
-                <p lang={t.tr[lang] && t.orig.lang !== lang ? lang : t.orig.lang}>{t.orig.lang === lang ? t.orig.text : (t.tr[lang] ?? t.orig.text)}</p>
-              ) : (
-                <ul className="flex flex-col gap-1 border-l-2 border-border pl-3">
-                  {people.map((p) => {
+        <div className="border-y border-border">
+          <div aria-hidden className={`${cols} meta border-b border-border py-2 max-md:hidden`}>
+            <span />
+            {view === "mine" ? (
+              <>
+                <span>Original</span>
+                <span lang={lang}>{langName(lang)}</span>
+              </>
+            ) : (
+              people.map((p) => <span key={p.id}>{p.displayName} saw</span>)
+            )}
+          </div>
+          <ol className="flex flex-col">
+            {transcript.map((t) => (
+              <li key={t.at + t.from} className={`${cols} border-b border-border py-3 last:border-b-0`}>
+                <p className="flex flex-col text-sm">
+                  <span className="font-medium">{nameOf(t.from)}</span>
+                  <span className="agate text-muted">{time(t.at)}</span>
+                  <span className="text-muted">
+                    wrote in <span lang={t.orig.lang}>{langName(t.orig.lang)}</span>
+                  </span>
+                </p>
+                {view === "mine" ? (
+                  <>
+                    <p lang={t.orig.lang} className={t.orig.lang === lang ? "md:col-span-2" : "text-muted"}>
+                      {t.orig.text}
+                    </p>
+                    {t.orig.lang !== lang && <p lang={t.tr[lang] ? lang : t.orig.lang}>{t.tr[lang] ?? t.orig.text}</p>}
+                  </>
+                ) : (
+                  people.map((p) => {
                     const saw = t.shownTo[p.id];
                     return (
-                      <li key={p.id} className="text-sm">
-                        <span className="text-muted">{p.displayName} saw: </span>
+                      <p key={p.id} className="flex flex-col md:border-l md:border-border md:pl-3">
+                        <span className="meta md:sr-only">{p.displayName} saw: </span>
                         {saw ? (
                           <>
                             <span lang={saw.lang}>{saw.text}</span>
-                            <span className="text-xs text-muted"> ({saw.translated ? `translated to ${langName(saw.lang)}` : "original"})</span>
+                            <span className="meta"> ({saw.translated ? `translated to ${langName(saw.lang)}` : "original"})</span>
                           </>
                         ) : (
                           <span className="text-muted">not recorded</span>
                         )}
-                      </li>
+                      </p>
                     );
-                  })}
-                </ul>
-              )}
-            </li>
-          ))}
-        </ol>
+                  })
+                )}
+              </li>
+            ))}
+          </ol>
+        </div>
       )}
-    </div>
+    </section>
   );
 }
 
@@ -163,14 +188,14 @@ export function AgentCase() {
   if (error) {
     return (
       <section className="flex flex-1 flex-col items-start justify-center gap-4">
-        <h1 className="text-2xl font-semibold">{error.notFound ? "Case not found" : "Couldn't open this case"}</h1>
+        <h1 className="page-title">{error.notFound ? "Case not found" : "Couldn't open this case"}</h1>
         <p className="text-muted">{error.text}</p>
         {error.notFound ? (
-          <Link href="/agent" className="inline-flex min-h-tap items-center rounded-lg bg-brand px-4 font-medium text-brand-fg">
+          <Link href="/agent" className="btn btn-primary">
             Back to dispatch
           </Link>
         ) : (
-          <button type="button" onClick={() => setAttempt((n) => n + 1)} className="min-h-tap rounded-lg bg-brand px-4 font-medium text-brand-fg">
+          <button type="button" onClick={() => setAttempt((n) => n + 1)} className="btn btn-primary">
             Try again
           </button>
         )}
@@ -178,49 +203,54 @@ export function AgentCase() {
     );
   }
 
-  if (!session || !detail) return <div aria-busy className="h-72 animate-pulse rounded-xl bg-surface" />;
+  if (!session || !detail) return <div aria-busy className="skeleton h-72" />;
   const { case: c, summary } = detail;
   const lang = session.user.language;
   const mine = c.agent?.id === session.user.id;
   const deal = c.dealSnapshot ?? summary.deal;
 
   return (
-    <section data-wide className="flex flex-col gap-4">
-      <header className="flex flex-wrap items-center gap-3">
-        <Link href="/agent" aria-label="Back to dispatch" className="flex min-h-tap min-w-tap items-center justify-center rounded-lg text-xl">
-          ‹
+    <section data-wide className="flex flex-col gap-6">
+      <header className="flex flex-wrap items-start gap-3 border-b border-border pb-4">
+        <Link href="/agent" aria-label="Back to dispatch" className="btn btn-icon">
+          <svg aria-hidden width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
+            <path d="M10 3 5 8l5 5" />
+          </svg>
         </Link>
-        <div className="min-w-0 flex-1">
-          <h1 className="text-xl font-semibold">{reasonLabel(c.reason)}</h1>
-          <p className="text-sm text-muted">
+        <div className="flex min-w-0 flex-1 flex-col gap-1">
+          <h1 className="page-title">{reasonLabel(c.reason)}</h1>
+          <p className="meta">
             {c.buyer.displayName} (<span lang={c.buyer.language}>{langName(c.buyer.language)}</span>) ↔ {c.seller.displayName} (
-            <span lang={c.seller.language}>{langName(c.seller.language)}</span>) · {c.status === "resolved" ? "Resolved" : c.status === "claimed" ? (mine ? "Yours" : `Claimed by ${c.agent?.displayName}`) : "Open"}
+            <span lang={c.seller.language}>{langName(c.seller.language)}</span>)
           </p>
+          <p className="text-sm font-medium">{c.status === "resolved" ? "Resolved" : c.status === "claimed" ? (mine ? "Yours" : `Claimed by ${c.agent?.displayName}`) : "Open"}</p>
         </div>
         {c.status === "open" && (
-          <button type="button" onClick={() => act("claim")} disabled={busy} className="min-h-tap rounded-lg bg-brand px-4 font-medium text-brand-fg disabled:opacity-50">
+          <button type="button" onClick={() => act("claim")} disabled={busy} aria-busy={busy} className="btn btn-primary max-sm:w-full">
             Claim this case
           </button>
         )}
       </header>
 
       {actionError && (
-        <p role="alert" className="rounded-lg bg-danger-bg px-3 py-2 text-danger">
+        <p role="alert" className="note note-error">
           {actionError}
         </p>
       )}
 
-      <div className="grid gap-4 lg:grid-cols-2">
-        <div className="flex flex-col gap-4">
-          <div className={card}>
-            <h2 className="font-semibold">Summary</h2>
+      <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_20rem]">
+        <div className="lg:col-start-1 lg:row-start-1">
+          <Transcript detail={detail} lang={lang} />
+        </div>
+
+        <aside className="well flex flex-col gap-4 px-4 py-4 lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:self-start">
+          <section className="flex flex-col gap-2">
+            <h2 className="item-title">Summary</h2>
             {summary.text ? (
               <>
-                <p lang={summary.lang} className="mt-2">
-                  {summary.text}
-                </p>
+                <p lang={summary.lang}>{summary.text}</p>
                 {summary.keyFacts.length > 0 && (
-                  <ul className="mt-2 list-disc pl-5 text-sm">
+                  <ul className="list-disc pl-5 text-sm">
                     {summary.keyFacts.map((f) => (
                       <li key={f}>{f}</li>
                     ))}
@@ -228,55 +258,49 @@ export function AgentCase() {
                 )}
               </>
             ) : (
-              <p className="mt-2 text-sm text-muted">The AI summary appears here once the conversation has been recorded.</p>
+              <p className="meta">The AI summary appears here once the conversation has been recorded.</p>
             )}
-          </div>
+          </section>
 
-          {deal ? <DealCard deal={deal} lang={lang} /> : <p className={`${card} text-sm text-muted`}>No agreed deal in this chat.</p>}
-
-          <Transcript detail={detail} lang={lang} />
+          {deal ? <DealCard deal={deal} lang={lang} /> : <p className="meta border-t border-border pt-4">No agreed deal in this chat.</p>}
 
           {c.status === "resolved" ? (
-            <div className="rounded-xl bg-success-bg p-4 text-success">
-              <p className="font-semibold">Resolved</p>
-              <p className="mt-1 text-text">{c.resolution}</p>
+            <div className="note note-success">
+              <p className="font-medium text-success">Resolved</p>
+              <p className="mt-1">{c.resolution}</p>
             </div>
           ) : (
             mine && (
               <form
-                className={`${card} flex flex-col gap-2`}
+                className="flex flex-col gap-2 border-t border-border pt-4"
                 onSubmit={(e) => {
                   e.preventDefault();
                   act("resolve");
                 }}
               >
                 <label className="flex flex-col gap-2">
-                  <span className="font-semibold">Resolution</span>
+                  <span className="label">Resolution</span>
                   <textarea
                     rows={3}
                     maxLength={2000}
                     value={resolution}
                     onChange={(e) => setResolution(e.target.value)}
                     placeholder="What was decided, in a sentence both sides will understand"
-                    className="rounded-lg border border-border bg-bg px-3 py-2 text-base"
+                    className="field"
                   />
                 </label>
-                <button
-                  type="submit"
-                  disabled={!resolution.trim() || busy}
-                  className="min-h-tap self-start rounded-lg bg-brand px-4 font-medium text-brand-fg disabled:opacity-50"
-                >
+                <button type="submit" disabled={!resolution.trim() || busy} aria-busy={busy} className="btn btn-primary self-start">
                   {busy ? "Saving…" : "Mark resolved"}
                 </button>
               </form>
             )
           )}
-        </div>
+        </aside>
 
-        <div className={`${card} flex min-h-96 flex-col lg:max-h-[calc(100dvh-9rem)] lg:overflow-y-auto`}>
-          <h2 className="font-semibold">Chat with both sides</h2>
+        <section className="flex min-h-96 flex-col border-t border-border pt-4 lg:col-start-1 lg:row-start-2 lg:max-h-[calc(100dvh-9rem)] lg:overflow-y-auto">
+          <h2 className="section-title">Chat with both sides</h2>
           {!mine && c.status !== "resolved" ? (
-            <p className="m-auto max-w-xs py-8 text-center text-sm text-muted">Claim the case to join the chat.</p>
+            <p className="meta m-auto max-w-xs py-8 text-center">Claim the case to join the chat.</p>
           ) : (
             <ChatThread
               session={session}
@@ -286,7 +310,7 @@ export function AgentCase() {
               closedText={c.status === "resolved" ? "This case is resolved." : undefined}
             />
           )}
-        </div>
+        </section>
       </div>
     </section>
   );

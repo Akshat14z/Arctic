@@ -51,14 +51,14 @@ export function OnboardingForm() {
   }
 
   return (
-    <form onSubmit={submit} className="flex flex-col gap-6" noValidate>
-      <div className="flex flex-col gap-1">
-        <h1 className="text-2xl font-semibold tracking-tight">Get started</h1>
+    <form onSubmit={submit} className="flex flex-col gap-8" noValidate>
+      <div className="flex flex-col gap-2">
+        <h1 className="page-title">Get started</h1>
         <p className="text-muted">Two quick choices. No email or password.</p>
       </div>
 
       <label className="flex flex-col gap-2">
-        <span className="font-medium">Your name</span>
+        <span className="label">Your name</span>
         <input
           autoFocus
           autoComplete="given-name"
@@ -66,18 +66,18 @@ export function OnboardingForm() {
           value={name}
           onChange={(e) => setName(e.target.value)}
           placeholder="e.g. Priya"
-          className="min-h-tap rounded-lg border border-border bg-surface px-3 text-base"
+          className="field"
         />
-        <span className="text-sm text-muted">Shown to the people you chat with.</span>
+        <span className="hint">Shown to the people you chat with.</span>
       </label>
 
       <fieldset className="flex flex-col gap-2">
-        <legend className="mb-2 font-medium">The language you read</legend>
-        <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+        <legend className="label mb-2">The language you read</legend>
+        <div className="grid border-t border-border sm:grid-cols-2 sm:gap-x-6">
           {LANGUAGES.map((l) => (
             <label
               key={l.code}
-              className="flex min-h-tap cursor-pointer flex-col justify-center rounded-lg border border-border bg-surface px-3 py-2 has-[:checked]:border-brand has-[:checked]:ring-2 has-[:checked]:ring-brand has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-brand"
+              className="flex min-h-tap cursor-pointer items-center gap-3 border-b border-border py-3 hover:bg-surface has-[:checked]:bg-surface"
             >
               <input
                 type="radio"
@@ -86,29 +86,25 @@ export function OnboardingForm() {
                 checked={chosen === l.code}
                 onChange={() => setLanguage(l.code)}
                 aria-label={l.code === "en" ? l.native : `${l.native} (${l.english})`}
-                className="sr-only"
+                className="size-4 shrink-0 accent-text"
               />
-              <span lang={l.code} className="font-medium">
+              <span lang={l.code} className="text-lg">
                 {l.native}
               </span>
-              {l.code !== "en" && <span className="text-xs text-muted">{l.english}</span>}
+              {l.code !== "en" && <span className="meta ml-auto pr-2">{l.english}</span>}
             </label>
           ))}
         </div>
-        <span className="text-sm text-muted">Every message you get will be shown in this language.</span>
+        <span className="hint">Every message you get will be shown in this language.</span>
       </fieldset>
 
       {error && (
-        <p role="alert" className="rounded-lg bg-danger-bg px-3 py-2 text-danger">
+        <p role="alert" className="note note-error">
           {error}
         </p>
       )}
 
-      <button
-        type="submit"
-        disabled={!displayName || busy}
-        className="min-h-tap rounded-lg bg-brand px-4 font-medium text-brand-fg disabled:opacity-50"
-      >
+      <button type="submit" disabled={!displayName || busy} aria-busy={busy} className="btn btn-primary self-start px-8">
         {busy ? "Signing you in…" : "Start"}
       </button>
     </form>

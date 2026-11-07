@@ -25,7 +25,7 @@ export function SealQr({ url, size = 112 }: { url: string; size?: number }) {
       width={size}
       height={size}
       shapeRendering="crispEdges"
-      className="shrink-0 rounded-md"
+      className="shrink-0"
     >
       <rect width={n} height={n} fill="#fff" />
       <path d={d} fill="#000" />

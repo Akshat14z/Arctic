@@ -45,12 +45,13 @@ function ChatWithSeller({ listingId }: { listingId: string }) {
         type="button"
         onClick={open}
         disabled={busy}
-        className="min-h-tap rounded-lg bg-brand px-4 font-medium text-brand-fg disabled:opacity-50"
+        aria-busy={busy}
+        className="btn btn-primary w-full sm:w-auto sm:self-start"
       >
         {busy ? "Opening chat…" : "Chat with seller"}
       </button>
       {error && (
-        <p role="alert" className="text-sm text-danger">
+        <p role="alert" className="note note-error">
           {error}
         </p>
       )}
@@ -86,17 +87,17 @@ export function ListingDetail() {
   if (error) {
     return (
       <section className="flex flex-1 flex-col items-start justify-center gap-4">
-        <h1 className="text-2xl font-semibold">{error.notFound ? "Listing not found" : "Couldn't load this listing"}</h1>
+        <h1 className="page-title">{error.notFound ? "Listing not found" : "Couldn't load this listing"}</h1>
         <p className="text-muted">{error.text}</p>
         {error.notFound ? (
-          <Link href="/listings" className="inline-flex min-h-tap items-center rounded-lg bg-brand px-4 font-medium text-brand-fg">
+          <Link href="/listings" className="btn btn-primary">
             Browse listings
           </Link>
         ) : (
           <button
             type="button"
             onClick={() => setAttempt((n) => n + 1)}
-            className="min-h-tap rounded-lg bg-brand px-4 font-medium text-brand-fg"
+            className="btn btn-primary"
           >
             Try again
           </button>
@@ -105,7 +106,15 @@ export function ListingDetail() {
     );
   }
 
-  if (!listing) return <div aria-busy className="h-72 animate-pulse rounded-xl bg-surface" />;
+  if (!listing)
+    return (
+      <div aria-busy className="flex flex-col gap-4">
+        <div className="skeleton aspect-[4/3] w-full" />
+        <div className="skeleton h-8 w-3/4" />
+        <div className="skeleton h-6 w-1/3" />
+        <div className="skeleton h-20 w-full" />
+      </div>
+    );
 
   const mine = session?.user.id === listing.sellerId;
   const original = listing.lang !== lang ? LANGUAGES.find((l) => l.code === listing.lang) : undefined;
@@ -115,35 +124,37 @@ export function ListingDetail() {
     <article className="flex flex-col gap-5">
       {listing.imageUrl && (
         // eslint-disable-next-line @next/next/no-img-element -- arbitrary seller URLs
-        <img src={listing.imageUrl} alt={listing.title} className="aspect-[4/3] w-full rounded-xl object-cover" />
+        <img src={listing.imageUrl} alt={listing.title} className="aspect-[4/3] w-full border border-border object-cover" />
       )}
 
       <div className="flex flex-col gap-2">
-        <div className="flex items-start gap-2">
-          <h1 lang={textLang} className="text-2xl font-semibold tracking-tight text-balance">
-            {listing.title}
-          </h1>
+        <h1 lang={textLang} className="page-title text-balance">
+          {listing.title}
+        </h1>
+        <div className="flex items-center gap-3">
+          <p className="agate text-xl">{formatPrice(listing.price, lang)}</p>
           {listing.isDemo && <DemoBadge />}
         </div>
-        <p className="text-2xl font-semibold">{formatPrice(listing.price, lang)}</p>
         {original && (
-          <p className="text-sm text-muted">
+          <p className="meta">
             Written in <span lang={original.code}>{original.native}</span>
           </p>
         )}
       </div>
 
-      <p lang={textLang} className="whitespace-pre-line text-pretty">
+      <p lang={textLang} className="max-w-prose whitespace-pre-line text-pretty">
         {listing.description}
       </p>
 
       {!mine && <ChatWithSeller listingId={listing.id} />}
 
-      <ShareListing listing={listing} lang={lang} mine={mine} />
+      <div className="border-t border-border pt-4">
+        <ShareListing listing={listing} lang={lang} mine={mine} />
+      </div>
 
-      <div className="flex items-center justify-between gap-3 border-t border-border pt-4 text-sm text-muted">
+      <div className="meta flex items-center justify-between gap-3 border-t border-border pt-4">
         <span>{mine ? "This is your listing." : listing.seller ? `Sold by ${listing.seller.displayName}` : null}</span>
-        <time dateTime={listing.createdAt}>
+        <time dateTime={listing.createdAt} className="agate">
           {new Date(listing.createdAt).toLocaleDateString(localeFor(lang), { day: "numeric", month: "short" })}
         </time>
       </div>

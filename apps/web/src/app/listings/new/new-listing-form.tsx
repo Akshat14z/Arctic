@@ -14,7 +14,6 @@ import { LANGUAGES } from "@/lib/languages";
 import { useRequireSession } from "@/lib/use-require-session";
 
 const CURRENCIES = MoneySchema.shape.currency.removeDefault().options;
-const input = "min-h-tap w-full rounded-lg border border-border bg-surface px-3 text-base";
 
 export function NewListingForm() {
   const session = useRequireSession();
@@ -73,22 +72,22 @@ export function NewListingForm() {
 
   const error = (key: string) =>
     errors[key] && (
-      <span id={`${key}-error`} className="text-sm text-danger">
+      <span id={`${key}-error`} className="note note-error">
         {errors[key]}
       </span>
     );
 
   return (
     <form onSubmit={submit} noValidate className="flex flex-col gap-5">
-      <div className="flex flex-col gap-1">
-        <h1 className="text-2xl font-semibold tracking-tight">Sell something</h1>
+      <div className="flex flex-col gap-1 border-b border-border pb-4">
+        <h1 className="page-title">Sell something</h1>
         <p className="text-muted">
           Write in <span lang={lang}>{writtenIn}</span>. Buyers read it in their own language.
         </p>
       </div>
 
       <label className="flex flex-col gap-2">
-        <span className="font-medium">Title</span>
+        <span className="label">Title</span>
         <input
           lang={lang}
           maxLength={150}
@@ -96,13 +95,13 @@ export function NewListingForm() {
           onChange={(e) => setTitle(e.target.value)}
           aria-invalid={!!errors.title}
           aria-describedby={errors.title ? "title-error" : undefined}
-          className={input}
+          className="field"
         />
         {error("title")}
       </label>
 
       <label className="flex flex-col gap-2">
-        <span className="font-medium">Description</span>
+        <span className="label">Description</span>
         <textarea
           lang={lang}
           rows={5}
@@ -111,20 +110,20 @@ export function NewListingForm() {
           onChange={(e) => setDescription(e.target.value)}
           aria-invalid={!!errors.description}
           aria-describedby={errors.description ? "description-error" : undefined}
-          className={`${input} py-2`}
+          className="field"
           placeholder="Condition, size, what's included, where to pick up"
         />
         {error("description")}
       </label>
 
       <fieldset className="flex flex-col gap-2">
-        <legend className="mb-2 font-medium">Price</legend>
+        <legend className="label mb-2">Price</legend>
         <div className="flex gap-2">
           <select
             aria-label="Currency"
             value={cur}
             onChange={(e) => setCurrency(e.target.value as Money["currency"])}
-            className="min-h-tap rounded-lg border border-border bg-surface px-3"
+            className="field w-auto shrink-0"
           >
             {CURRENCIES.map((c) => (
               <option key={c}>{c}</option>
@@ -137,20 +136,20 @@ export function NewListingForm() {
             onChange={(e) => setAmount(e.target.value.replace(/[^\d.]/g, ""))}
             aria-invalid={!!errors.price}
             aria-describedby={errors.price ? "price-error" : "price-preview"}
-            className={input}
+            className="field"
             placeholder="200000"
           />
         </div>
         {price > 0 && !errors.price && (
-          <span id="price-preview" className="text-sm text-muted">
-            Buyers will see <strong className="text-text">{formatPrice({ amount: price, currency: cur }, lang)}</strong>
+          <span id="price-preview" className="hint">
+            Buyers will see <strong className="agate text-text">{formatPrice({ amount: price, currency: cur }, lang)}</strong>
           </span>
         )}
         {error("price")}
       </fieldset>
 
       <label className="flex flex-col gap-2">
-        <span className="font-medium">
+        <span className="label">
           Photo link <span className="font-normal text-muted">(optional)</span>
         </span>
         <input
@@ -160,19 +159,19 @@ export function NewListingForm() {
           onChange={(e) => setImageUrl(e.target.value)}
           aria-invalid={!!errors.imageUrl}
           aria-describedby={errors.imageUrl ? "imageUrl-error" : undefined}
-          className={input}
+          className="field"
           placeholder="https://"
         />
         {error("imageUrl")}
       </label>
 
       {failure && (
-        <p role="alert" className="rounded-lg bg-danger-bg px-3 py-2 text-danger">
+        <p role="alert" className="note note-error">
           {failure}
         </p>
       )}
 
-      <button type="submit" disabled={busy} className="min-h-tap rounded-lg bg-brand px-4 font-medium text-brand-fg disabled:opacity-50">
+      <button type="submit" disabled={busy} aria-busy={busy} className="btn btn-primary">
         {busy ? "Posting…" : "Post listing"}
       </button>
     </form>
