@@ -10,7 +10,8 @@ export async function generateMetadata({ params }: PageProps<"/listings/[id]">):
   const { id } = await params;
   await connection(); // per-request: the fetch below must not run during prerender (blocking-prerender-current-time)
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/listings/${encodeURIComponent(id)}`, { next: { revalidate: 300 } });
+    const base = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000";
+    const res = await fetch(`${base}/api/listings/${encodeURIComponent(id)}`, { next: { revalidate: 300 } });
     const parsed = ListingDetailResponseSchema.safeParse(await res.json());
     if (!parsed.success) return { title: "Listing" };
     const { listing } = parsed.data;

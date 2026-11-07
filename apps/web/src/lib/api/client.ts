@@ -4,7 +4,7 @@ import { ApiError } from "./errors";
 
 export { ApiError, friendlyMessage } from "./errors";
 
-const BASE = process.env.NEXT_PUBLIC_API_URL;
+const BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000";
 
 /** Absolute URL for a server path (e.g. a voice note's `/api/audio/:id`), for <audio src>. */
 export const apiUrl = (path: string) => (/^(https?:|blob:|data:)/.test(path) ? path : `${BASE ?? ""}${path}`);
