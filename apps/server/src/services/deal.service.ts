@@ -124,7 +124,7 @@ export async function extractDeal(channelId: string, userId: string): Promise<De
   for (const lang of ALL_LANGUAGES) {
     if (!itemMap[lang]) {
       try {
-        itemMap[lang] = await translateText(chat.listing.title, listingLang, lang);
+        itemMap[lang] = (await translateText(chat.listing.title, listingLang, lang)) ?? chat.listing.title;
       } catch {
         itemMap[lang] = chat.listing.title;
       }

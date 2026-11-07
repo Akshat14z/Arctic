@@ -172,3 +172,13 @@ model WebhookNonce {
   @@map("webhook_nonces")
 }
 
+
+/// Voice-note audio (DHRUMIL-T19). Durable, so clips survive restarts and redeploys.
+model VoiceClip {
+  id        String   @id @default(uuid())
+  mimeType  String
+  data      Bytes
+  createdAt DateTime @default(now())
+
+  @@map("voice_clips")
+}

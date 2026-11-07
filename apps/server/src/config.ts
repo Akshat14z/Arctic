@@ -8,8 +8,9 @@ const __dirname = path.dirname(__filename);
 
 // 1. Load local server .env (if present)
 dotenv.config();
-// 2. Load root workspace .env (override placeholder values with root .env values)
-dotenv.config({ path: path.resolve(__dirname, '../../../.env'), override: true });
+// 2. Load root workspace .env for anything still unset
+// No override: real environment variables (the platform's, a launch config's, the test setup's) win over .env files.
+dotenv.config({ path: path.resolve(__dirname, '../../../.env') });
 
 const ConfigSchema = z.object({
   NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
@@ -35,16 +36,8 @@ const ConfigSchema = z.object({
       const candidate = val || process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY;
       return candidate === 'your_llm_api_key_here' ? undefined : candidate;
     }),
-  LLM_MODEL: z
-    .string()
-    .default('gemini-2.0-flash')
-    .transform((val) => {
-      const candidate = (val || '').trim();
-      if (candidate.includes('3.5')) {
-        return candidate.includes('lite') ? 'gemini-2.0-flash-lite' : 'gemini-2.0-flash';
-      }
-      return candidate || 'gemini-2.0-flash';
-    }),
+  // The first model tried; gemini.ts falls back to models measured to work (the 2.0/2.5/1.5 family is retired: 404).
+  LLM_MODEL: z.string().trim().min(1).default('gemini-flash-lite-latest'),
 });
 
 export type Config = z.infer<typeof ConfigSchema>;
