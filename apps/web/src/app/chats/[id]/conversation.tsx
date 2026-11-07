@@ -72,13 +72,13 @@ export function Conversation() {
   return (
     <section className="-my-6 flex min-h-[calc(100dvh-3.5rem)] flex-col">
       <header className="sticky top-0 z-10 flex items-center gap-2 border-b border-border bg-bg py-2">
-        <Link href="/chats" aria-label="Back to chats" className="btn btn-icon shrink-0 border-transparent">
+        <Link href="/chats" aria-label="Back to chats" className="btn btn-icon shrink-0">
           <svg aria-hidden="true" viewBox="0 0 24 24" className="size-5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="square">
             <path d="M15 5l-7 7 7 7" />
           </svg>
         </Link>
         <div className="min-w-0 flex-1">
-          <h1 className="item-title truncate">{other.displayName}</h1>
+          <h1 className="item-title break-words">{other.displayName}</h1>
           <Link
             href={`/listings/${chat.listing.id}`}
             className="flex min-w-0 items-baseline gap-2 text-sm text-muted underline decoration-border underline-offset-2 hover:decoration-text"

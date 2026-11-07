@@ -55,6 +55,7 @@ export function TrySandbox() {
           Pick a side of a real chat. These are demo accounts, marked Demo everywhere, with no sign-up.
         </p>
       </div>
+      <hr className="rule-double" />
 
       <ul className="flex flex-col border-y border-border">
         {ROLES.map((r) => (

@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { Suspense } from "react";
+import { NavLinks, NavLinksStatic } from "@/components/nav-links";
 
 /** The product's header and column. The landing page (data-landing) hides this header and goes full width (globals.css). */
 export function AppChrome({ children }: { children: React.ReactNode }) {
@@ -10,12 +12,9 @@ export function AppChrome({ children }: { children: React.ReactNode }) {
             Handshake
           </Link>
           <nav aria-label="Main" className="ml-auto flex items-center gap-1">
-            <Link href="/listings" className="btn btn-quiet no-underline hover:underline">
-              Browse
-            </Link>
-            <Link href="/chats" className="btn btn-quiet no-underline hover:underline">
-              Chats
-            </Link>
+            <Suspense fallback={<NavLinksStatic />}>
+              <NavLinks />
+            </Suspense>
             <Link href="/listings/new" className="btn btn-primary ml-1">
               Sell
             </Link>

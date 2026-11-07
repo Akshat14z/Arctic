@@ -49,7 +49,7 @@
 /* The landing page brings its own masthead. */
 body:has([data-landing]) [data-app-chrome] { display: none; }
 /* Wide screens (the agent console) widen the header with the page, so the wordmark lines up with the content. */
-body:has([data-wide]) [data-app-chrome] > div { max-width: var(--container-6xl); }
+body:has([data-wide]) [data-app-chrome] > div { max-width: 72rem; }
 
 /* Product screenshots are not photographs: no mono treatment. */
 [data-slot][data-kind="product"] > img { filter: none; object-fit: cover; object-position: top center; }

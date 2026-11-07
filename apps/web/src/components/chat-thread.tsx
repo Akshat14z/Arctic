@@ -40,6 +40,7 @@ export function ChatThread({ session, channel, channelId, emptyText, closedText,
   const state = useConnectionState();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [attempt, setAttempt] = useState(0); // "Try again" re-runs the history load
   const [proposing, setProposing] = useState(false);
   const endRef = useRef<HTMLDivElement>(null);
   const lang = session.user.language;
@@ -65,7 +66,7 @@ export function ChatThread({ session, channel, channelId, emptyText, closedText,
       off();
     };
     // Keyed on the channel's type + id (not the object) so a new-but-equal ref doesn't resubscribe.
-  }, [channel.type, channel.id, state]);
+  }, [channel.type, channel.id, state, attempt]);
 
   useEffect(() => {
     endRef.current?.scrollIntoView({ block: "end" }); // braces: scroll methods may return a Promise, effects must not
@@ -122,8 +123,11 @@ export function ChatThread({ session, channel, channelId, emptyText, closedText,
         </p>
       )}
       {error && (
-        <p role="alert" className="note note-error mt-3">
-          {error}
+        <p role="alert" className="note note-error mt-3 flex flex-wrap items-center justify-between gap-2">
+          <span>{error}</span>
+          <button type="button" onClick={() => setAttempt((n) => n + 1)} className="btn btn-quiet">
+            Try again
+          </button>
         </p>
       )}
 

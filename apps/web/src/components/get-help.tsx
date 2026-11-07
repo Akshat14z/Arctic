@@ -59,6 +59,7 @@ export function GetHelp({ channelId, token }: { channelId: string; token: string
               A support agent joins this chat and sees the whole conversation in both languages.
             </p>
           </div>
+          <hr className="rule-double" />
 
           <fieldset className="flex flex-col">
             <legend className="label mb-2">What&apos;s wrong?</legend>

@@ -7,6 +7,7 @@ import { AgentQueueResponseSchema, CaseResponseSchema, type Case, type User } fr
 import { api, friendlyMessage } from "@/lib/api/client";
 import { minutesText, reasonLabel } from "@/lib/cases";
 import { LANGUAGES } from "@/lib/languages";
+import { localeFor } from "@/lib/format";
 import { clearSession } from "@/lib/session";
 import { useRequireAgent } from "@/lib/use-require-agent";
 
@@ -61,7 +62,7 @@ export function Queue() {
   const me = session.user;
   const helps = me.agentLanguages ?? [me.language];
   const now = Date.now();
-  const clock = (iso: string) => new Date(iso).toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" });
+  const clock = (iso: string) => new Date(iso).toLocaleTimeString(localeFor(session?.user.language ?? "en"), { hour: "numeric", minute: "2-digit" });
   const th = "py-2 pr-4 text-left align-bottom font-medium";
   const td = "py-3 pr-4 align-top max-md:py-0.5 max-md:pr-0";
 
@@ -151,13 +152,13 @@ export function Queue() {
                         </span>
                       ))}
                     </span>
-                    {matches && <span className="block text-sm font-medium text-success">Your languages</span>}
+                    {matches && <span className="block text-sm text-muted">Your languages</span>}
                   </td>
                   <td className={`${td} font-medium max-md:order-1`}>{reasonLabel(c.reason)}</td>
                   <td className={`${td} max-md:order-5`}>
                     <span className="agate text-sm">{clock(c.createdAt)}</span>
                     {c.status === "open" && (
-                      <span className={`block text-sm ${overdue ? "font-medium text-danger" : "text-muted"}`}>
+                      <span className="block text-sm text-muted">
                         Waiting <span className="agate">{minutesText(now - Date.parse(c.createdAt))}</span>
                       </span>
                     )}

@@ -24,13 +24,14 @@
 .btn-primary { background: var(--color-ink); color: var(--color-paper); }
 .btn-primary:hover:not(:disabled) { background: var(--color-ink-2); }
 .btn-primary:active:not(:disabled) { background: var(--color-rule-2); }
-.btn-secondary { background: transparent; color: var(--color-ink); border-color: var(--color-ink) transparent; }
+.btn-secondary { background: transparent; color: var(--color-ink); border-color: var(--color-ink); }
 .btn-secondary:hover:not(:disabled) { background: var(--color-paper-2); }
 .btn-secondary:active:not(:disabled) { background: var(--color-paper-3); }
-.btn-danger { background: transparent; color: var(--color-error); border-color: var(--color-error) transparent; }
+.btn-danger { background: transparent; color: var(--color-error); border-color: var(--color-error); }
 .btn-danger:hover:not(:disabled) { background: var(--color-danger-bg); }
 .btn-quiet { background: transparent; color: var(--color-ink); padding-inline: var(--space-xs); text-decoration: underline; text-decoration-color: var(--color-rule); text-underline-offset: 0.2em; }
 .btn-quiet:hover:not(:disabled) { text-decoration-color: var(--color-ink); }
+.btn-quiet[aria-current="page"] { text-decoration-color: var(--color-ink); text-decoration-thickness: 2px; }
 .btn-icon { min-width: 2.75rem; padding: 0; border-color: var(--color-rule); }
 .btn-icon:hover:not(:disabled) { background: var(--color-paper-2); border-color: var(--color-ink); }
 

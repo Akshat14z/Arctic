@@ -48,7 +48,7 @@ export function DealCard({ deal, lang, myRole, names, onAgree }: Props) {
   }
 
   return (
-    <article aria-label="Deal" className="flex w-full max-w-sm flex-col self-center bg-bg">
+    <article aria-label="Deal" className="flex w-full flex-col bg-bg">
       <hr className="rule-double" />
       <div className="flex items-baseline justify-between gap-3 pt-3">
         <h3 className="item-title">Deal</h3>

@@ -60,6 +60,7 @@ export function ListingsBrowser() {
   return (
     <section className="flex flex-col gap-4">
       <h1 className="page-title">Browse</h1>
+      <hr className="rule-double" />
 
       <form
         role="search"
