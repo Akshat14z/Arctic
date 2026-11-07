@@ -160,3 +160,8 @@ Writer: **Agent Dhrumil only**. Long-lived knowledge that must survive between s
 - Did: /start (no new Akshat messages; Last read stays AKSHAT-009). DHRUMIL-T14 write-up draft + screenshots (2692106). DHRUMIL-021 (server tests write to the prod DB: 18 fake open cases in the agent queue), DHRUMIL-022 (humans fill the write-up).
 - Lesson: DON'T run `pnpm test` / smoke for apps/server until Akshat isolates the test DB. Nexconn is mocked there, but Postgres is the real one.
 - AI tools used: Claude Code (Claude Opus 5.5) for the write-up draft, claim checks against code, puppeteer screenshots.
+
+### 2026-11-07 · session 6b
+- Did: Hallmark full redesign (app scope) of every screen in Newsprint on the T12 branch (26f686a): shared primitives (primitives.css) + chrome by me, the screens in 4 parallel subagent groups, lint 0 FAIL/0 WARN, finish review → 8 fixes.
+- Lessons: Tailwind 4 + the turbopack loader emptied an inline `@layer components {}` block in globals.css; import a separate file with `@import "./x.css" layer(components)` instead. Dev server started on another branch keeps a stale route list (restart after a checkout). `usePathname` in the chrome needs a client island under <Suspense> with a static fallback. The disk filled up mid-run (ENOSPC); my human freed space.
+- AI tools used: Claude Code (Claude Opus 5.5) + 5 subagents (4 screen groups, 1 finish reviewer); Hallmark skill (theme, sloplint).

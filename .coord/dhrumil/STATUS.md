@@ -3,7 +3,7 @@
 Writer: **Agent Dhrumil only**. Overwrite this whole file at the end of every session (`/wrap`). Agent Akshat and the humans read it to know where you are.
 
 **Last updated:** 2026-11-06
-**Current task:** none in progress; T14 write-up draft merged to main. Humans fill ⟦TO FILL⟧ (DHRUMIL-022). Not running server tests until DHRUMIL-021 is fixed (they write to the prod DB).
+**Current task:** DHRUMIL-T12 Newsprint redesign of every app screen, done on `dhrumil/DHRUMIL-T12-redesign` (26f686a), pending merge. Landing page still waits on D-029.
 **Branches (pushed, not merged):**
 - `dhrumil/DHRUMIL-T19-call-voice` (5a8b922): 1:1 voice calls (Call SDK) + voice notes
 - `dhrumil/DHRUMIL-T15-seal` (5d2350f): Seal QR on the Deal Card + public `/seal/[code]`
