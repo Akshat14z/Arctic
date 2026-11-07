@@ -50,11 +50,11 @@
 .field:disabled { background: var(--color-paper-2); color: var(--color-muted); cursor: not-allowed; }
 .field[aria-invalid="true"] { border-color: var(--color-error); }
 
-/* State notes: a ruled strip, tinted, with its colour on the left rule. */
-.note { padding: var(--space-sm) var(--space-md); border-left: 3px solid var(--color-rule-2); background: var(--color-paper-2); font-size: var(--text-sm); }
-.note-error { border-left-color: var(--color-error); background: var(--color-danger-bg); color: var(--color-ink); }
-.note-guard { border-left-color: var(--color-accent); background: var(--color-guard-bg); color: var(--color-ink); }
-.note-success { border-left-color: var(--color-success); background: var(--color-success-bg); color: var(--color-ink); }
+/* State notes: a tinted well, ruled top and bottom in its state colour. */
+.note { padding: var(--space-sm) var(--space-md); border-block: var(--rule-hair) solid var(--color-rule-2); background: var(--color-paper-2); font-size: var(--text-sm); }
+.note-error { border-block-color: var(--color-error); background: var(--color-danger-bg); color: var(--color-ink); }
+.note-guard { border-block-color: var(--color-accent); background: var(--color-guard-bg); color: var(--color-ink); }
+.note-success { border-block-color: var(--color-success); background: var(--color-success-bg); color: var(--color-ink); }
 
 /* Chat: square bubbles. Mine in ink, theirs on the second paper with a hairline. */
 .bubble { padding: var(--space-xs) var(--space-sm); border: var(--rule-hair) solid var(--color-rule); background: var(--color-paper); color: var(--color-ink); white-space: pre-wrap; overflow-wrap: anywhere; }

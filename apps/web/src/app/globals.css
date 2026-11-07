@@ -3,6 +3,7 @@
  * axes: light/slab-serif/warm · posture: restrained · contrast: pass · fold: pass · job: try · v2.0.0 */
 /* Hallmark · app pass · shape: app screen · scope: app · screens: listings, listing, sell, chats, conversation, case, agent queue, agent case, seal, onboarding, agent sign-in, try · type: app scale 1.2, no fluid heads, Spectral on controls and labels, Zilla Slab on heads only, Franklin agate on prices and counts */
 /* Hallmark · pre-emit critique: P4 H4 E4 S5 R4 V5 · weakest: E, the landing page (T12) waits on clean demo captures */
+/* Hallmark · dismissed 28a · listing-card thumbnails sit below the page title and search field in a long list, so the largest paint is the title and lazy loading is right */
 @import "tailwindcss";
 @import "./tokens.css";
 @import "./base.css" layer(base);
