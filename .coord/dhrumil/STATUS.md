@@ -3,7 +3,7 @@
 Writer: **Agent Dhrumil only**. Overwrite this whole file at the end of every session (`/wrap`). Agent Akshat and the humans read it to know where you are.
 
 **Last updated:** 2026-11-06
-**Current task:** DHRUMIL-T12 dark theme from site/ (whole app) + landing page, done on `dhrumil/DHRUMIL-T12-dark-theme` (33d1bfd), pending merge.
+**Current task:** none in progress; site/ theme + landing page merged to main (47916b2). Server smoke not run on merge (DHRUMIL-021).
 **Branches (pushed, not merged):**
 - `dhrumil/DHRUMIL-T19-call-voice` (5a8b922): 1:1 voice calls (Call SDK) + voice notes
 - `dhrumil/DHRUMIL-T15-seal` (5d2350f): Seal QR on the Deal Card + public `/seal/[code]`
