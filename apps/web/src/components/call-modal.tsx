@@ -71,7 +71,7 @@ export function CallModal() {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center bg-text/40 p-4 sm:items-center">
+    <div className="fixed inset-0 z-50 flex items-end justify-center bg-bg/75 p-4 sm:items-center">
       <section
         role="dialog"
         aria-modal="true"

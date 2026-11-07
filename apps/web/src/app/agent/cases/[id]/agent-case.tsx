@@ -64,7 +64,7 @@ function Transcript({ detail, lang }: { detail: CaseDetailResponse; lang: LangCo
     <section className="flex flex-col gap-3">
       <div className="flex flex-wrap items-end justify-between gap-2">
         <h2 className="section-title">Conversation before the case</h2>
-        <div role="group" aria-label="Transcript view" className="flex border border-border">
+        <div role="group" aria-label="Transcript view" className="flex gap-1 rounded-full border border-border bg-surface p-1">
           {(
             [
               ["mine", "In my language"],
@@ -76,7 +76,7 @@ function Transcript({ detail, lang }: { detail: CaseDetailResponse; lang: LangCo
               type="button"
               aria-pressed={view === v}
               onClick={() => setView(v)}
-              className={`btn px-3 text-sm not-first:border-l-border ${view === v ? "bg-surface font-medium underline underline-offset-4" : "text-muted hover:bg-surface"}`}
+              className={`btn px-3 text-sm ${view === v ? "bg-text font-medium text-bg" : "text-muted hover:text-text"}`}
             >
               {label}
             </button>
