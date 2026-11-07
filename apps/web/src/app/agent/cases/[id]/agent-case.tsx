@@ -64,7 +64,7 @@ function Transcript({ detail, lang }: { detail: CaseDetailResponse; lang: LangCo
     <section className="flex flex-col gap-3">
       <div className="flex flex-wrap items-end justify-between gap-2">
         <h2 className="section-title">Conversation before the case</h2>
-        <div role="group" aria-label="Transcript view" className="flex gap-1 rounded-full border border-border bg-surface p-1">
+        <div role="group" aria-label="Transcript view" className="grid w-full grid-cols-2 gap-1 rounded-full border border-border bg-surface p-1 sm:inline-grid sm:w-auto">
           {(
             [
               ["mine", "In my language"],
@@ -250,7 +250,7 @@ export function AgentCase() {
               <>
                 <p lang={summary.lang}>{summary.text}</p>
                 {summary.keyFacts.length > 0 && (
-                  <ul className="list-disc pl-5 text-sm">
+                  <ul className="list-disc pl-5 text-sm [overflow-wrap:anywhere]">
                     {summary.keyFacts.map((f) => (
                       <li key={f}>{f}</li>
                     ))}

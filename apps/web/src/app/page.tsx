@@ -38,8 +38,8 @@ export default function Home() {
 
         <div className="grid flex-1 grid-cols-[minmax(0,1fr)] items-center gap-10 px-5 pb-8 sm:px-8 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)] lg:gap-12 lg:px-14">
           <div className="flex flex-col gap-6">
-            <h1 className="max-w-none font-display text-[clamp(1.75rem,3.7vw,3.25rem)] uppercase leading-[1.05] tracking-[0.02em]">
-              Same deal, in both languages.
+            <h1 className="max-w-none font-display text-[clamp(1.5rem,3.7vw,3.25rem)] uppercase leading-[1.05] tracking-[0.02em]">
+              Same deal, in both <span className="whitespace-nowrap">languages.</span>
             </h1>
             <p className="max-w-[40ch] text-lg text-ink-2">Marketplace chat that translates every message and spells out every amount.</p>
             <div className="flex flex-wrap items-center gap-3">
@@ -52,11 +52,11 @@ export default function Home() {
 
           {/* Signature: the same exchange on two screens */}
           <div className="flex flex-col gap-4">
-            <figure className="flex w-[88%] flex-col gap-2">
+            <figure className="flex w-full flex-col gap-2 sm:w-[88%]">
               <Shot src="/screens/chat-buyer.png" alt="Priya's screen: her message and Kenji's reply, both in Hindi" w={780} h={382} hero />
               <figcaption className="text-sm text-muted">Priya reads Hindi</figcaption>
             </figure>
-            <figure className="flex w-[88%] flex-col gap-2 self-end">
+            <figure className="flex w-full flex-col gap-2 self-end sm:w-[88%]">
               <Shot src="/screens/chat-seller.png" alt="Kenji's screen: the same two messages, both in Japanese" w={780} h={476} hero />
               <figcaption className="text-sm text-muted">Kenji reads Japanese</figcaption>
             </figure>
@@ -83,12 +83,12 @@ export default function Home() {
             Type &ldquo;2 lakh&rdquo; and Handshake asks first: it shows ₹2,00,000, so the buyer in Tokyo reads the same number you meant.
           </p>
         </div>
-        <Shot src="/screens/guard.png" alt="Meaning Guard: '2 lakh' becomes ₹2,00,000 before the message is sent" w={780} h={900} className="mx-auto max-w-sm" />
+        <Shot src="/screens/guard.png" alt="Meaning Guard: '2 lakh' becomes ₹2,00,000 before the message is sent" w={704} h={856} className="mx-auto max-w-sm" />
       </section>
 
       {/* Deal Card and Seal */}
       <section className={`${panel} grid items-center gap-8 px-5 py-12 sm:px-8 grid-cols-[minmax(0,1fr)] md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:px-14 lg:py-20`}>
-        <Shot src="/screens/seal.png" alt="A Handshake Seal: the agreed terms, both names and a QR code anyone can check" w={780} h={1688} className="mx-auto max-w-xs md:order-first" />
+        <Shot src="/screens/seal.png" alt="A sealed Deal Card: the agreed terms, both agree times and the Seal's QR code" w={716} h={1160} className="mx-auto max-w-sm md:order-first" />
         <div className="flex flex-col gap-4">
           <h2 className="max-w-[18ch] font-display text-[clamp(1.75rem,3vw,2.75rem)] uppercase leading-[1.05]">Agree once. Prove it at pickup.</h2>
           <p className="max-w-[44ch] text-ink-2">
@@ -105,13 +105,13 @@ export default function Home() {
             Tap Get help and an agent joins the chat. They see what each side wrote, what each side read, and the deal you both agreed to.
           </p>
         </div>
-        <Shot src="/screens/agent.png" alt="The agent console: the conversation in both languages, a case summary and the frozen deal" w={2560} h={1600} />
+        <Shot src="/screens/agent.png" alt="The agent console: the conversation in the original and in the agent's language, beside the case summary" w={2512} h={816} />
       </section>
 
       {/* Close */}
-      <section className={`${panel} flex flex-col items-start gap-6 px-5 py-12 sm:px-8 lg:px-14 lg:py-20`}>
-        <h2 className="max-w-[20ch] font-display text-[clamp(1.75rem,3vw,2.75rem)] uppercase leading-[1.05]">Try both sides of a real chat.</h2>
-        <div className="flex flex-wrap gap-3">
+      <section className={`${panel} flex flex-col items-center gap-6 px-5 py-12 text-center sm:px-8 lg:px-14 lg:py-20`}>
+        <h2 className="max-w-[20ch] text-balance font-display text-[clamp(1.75rem,3vw,2.75rem)] uppercase leading-[1.05]">Try both sides of a real chat.</h2>
+        <div className="flex flex-wrap justify-center gap-3">
           <Link href="/try" className="btn btn-primary">
             Try the demo
           </Link>
