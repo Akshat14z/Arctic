@@ -13,7 +13,7 @@ export function HomeActions() {
     return (
       <Link
         href="/onboarding"
-        className="btn btn-primary self-start"
+        className="btn btn-secondary self-start"
       >
         Get started
       </Link>

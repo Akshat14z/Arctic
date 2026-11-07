@@ -1,8 +1,9 @@
 /* Hallmark · shape: app screen · genre: atmospheric · theme: brand (site/, Akshat's landing template) · redesign: restyle · scope: app
  * paper: oklch(14.6% 0.004 286) · accent: oklch(93.2% 0.003 106) (the frame grey) · display: Syne 800 · body: Inter
  * nav: kept, inside the pale frame · signature: kept, the same message on two screens · states: loading, empty, error, busy, disabled, not found
- * axes: dark/display-heavy/neutral · posture: cinematic, restrained · contrast: pass · v2.0.0 */
+ * axes: dark/display-heavy/neutral · posture: restrained (cinematic) · contrast: pass · v2.0.0 */
 /* Hallmark · pre-emit critique: P4 H4 E4 S4 R4 V4 · weakest: S, Syne is Latin only, so Indic and Japanese heads fall back to Noto Sans; kept heads short and in UI copy */
+/* Hallmark · waive 23 · the landing's root and the app body paint --color-frame behind the dark panels · the frame is the template's pale device bezel, a field colour that happens to share the accent's value; the accent itself only marks focus and selection */
 /* Hallmark · dismissed 28a · listing-card thumbnails sit below the page title and search field in a long list, so the largest paint is the title and lazy loading is right */
 @import "tailwindcss";
 @import "./tokens.css";
@@ -27,6 +28,7 @@
   --color-bg: var(--color-paper);
   --color-surface: var(--color-paper-2);
   --color-text: var(--color-ink);
+  --color-ink-2: var(--color-ink-2);
   --color-muted: var(--color-muted);
   --color-border: var(--color-rule);
   --color-brand: var(--color-ink);
