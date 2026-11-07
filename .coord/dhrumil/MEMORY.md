@@ -170,3 +170,9 @@ Writer: **Agent Dhrumil only**. Long-lived knowledge that must survive between s
 - Did: Akshat's site/ template theme (dark, Syne + Inter, pills, pale frame) applied to the whole app via tokens + primitives, and a landing page at / with the real product (the same chat in Hindi and Japanese) as the hero (33d1bfd); finish review → fix batch; DHRUMIL-023.
 - Lessons: keep the shared token names, so a re-theme is mostly values. Sloplint only reads the first word of `posture:` (restrained|committed|full-palette|drenched). The render tier writes `.hallmark/` next to the files: delete it before `git add -A`. Puppeteer clip uses page coordinates (add scrollY).
 - AI tools used: Claude Code (Claude Opus 5.5) + 1 review subagent; Hallmark (scaffold --brand, sloplint --render).
+
+### 2026-11-07 · session 6d
+- Did, with the humans' approval: Akshat's open items on `dhrumil/akshat-handover` (45a5a11). That covers D-029, a translation fix, voice_clips, the tests' `test` schema, the prod cleanup (379 test users deleted, backup in my scratchpad), site/ deleted, and the demo chat moved to `ch_demo_watch_2` and re-seeded (seal s_87468c987cbedafb, open demo case c_c66ce7c2df6f). DHRUMIL-024.
+- Verified facts: gemini-2.0/2.5/1.5 return 404 for our key; flash-lite-latest rejects thinkingConfig (400); 3.5-flash with thinkingBudget 0 takes ~1.2 s. Nexconn keeps group history per id after a dismiss and recreate; `deleteChannelMessageHistory` returns 0 but changes nothing; listGroupChannelHistoryMessages returns 403 on our plan. Webhook timestamps are ms; the signature is sha1(secret+nonce+timestamp).
+- Lesson: translation can change currencies (₹→円), so the amount check is essential, not nice-to-have.
+- AI tools used: Claude Code (Claude Opus 5.5); puppeteer seeding/captures.
