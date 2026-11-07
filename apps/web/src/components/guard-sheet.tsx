@@ -55,7 +55,7 @@ export function GuardSheet({ voice, text, issues, blocking, lang, onEdit, onUseS
         onEdit();
       }}
       aria-labelledby="guard-title"
-      className="m-auto w-[min(100%-2rem,28rem)] border border-text bg-bg p-0 text-text backdrop:bg-text/40"
+      className="m-auto w-[min(100%-2rem,28rem)] rounded-xl border border-border bg-surface p-0 text-text backdrop:bg-bg/75"
     >
       <div className="flex flex-col gap-4 p-5">
         <div className="flex flex-col gap-2">

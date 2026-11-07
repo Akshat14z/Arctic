@@ -1,66 +1,66 @@
 /* ---------------------------------------------------------------------------------------------
-   App primitives (Newsprint, app scope). Rules, never boxes; square; ink for the primary action;
-   brick only for links, focus and a tick. Every control: rest, hover, active, focus-visible,
+   App primitives (Akshat's theme from site/, app scope): near-black screens, white type, raised
+   dark panels, white pills for the primary action, glass pills for the rest. Every control: rest, hover, active, focus-visible,
    disabled, and busy via aria-busy.
    --------------------------------------------------------------------------------------------- */
-.page-title { font-size: var(--text-2xl); max-width: 28ch; }
+.page-title { font-size: var(--text-2xl); max-width: 28ch; text-transform: uppercase; }
 .section-title { font-size: var(--text-xl); max-width: 36ch; }
-.item-title { font-size: var(--text-lg); line-height: 1.2; max-width: 40ch; }
+.item-title { font-family: var(--font-body); font-weight: 600; letter-spacing: 0; font-size: var(--text-lg); line-height: 1.25; max-width: 40ch; }
 .meta { font-size: var(--text-sm); font-weight: 500; color: var(--color-muted); }
 .agate { font-family: var(--font-outlier); font-weight: 500; font-variant-numeric: tabular-nums; }
 
 .rule { border: 0; border-top: var(--rule-hair) solid var(--color-rule); margin: 0; }
-.rule-double { box-sizing: content-box; height: 2px; border: 0; border-block: var(--rule-hair) solid var(--color-rule-2); margin: 0; }
-.well { background: var(--color-paper-2); border-block: var(--rule-hair) solid var(--color-rule); }
+.rule-double { border: 0; border-top: var(--rule-hair) solid var(--color-rule-2); margin: 0; }
+.well { background: var(--color-paper-2); border: var(--rule-hair) solid var(--color-rule); border-radius: var(--radius-card); }
 
 .btn {
   display: inline-flex; align-items: center; justify-content: center; gap: var(--space-xs);
-  min-height: 2.75rem; padding: 0 var(--space-md); border: var(--rule-hair) solid transparent; border-radius: 0;
-  font: 500 var(--text-md)/1.1 var(--font-body); text-decoration: none; cursor: pointer; text-align: center;
+  min-height: 2.75rem; padding: 0 var(--space-lg); border: var(--rule-hair) solid transparent; border-radius: var(--radius-pill);
+  font: 500 var(--text-md)/1.1 var(--font-body); text-decoration: none; cursor: pointer; text-align: center; white-space: nowrap;
   transition: background-color var(--dur-micro) var(--ease-out), color var(--dur-micro) var(--ease-out), border-color var(--dur-micro) var(--ease-out);
 }
 .btn:disabled, .btn[aria-disabled="true"] { opacity: 0.5; cursor: not-allowed; }
 .btn[aria-busy="true"] { cursor: progress; }
 .btn-primary { background: var(--color-ink); color: var(--color-paper); }
 .btn-primary:hover:not(:disabled) { background: var(--color-ink-2); }
-.btn-primary:active:not(:disabled) { background: var(--color-rule-2); }
-.btn-secondary { background: transparent; color: var(--color-ink); border-color: var(--color-ink); }
-.btn-secondary:hover:not(:disabled) { background: var(--color-paper-2); }
+.btn-primary:active:not(:disabled) { background: var(--color-muted); }
+.btn-secondary { background: var(--color-paper-2); color: var(--color-ink); border-color: var(--color-rule-2); }
+.btn-secondary:hover:not(:disabled) { background: var(--color-paper-3); border-color: var(--color-ink-2); }
 .btn-secondary:active:not(:disabled) { background: var(--color-paper-3); }
 .btn-danger { background: transparent; color: var(--color-error); border-color: var(--color-error); }
 .btn-danger:hover:not(:disabled) { background: var(--color-danger-bg); }
 .btn-quiet { background: transparent; color: var(--color-ink); padding-inline: var(--space-xs); text-decoration: underline; text-decoration-color: var(--color-rule); text-underline-offset: 0.2em; }
 .btn-quiet:hover:not(:disabled) { text-decoration-color: var(--color-ink); }
 .btn-quiet[aria-current="page"] { text-decoration-color: var(--color-ink); text-decoration-thickness: 2px; }
-.btn-icon { min-width: 2.75rem; padding: 0; border-color: var(--color-rule); }
-.btn-icon:hover:not(:disabled) { background: var(--color-paper-2); border-color: var(--color-ink); }
+.btn-icon { min-width: 2.75rem; padding: 0; border-color: var(--color-rule-2); background: var(--color-paper-2); }
+.btn-icon:hover:not(:disabled) { background: var(--color-paper-3); border-color: var(--color-ink-2); }
 
-.link { color: var(--color-accent); text-decoration: underline; text-decoration-color: var(--color-accent); text-decoration-thickness: 1px; text-underline-offset: 0.16em; }
-.link:hover { text-decoration-thickness: 2px; }
+.link { color: var(--color-ink); text-decoration: underline; text-decoration-color: var(--color-muted); text-decoration-thickness: 1px; text-underline-offset: 0.16em; }
+.link:hover { text-decoration-color: var(--color-ink); text-decoration-thickness: 2px; }
 
 .label { display: block; font-size: var(--text-sm); font-weight: 500; color: var(--color-ink-2); }
 .hint { font-size: var(--text-sm); color: var(--color-muted); }
 .field {
-  width: 100%; min-height: 2.75rem; padding: var(--space-xs) var(--space-sm); border: var(--rule-hair) solid var(--color-rule-2); border-radius: 0;
-  background: var(--color-paper); color: var(--color-ink); font: 400 var(--text-md)/1.4 var(--font-body);
+  width: 100%; min-height: 2.75rem; padding: var(--space-xs) var(--space-md); border: var(--rule-hair) solid var(--color-rule-2); border-radius: var(--radius-field);
+  background: var(--color-paper-2); color: var(--color-ink); font: 400 var(--text-md)/1.4 var(--font-body);
   transition: border-color var(--dur-micro) var(--ease-out), background-color var(--dur-micro) var(--ease-out);
 }
 .field::placeholder { color: var(--color-muted); }
-.field:hover:not(:disabled) { border-color: var(--color-ink); }
+.field:hover:not(:disabled) { border-color: var(--color-ink-2); }
 .field:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 0; border-color: var(--color-ink); }
-.field:disabled { background: var(--color-paper-2); color: var(--color-muted); cursor: not-allowed; }
+.field:disabled { background: var(--color-paper); color: var(--color-muted); cursor: not-allowed; }
 .field[aria-invalid="true"] { border-color: var(--color-error); }
 
-/* State notes: a tinted well, ruled top and bottom in its state colour. */
-.note { padding: var(--space-sm) var(--space-md); border-block: var(--rule-hair) solid var(--color-rule-2); background: var(--color-paper-2); font-size: var(--text-sm); }
-.note-error { border-block-color: var(--color-error); background: var(--color-danger-bg); color: var(--color-ink); }
-.note-guard { border-block-color: var(--color-accent); background: var(--color-guard-bg); color: var(--color-ink); }
-.note-success { border-block-color: var(--color-success); background: var(--color-success-bg); color: var(--color-ink); }
+/* State notes: a tinted rounded panel with a hairline in its state colour. */
+.note { padding: var(--space-sm) var(--space-md); border: var(--rule-hair) solid var(--color-rule-2); border-radius: var(--radius-field); background: var(--color-paper-2); font-size: var(--text-sm); }
+.note-error { border-color: var(--color-error); background: var(--color-danger-bg); color: var(--color-ink); }
+.note-guard { border-color: var(--color-guard); background: var(--color-guard-bg); color: var(--color-ink); }
+.note-success { border-color: var(--color-success); background: var(--color-success-bg); color: var(--color-ink); }
 
-/* Chat: square bubbles. Mine in ink, theirs on the second paper with a hairline. */
-.bubble { padding: var(--space-xs) var(--space-sm); border: var(--rule-hair) solid var(--color-rule); background: var(--color-paper); color: var(--color-ink); white-space: pre-wrap; overflow-wrap: anywhere; }
+/* Chat: rounded bubbles. Mine in white, theirs on the raised dark panel with a hairline. */
+.bubble { padding: var(--space-xs) var(--space-md); border: var(--rule-hair) solid var(--color-rule); border-radius: var(--radius-lg, 20px); background: var(--color-paper-2); color: var(--color-ink); white-space: pre-wrap; overflow-wrap: anywhere; }
 .bubble-mine { background: var(--color-ink); border-color: var(--color-ink); color: var(--color-paper); }
 
-.skeleton { background: var(--color-paper-2); border-block: var(--rule-hair) solid var(--color-rule); }
+.skeleton { background: var(--color-paper-2); border-radius: var(--radius-field); }
 @media (prefers-reduced-motion: no-preference) { .skeleton { animation: skeleton-pulse 1.4s var(--ease-in-out) infinite alternate; } }
 @keyframes skeleton-pulse { from { opacity: 1; } to { opacity: 0.55; } }

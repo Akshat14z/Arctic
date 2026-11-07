@@ -48,7 +48,7 @@ export function GetHelp({ channelId, token }: { channelId: string; token: string
       <dialog
         ref={dialog}
         aria-labelledby="get-help-title"
-        className="m-auto w-[min(100%-2rem,28rem)] border-y-4 border-double border-text bg-bg p-0 text-text backdrop:bg-text/40"
+        className="m-auto w-[min(100%-2rem,28rem)] rounded-xl border border-border bg-surface p-0 text-text backdrop:bg-bg/75"
       >
         <form onSubmit={submit} className="flex flex-col gap-4 p-5">
           <div className="flex flex-col gap-1">
