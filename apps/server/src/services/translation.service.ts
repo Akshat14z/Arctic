@@ -45,13 +45,23 @@ async function translateWithGemini(text: string, from: LangCode, to: LangCode): 
   const prompt = `You are a real-time translation engine for Handshake, a cross-language marketplace.
 Translate the following message directly from language code '${from}' to '${to}'.
 Guidelines:
-- Preserve currency figures, numbers, and proper nouns.
+- Keep every amount and currency symbol exactly as written: "₹14,000" stays "₹14,000". Never convert currencies or units.
+- Preserve numbers and proper nouns.
 - Keep the natural, concise conversational tone of buyer-seller negotiation.
 - Output ONLY the translated text without extra formatting, explanations, or quotes.
 
 Message:
 ${text}`;
-  return geminiGenerate([{ text: prompt }], { maxOutputTokens: 512, timeoutMs: 3500 });
+  const out = await geminiGenerate([{ text: prompt }], { maxOutputTokens: 512, timeoutMs: 3500 });
+  // Meaning check: every rupee amount in the source must survive word for word (a model once turned ₹14,000 into 14,000円).
+  const missing = rupeeAmounts(text).filter((amt) => !out.replace(/\s/g, '').includes(amt));
+  if (missing.length) throw new Error(`translation changed an amount (${missing.join(', ')})`);
+  return out;
+}
+
+/** "₹14,000", "Rs 500", "INR 2,00,000" → the digits with their ₹ form, e.g. ["₹14,000"]. */
+export function rupeeAmounts(text: string): string[] {
+  return [...text.matchAll(/(?:₹|\bRs\.?|\bINR)\s?(\d[\d,]*(?:\.\d+)?)/gi)].map((m) => `₹${m[1]}`).filter((a) => text.includes(a));
 }
 
 /**

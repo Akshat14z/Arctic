@@ -53,11 +53,11 @@ export default function Home() {
           {/* Signature: the same exchange on two screens */}
           <div className="flex flex-col gap-4">
             <figure className="flex w-full flex-col gap-2 sm:w-[88%]">
-              <Shot src="/screens/chat-buyer.png" alt="Priya's screen: her message and Kenji's reply, both in Hindi" w={780} h={382} hero />
+              <Shot src="/screens/chat-buyer.png" alt="Priya's screen: her question about the watch and Kenji's reply, both in Hindi" w={780} h={432} hero />
               <figcaption className="text-sm text-muted">Priya reads Hindi</figcaption>
             </figure>
             <figure className="flex w-full flex-col gap-2 self-end sm:w-[88%]">
-              <Shot src="/screens/chat-seller.png" alt="Kenji's screen: the same two messages, both in Japanese" w={780} h={476} hero />
+              <Shot src="/screens/chat-seller.png" alt="Kenji's screen: the same question and reply, both in Japanese" w={780} h={426} hero />
               <figcaption className="text-sm text-muted">Kenji reads Japanese</figcaption>
             </figure>
           </div>
@@ -105,7 +105,7 @@ export default function Home() {
             Tap Get help and an agent joins the chat. They see what each side wrote, what each side read, and the deal you both agreed to.
           </p>
         </div>
-        <Shot src="/screens/agent.png" alt="The agent console: the conversation in the original and in the agent's language, beside the case summary" w={2512} h={816} />
+        <Shot src="/screens/agent.png" alt="The agent console: each message in the original and in English, beside the case summary and the frozen deal" w={2512} h={1524} />
       </section>
 
       {/* Close */}

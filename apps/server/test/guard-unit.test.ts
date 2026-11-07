@@ -103,3 +103,11 @@ describe('Translation Service Unit Tests', () => {
   }, 15000);
 });
 
+
+describe('Translation meaning check', () => {
+  it('extracts the ₹ amounts a translation must keep word for word', async () => {
+    const { rupeeAmounts } = await import('../src/services/translation.service.js');
+    expect(rupeeAmounts('क्या आप ₹14,000 में देंगे? या ₹2,00,000?')).toEqual(['₹14,000', '₹2,00,000']);
+    expect(rupeeAmounts('No amounts here')).toEqual([]);
+  });
+});
