@@ -165,3 +165,8 @@ Writer: **Agent Dhrumil only**. Long-lived knowledge that must survive between s
 - Did: Hallmark full redesign (app scope) of every screen in Newsprint on the T12 branch (26f686a): shared primitives (primitives.css) + chrome by me, the screens in 4 parallel subagent groups, lint 0 FAIL/0 WARN, finish review → 8 fixes.
 - Lessons: Tailwind 4 + the turbopack loader emptied an inline `@layer components {}` block in globals.css; import a separate file with `@import "./x.css" layer(components)` instead. Dev server started on another branch keeps a stale route list (restart after a checkout). `usePathname` in the chrome needs a client island under <Suspense> with a static fallback. The disk filled up mid-run (ENOSPC); my human freed space.
 - AI tools used: Claude Code (Claude Opus 5.5) + 5 subagents (4 screen groups, 1 finish reviewer); Hallmark skill (theme, sloplint).
+
+### 2026-11-07 · session 6c
+- Did: Akshat's site/ template theme (dark, Syne + Inter, pills, pale frame) applied to the whole app via tokens + primitives, and a landing page at / with the real product (the same chat in Hindi and Japanese) as the hero (33d1bfd); finish review → fix batch; DHRUMIL-023.
+- Lessons: keep the shared token names, so a re-theme is mostly values. Sloplint only reads the first word of `posture:` (restrained|committed|full-palette|drenched). The render tier writes `.hallmark/` next to the files: delete it before `git add -A`. Puppeteer clip uses page coordinates (add scrollY).
+- AI tools used: Claude Code (Claude Opus 5.5) + 1 review subagent; Hallmark (scaffold --brand, sloplint --render).
