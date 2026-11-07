@@ -5,7 +5,7 @@ export default function Home() {
   return (
     <section className="flex flex-1 flex-col justify-center gap-6">
       <div className="flex flex-col gap-3">
-        <h1 className="text-3xl font-semibold tracking-tight text-balance sm:text-4xl">
+        <h1 className="page-title text-balance">
           Same deal, in both languages.
         </h1>
         <p className="text-muted text-pretty">
@@ -14,9 +14,9 @@ export default function Home() {
         </p>
       </div>
 
-      <ul className="flex flex-wrap gap-2" aria-label="Supported languages">
+      <ul className="flex flex-wrap gap-x-4 gap-y-1 border-y border-border py-3" aria-label="Supported languages">
         {LANGUAGES.map(({ code, native }) => (
-          <li key={code} lang={code} className="rounded-full border border-border bg-surface px-3 py-1 text-sm">
+          <li key={code} lang={code} className="text-sm">
             {native}
           </li>
         ))}

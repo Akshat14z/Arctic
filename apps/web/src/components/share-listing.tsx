@@ -18,13 +18,13 @@ export function ShareListing({ listing, lang, mine }: { listing: Listing; lang: 
 
   return (
     <section aria-label="Share this listing" className="flex flex-col gap-2">
-      <p className="text-sm text-muted">{mine ? "Post it to your WhatsApp groups. Buyers open it in their own language." : "Know someone who wants this?"}</p>
-      <div className="flex flex-wrap gap-2">
+      <p className="meta">{mine ? "Post it to your WhatsApp groups. Buyers open it in their own language." : "Know someone who wants this?"}</p>
+      <div className="-ms-[var(--space-xs)] flex flex-wrap gap-x-4 gap-y-1">
         <a
           href={`https://wa.me/?text=${encodeURIComponent(`${text} ${url}`)}`}
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex min-h-tap items-center rounded-lg border border-border px-4 font-medium"
+          className="btn btn-quiet"
         >
           Share on WhatsApp
         </a>
@@ -32,7 +32,7 @@ export function ShareListing({ listing, lang, mine }: { listing: Listing; lang: 
           <button
             type="button"
             onClick={() => navigator.share({ title: listing.title, text, url }).catch(() => {})}
-            className="min-h-tap rounded-lg border border-border px-4 font-medium"
+            className="btn btn-quiet"
           >
             Share…
           </button>
@@ -45,7 +45,7 @@ export function ShareListing({ listing, lang, mine }: { listing: Listing; lang: 
               setCopied(true);
             } catch {}
           }}
-          className="min-h-tap rounded-lg border border-border px-4 font-medium"
+          className="btn btn-quiet"
         >
           {copied ? "Link copied" : "Copy link"}
         </button>

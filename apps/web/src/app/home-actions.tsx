@@ -13,7 +13,7 @@ export function HomeActions() {
     return (
       <Link
         href="/onboarding"
-        className="inline-flex min-h-tap items-center justify-center self-start rounded-lg bg-brand px-5 font-medium text-brand-fg"
+        className="btn btn-primary self-start"
       >
         Get started
       </Link>
@@ -25,9 +25,9 @@ export function HomeActions() {
   return (
     <div className="flex flex-wrap items-center gap-3">
       <p>
-        Signed in as <strong>{user.displayName}</strong> · reading in <span lang={user.language}>{lang?.native}</span>
+        Signed in as <strong>{user.displayName}</strong>, reading in <span lang={user.language}>{lang?.native}</span>
       </p>
-      <button type="button" onClick={clearSession} className="min-h-tap text-sm text-muted underline">
+      <button type="button" onClick={clearSession} className="btn btn-quiet -ms-[var(--space-xs)] text-sm">
         Sign out
       </button>
     </div>

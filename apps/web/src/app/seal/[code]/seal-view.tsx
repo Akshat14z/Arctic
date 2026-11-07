@@ -43,14 +43,14 @@ export function SealView() {
   if (error) {
     return (
       <section className="flex flex-1 flex-col items-start justify-center gap-4">
-        <h1 className="text-2xl font-semibold">{error.notFound ? "No Handshake Seal with this code" : "Couldn't check this seal"}</h1>
-        <p className="text-muted">
+        <h1 className="page-title">{error.notFound ? "No Handshake Seal with this code" : "Couldn't check this seal"}</h1>
+        <p className="max-w-prose text-muted">
           {error.notFound
             ? "A seal only exists after both sides agree to a deal. Ask the other person to open the deal in their Handshake chat and show you its QR code."
             : error.text}
         </p>
         {!error.notFound && (
-          <button type="button" onClick={() => setAttempt((n) => n + 1)} className="min-h-tap rounded-lg bg-brand px-4 font-medium text-brand-fg">
+          <button type="button" onClick={() => setAttempt((n) => n + 1)} className="btn btn-primary">
             Try again
           </button>
         )}
@@ -58,7 +58,7 @@ export function SealView() {
     );
   }
 
-  if (!lang || !seal) return <div aria-busy className="h-96 animate-pulse rounded-xl bg-surface" />;
+  if (!lang || !seal) return <SealSkeleton />;
 
   const { deal } = seal;
   const when = (iso: string) => new Date(iso).toLocaleString(localeFor(lang), { dateStyle: "medium", timeStyle: "short" });
@@ -66,18 +66,17 @@ export function SealView() {
   const demo = deal.listingId.startsWith("demo_");
 
   return (
-    <section className="flex flex-col gap-5">
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        <p className="inline-flex items-center gap-2 rounded-full bg-success-bg px-3 py-1 text-sm font-medium text-success">
-          <span aria-hidden="true">✓</span> Verified Handshake Seal
-        </p>
-        <label className="flex items-center gap-2 text-sm text-muted">
-          Read in
-          <select
-            value={lang}
-            onChange={(e) => setLang(e.target.value as LangCode)}
-            className="min-h-tap rounded-lg border border-border bg-surface px-2 text-text"
-          >
+    <section className="flex flex-col gap-6">
+      <header className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+        <h1 className="page-title flex items-center gap-2">
+          <svg aria-hidden="true" viewBox="0 0 20 20" className="size-6 shrink-0 text-success" fill="none" stroke="currentColor" strokeWidth="2.5">
+            <path d="M4 10.5l4 4 8-9" strokeLinecap="square" />
+          </svg>
+          Verified Handshake Seal
+        </h1>
+        <label className="flex flex-col gap-1 sm:w-48">
+          <span className="label">Read in</span>
+          <select value={lang} onChange={(e) => setLang(e.target.value as LangCode)} className="field">
             {LANGUAGES.map((l) => (
               <option key={l.code} value={l.code} lang={l.code}>
                 {l.native}
@@ -85,55 +84,67 @@ export function SealView() {
             ))}
           </select>
         </label>
-      </div>
+      </header>
 
-      <article aria-label="Agreed deal" className="flex flex-col gap-4 rounded-2xl border-2 border-success bg-surface p-5">
-        <div>
-          {demo && <p className="mb-1 text-xs font-medium uppercase text-muted">Demo</p>}
-          <h1 lang={lang} className="text-xl font-semibold">
+      <article aria-label="Agreed deal" className="flex flex-col">
+        <hr className="rule-double" />
+        <div className="flex flex-col gap-1 py-4">
+          <h2 lang={lang} className="section-title">
             {pick(deal.item, lang)}
-          </h1>
-          <p className="text-3xl font-semibold">
+          </h2>
+          {demo && <p className="meta">Demo</p>}
+          <p className="agate text-4xl leading-tight">
             {formatPrice(deal.price, lang)}
-            {deal.quantity > 1 && <span className="text-base font-normal text-muted"> × {deal.quantity}</span>}
+            {deal.quantity > 1 && <span className="text-base text-muted"> × {deal.quantity}</span>}
           </p>
           {deal.delivery && (
-            <p className="text-sm text-muted">
+            <p className="meta">
               {deal.delivery.method === "pickup" ? "Pickup" : "Shipping"}
-              {deal.delivery.date && ` · ${deal.delivery.date}`}
+              {deal.delivery.date && <span className="agate">, {deal.delivery.date}</span>}
             </p>
           )}
-          {conditions.length > 0 && (
-            <ul lang={lang} className="mt-3 list-disc pl-5 text-sm">
-              {conditions.map((c) => (
-                <li key={c}>{c}</li>
-              ))}
-            </ul>
-          )}
         </div>
+        {conditions.length > 0 && (
+          <ul lang={lang} className="border-t border-border">
+            {conditions.map((c) => (
+              <li key={c} className="border-b border-border py-2">
+                {c}
+              </li>
+            ))}
+          </ul>
+        )}
 
-        <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 text-sm">
-          <dt className="text-muted">Buyer</dt>
-          <dd>
+        <dl className="mt-4 border-t border-border text-sm">
+          <Row term="Buyer">
             {seal.buyer.displayName}
-            {deal.agreedBy.buyer && <span className="text-muted"> · agreed {when(deal.agreedBy.buyer)}</span>}
-          </dd>
-          <dt className="text-muted">Seller</dt>
-          <dd>
+            {deal.agreedBy.buyer && (
+              <span className="meta block">
+                agreed <span className="agate">{when(deal.agreedBy.buyer)}</span>
+              </span>
+            )}
+          </Row>
+          <Row term="Seller">
             {seal.seller.displayName}
-            {deal.agreedBy.seller && <span className="text-muted"> · agreed {when(deal.agreedBy.seller)}</span>}
-          </dd>
-          <dt className="text-muted">Sealed</dt>
-          <dd>{when(seal.sealedAt)}</dd>
-          <dt className="text-muted">Code</dt>
-          <dd className="font-mono break-all">{code}</dd>
+            {deal.agreedBy.seller && (
+              <span className="meta block">
+                agreed <span className="agate">{when(deal.agreedBy.seller)}</span>
+              </span>
+            )}
+          </Row>
+          <Row term="Sealed">
+            <span className="agate">{when(seal.sealedAt)}</span>
+          </Row>
+          <Row term="Code">
+            <span className="agate break-all">{code}</span>
+          </Row>
         </dl>
+        <hr className="rule-double mt-4" />
       </article>
 
-      <div className="flex items-center gap-4">
+      <div className="note note-success flex items-start gap-4">
         <SealQr url={url} size={128} />
-        <div className="flex flex-col items-start gap-2 text-sm">
-          <p className="text-muted">Both people saw these exact terms in their own language and agreed to them on Handshake.</p>
+        <div className="flex min-w-0 flex-col items-start gap-2">
+          <p>Both people saw these exact terms in their own language and agreed to them on Handshake.</p>
           <button
             type="button"
             onClick={async () => {
@@ -142,21 +153,41 @@ export function SealView() {
                 setCopied(true);
               } catch {}
             }}
-            className="min-h-tap rounded-lg border border-border px-3 font-medium"
+            className="btn btn-secondary"
           >
             {copied ? "Link copied" : "Copy link"}
           </button>
         </div>
       </div>
 
-      <p className="text-xs text-muted">
+      <p className="meta max-w-prose">
         Only trust a seal shown on this site. Handshake looks up the code on our server, so a screenshot proves nothing by itself. Scan the QR
         code or open the link yourself.
       </p>
 
-      <Link href="/" className="text-sm underline underline-offset-2">
+      <Link href="/" className="link self-start text-sm">
         What is Handshake?
       </Link>
     </section>
+  );
+}
+
+function Row({ term, children }: { term: string; children: React.ReactNode }) {
+  return (
+    <div className="grid grid-cols-[5rem_1fr] gap-3 border-b border-border py-2">
+      <dt className="text-muted">{term}</dt>
+      <dd className="min-w-0">{children}</dd>
+    </div>
+  );
+}
+
+/** Loading: the seal document's shape, ruled. */
+export function SealSkeleton() {
+  return (
+    <div aria-busy="true" aria-label="Loading the seal" className="flex flex-col gap-4">
+      <div className="skeleton h-9 w-3/4" />
+      <div className="skeleton h-40" />
+      <div className="skeleton h-32" />
+    </div>
   );
 }

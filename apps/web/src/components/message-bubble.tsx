@@ -19,7 +19,7 @@ export function MessageBubble({ message, lang }: { message: ChatMessage; lang: L
     return (
       <p
         role={scam ? "alert" : undefined}
-        className={`self-center rounded-2xl px-3 py-1 text-center text-sm ${scam ? "bg-danger-bg font-medium text-danger" : "bg-surface text-muted"}`}
+        className={scam ? "note note-error self-stretch font-medium" : "meta self-center border-y border-border px-3 py-1 text-center"}
       >
         {extra.system.text[lang] ?? extra.system.text.en ?? message.text}
       </p>
@@ -35,14 +35,12 @@ export function MessageBubble({ message, lang }: { message: ChatMessage; lang: L
     <div className={`flex max-w-[85%] flex-col gap-1 ${message.mine ? "items-end self-end" : "items-start self-start"}`}>
       <div
         lang={shown.lang}
-        className={`whitespace-pre-wrap break-words rounded-2xl px-3 py-2 ${
-          message.mine ? "rounded-br-md bg-brand text-brand-fg" : "rounded-bl-md border border-border bg-surface"
-        }`}
+        className={message.mine ? "bubble bubble-mine" : "bubble"}
       >
         {extra?.kind === "voice_note" && extra.audioUrl && (
           <span className="mb-1 flex flex-col gap-1">
             {audioGone ? (
-              <span className="text-sm opacity-80">This voice recording is no longer available.</span>
+              <span className="text-sm italic">This voice recording is no longer available.</span>
             ) : (
               <audio
                 controls
@@ -58,15 +56,15 @@ export function MessageBubble({ message, lang }: { message: ChatMessage; lang: L
         {shown.text}
       </div>
       {scam && (
-        <p role="alert" className="max-w-full rounded-lg bg-danger-bg px-3 py-2 text-sm text-danger">
+        <p role="alert" className="note note-error max-w-full">
           <strong>Be careful.</strong> This asks to move the deal or payment off Handshake. Payments outside Handshake
           aren&apos;t protected, and we can&apos;t help if something goes wrong.
         </p>
       )}
-      <div className="flex items-center gap-2 px-1 text-xs text-muted">
-        <time dateTime={new Date(message.sentAt).toISOString()}>{time}</time>
+      <div className="meta flex flex-wrap items-center gap-x-3">
+        <time dateTime={new Date(message.sentAt).toISOString()} className="agate">{time}</time>
         {shown.canToggle && (
-          <button type="button" onClick={() => setShowOriginal((v) => !v)} className="min-h-6 underline" aria-pressed={showOriginal}>
+          <button type="button" onClick={() => setShowOriginal((v) => !v)} className="min-h-tap underline decoration-border underline-offset-2 transition-colors hover:text-text hover:decoration-text" aria-pressed={showOriginal}>
             {showOriginal ? "Show translation" : <>See original (<span lang={extra?.orig.lang}>{origName}</span>)</>}
           </button>
         )}

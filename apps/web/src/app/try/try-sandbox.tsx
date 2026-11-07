@@ -48,9 +48,9 @@ export function TrySandbox() {
   }, []);
 
   return (
-    <section className="flex flex-col gap-6">
+    <section className="flex flex-col gap-8">
       <div className="flex flex-col gap-2">
-        <h1 className="font-display text-3xl">Try Handshake</h1>
+        <h1 className="page-title">Try Handshake</h1>
         <p className="text-muted">
           Pick a side of a real chat. These are demo accounts, marked Demo everywhere, with no sign-up.
         </p>
@@ -63,20 +63,26 @@ export function TrySandbox() {
               type="button"
               onClick={() => enter(r.as, r.next)}
               disabled={busy !== null}
-              className="flex w-full items-center justify-between gap-4 py-4 text-left hover:bg-surface disabled:opacity-55"
+              aria-busy={busy === r.as}
+              className="group flex min-h-tap w-full items-center justify-between gap-4 py-5 text-left transition-colors hover:bg-surface disabled:opacity-55"
             >
-              <span className="flex flex-col">
-                <span className="font-display text-xl">
+              <span className="flex flex-col gap-1">
+                <span className="text-lg font-medium">
                   {r.name}, the {r.as}
                 </span>
-                <span className="text-sm text-muted">{r.does}</span>
+                <span className="meta">{r.does}</span>
               </span>
-              <span className="shrink-0 text-sm">
+              <span className="flex shrink-0 items-center gap-2 text-sm">
                 {busy === r.as ? (
                   "Opening…"
                 ) : (
                   <>
-                    reads <span lang={r.as === "buyer" ? "hi" : r.as === "seller" ? "ja" : "en"}>{r.reads}</span>
+                    <span>
+                      reads <span lang={r.as === "buyer" ? "hi" : r.as === "seller" ? "ja" : "en"}>{r.reads}</span>
+                    </span>
+                    <svg aria-hidden width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="motion-safe:transition-transform motion-safe:group-hover:translate-x-0.5">
+                      <path d="M6 3l5 5-5 5" />
+                    </svg>
                   </>
                 )}
               </span>
@@ -86,7 +92,7 @@ export function TrySandbox() {
       </ul>
 
       {error && (
-        <p role="alert" className="bg-danger-bg px-3 py-2 text-danger">
+        <p role="alert" className="note note-error">
           {error}
         </p>
       )}

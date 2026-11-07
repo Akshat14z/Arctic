@@ -48,45 +48,44 @@ export function DealCard({ deal, lang, myRole, names, onAgree }: Props) {
   }
 
   return (
-    <article
-      aria-label="Deal"
-      className={`flex w-full max-w-sm flex-col gap-3 self-center rounded-2xl border-2 bg-surface p-4 ${agreed ? "border-success" : "border-brand"}`}
-    >
-      <div className="flex items-center justify-between gap-2">
-        <h3 className="font-semibold">Deal</h3>
-        <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${agreed ? "bg-success-bg text-success" : "bg-guard-bg text-guard"}`}>
-          {agreed ? "Agreed by both" : "Waiting for agreement"}
-        </span>
+    <article aria-label="Deal" className="flex w-full max-w-sm flex-col self-center bg-bg">
+      <hr className="rule-double" />
+      <div className="flex items-baseline justify-between gap-3 pt-3">
+        <h3 className="item-title">Deal</h3>
+        <p className={`meta ${agreed ? "text-success" : ""}`}>{agreed ? "Agreed by both" : "Waiting for agreement"}</p>
       </div>
 
-      <div>
+      <div className="flex flex-col gap-1 pt-3 pb-4">
         <p lang={lang}>{pick(deal.item, lang)}</p>
-        <p className="text-2xl font-semibold">
+        <p className="agate text-3xl leading-tight">
           {formatPrice(deal.price, lang)}
-          {deal.quantity > 1 && <span className="text-base font-normal text-muted"> × {deal.quantity}</span>}
+          {deal.quantity > 1 && <span className="text-base text-muted"> × {deal.quantity}</span>}
         </p>
         {deal.delivery && (
-          <p className="text-sm text-muted">
+          <p className="meta">
             {deal.delivery.method === "pickup" ? "Pickup" : "Shipping"}
-            {deal.delivery.date && ` · ${deal.delivery.date}`}
+            {deal.delivery.date && <span className="agate">, {deal.delivery.date}</span>}
           </p>
-        )}
-        {conditions.length > 0 && (
-          <ul lang={lang} className="mt-2 list-disc pl-5 text-sm">
-            {conditions.map((c) => (
-              <li key={c}>{c}</li>
-            ))}
-          </ul>
         )}
       </div>
 
-      <ul className="flex flex-col gap-1 text-sm">
+      {conditions.length > 0 && (
+        <ul lang={lang} className="border-t border-border text-sm">
+          {conditions.map((c) => (
+            <li key={c} className="border-b border-border py-2">
+              {c}
+            </li>
+          ))}
+        </ul>
+      )}
+
+      <ul className={`text-sm ${conditions.length > 0 ? "mt-3 border-t border-border" : "border-t border-border"}`}>
         {(["buyer", "seller"] as const).map((r) => (
-          <li key={r} className="flex justify-between gap-2">
-            <span>
+          <li key={r} className="flex items-baseline justify-between gap-3 border-b border-border py-2">
+            <span className="min-w-0">
               {names[r]} {r === myRole && <span className="text-muted">(you)</span>}
             </span>
-            <span className={deal.agreedBy[r] ? "text-success" : "text-muted"}>
+            <span className={`agate shrink-0 ${deal.agreedBy[r] ? "text-success" : "text-muted"}`}>
               {deal.agreedBy[r] ? `✓ ${when(deal.agreedBy[r]!)}` : "not yet"}
             </span>
           </li>
@@ -94,16 +93,17 @@ export function DealCard({ deal, lang, myRole, names, onAgree }: Props) {
       </ul>
 
       {canAgree && (
-        <button type="button" onClick={agree} disabled={busy} className="min-h-tap rounded-lg bg-brand px-4 font-medium text-brand-fg disabled:opacity-50">
+        <button type="button" onClick={agree} disabled={busy} aria-busy={busy} className="btn btn-primary mt-4 w-full">
           {busy ? "Agreeing…" : "Agree to these terms"}
         </button>
       )}
       {failed && (
-        <p role="alert" className="text-sm text-danger">
+        <p role="alert" className="note note-error mt-3">
           Couldn&apos;t record your agreement. Try again.
         </p>
       )}
       {agreed && deal.sealCode && <SealBlock code={deal.sealCode} />}
+      <hr className="rule-double mt-4" />
     </article>
   );
 }
@@ -112,13 +112,13 @@ export function DealCard({ deal, lang, myRole, names, onAgree }: Props) {
 function SealBlock({ code }: { code: string }) {
   const url = useSealUrl(code);
   return (
-    <div className="flex items-center gap-3 rounded-lg bg-success-bg p-3 text-sm text-success">
+    <div className="note note-success mt-4 flex items-start gap-3">
       <SealQr url={url} size={96} />
       <div className="flex min-w-0 flex-col gap-1">
         <p className="font-semibold">Handshake Seal</p>
         <p>Both sides agreed to exactly this. Show the code at pickup: scanning it opens the verified deal.</p>
-        <Link href={`/seal/${encodeURIComponent(code)}`} className="min-h-6 font-medium underline underline-offset-2">
-          Open the seal <span className="font-mono">{code}</span>
+        <Link href={`/seal/${encodeURIComponent(code)}`} className="link inline-flex min-h-tap flex-wrap items-center gap-x-1 break-all">
+          Open the seal <span className="agate">{code}</span>
         </Link>
       </div>
     </div>

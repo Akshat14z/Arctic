@@ -59,7 +59,7 @@ export function ListingsBrowser() {
 
   return (
     <section className="flex flex-col gap-4">
-      <h1 className="text-2xl font-semibold tracking-tight">Browse</h1>
+      <h1 className="page-title">Browse</h1>
 
       <form
         role="search"
@@ -67,7 +67,7 @@ export function ListingsBrowser() {
           e.preventDefault();
           setQ(draft.trim());
         }}
-        className="flex gap-2"
+        className="flex gap-2 border-b border-border pb-4"
       >
         <input
           type="search"
@@ -75,44 +75,51 @@ export function ListingsBrowser() {
           onChange={(e) => setDraft(e.target.value)}
           placeholder="Search listings"
           aria-label="Search listings"
-          className="min-h-tap w-full rounded-lg border border-border bg-surface px-3 text-base"
+          className="field"
         />
-        <button type="submit" className="min-h-tap rounded-lg border border-border bg-surface px-4 font-medium">
+        <button type="submit" className="btn btn-primary shrink-0">
           Search
         </button>
       </form>
 
       {error && (
-        <div role="alert" className="flex items-center justify-between gap-3 rounded-lg bg-danger-bg px-3 py-2 text-danger">
+        <div role="alert" className="note note-error flex items-center justify-between gap-3">
           <span>{error}</span>
-          <button type="button" onClick={() => setAttempt((n) => n + 1)} className="min-h-tap font-medium underline">
+          <button type="button" onClick={() => setAttempt((n) => n + 1)} className="btn btn-quiet shrink-0">
             Try again
           </button>
         </div>
       )}
 
       {!page && !error && (
-        <ul aria-busy className="flex flex-col gap-3">
+        <ul aria-busy className="flex flex-col">
           {[0, 1, 2].map((i) => (
-            <li key={i} className="h-[106px] animate-pulse rounded-xl bg-surface" />
+            <li key={i} className="flex gap-3 border-b border-border py-4">
+              <div className="skeleton size-16 shrink-0 sm:size-20" />
+              <div className="flex flex-1 flex-col gap-2">
+                <div className="skeleton h-5 w-2/3" />
+                <div className="skeleton h-4 w-full" />
+                <div className="skeleton h-3 w-1/4" />
+              </div>
+            </li>
           ))}
         </ul>
       )}
 
       {page && page.items.length === 0 && (
-        <div className="flex flex-col items-start gap-3 rounded-xl border border-dashed border-border p-6">
-          <p className="font-medium">{q ? `Nothing matches "${q}".` : "No listings yet."}</p>
+        <div className="flex flex-col items-start gap-3 py-6">
+          <h2 className="section-title">{q ? `Nothing matches "${q}".` : "No listings yet."}</h2>
           <p className="text-muted">{q ? "Try a shorter word." : "Be the first to post something for sale."}</p>
-          <Link href="/listings/new" className="inline-flex min-h-tap items-center rounded-lg bg-brand px-4 font-medium text-brand-fg">
+          <Link href="/listings/new" className="btn btn-primary">
             Post a listing
           </Link>
         </div>
       )}
 
       {page && page.items.length > 0 && (
-        <ul className="flex flex-col gap-3">
+        <ul className="flex flex-col">
           {page.items.map((l) => (
-            <li key={l.id}>
+            <li key={l.id} className="border-b border-border">
               <ListingCard listing={l} lang={lang} />
             </li>
           ))}
@@ -124,7 +131,8 @@ export function ListingsBrowser() {
           type="button"
           onClick={loadMore}
           disabled={loadingMore}
-          className="min-h-tap self-center rounded-lg border border-border bg-surface px-4 font-medium disabled:opacity-50"
+          aria-busy={loadingMore}
+          className="btn btn-secondary self-center"
         >
           {loadingMore ? "Loading…" : "Show more"}
         </button>

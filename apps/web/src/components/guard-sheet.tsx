@@ -55,21 +55,22 @@ export function GuardSheet({ voice, text, issues, blocking, lang, onEdit, onUseS
         onEdit();
       }}
       aria-labelledby="guard-title"
-      className="m-auto w-[min(100%-2rem,28rem)] rounded-2xl border border-border bg-surface p-0 text-text backdrop:bg-black/40"
+      className="m-auto w-[min(100%-2rem,28rem)] border border-text bg-bg p-0 text-text backdrop:bg-text/40"
     >
       <div className="flex flex-col gap-4 p-5">
-        <div className="flex flex-col gap-1">
-          <h2 id="guard-title" className={`text-lg font-semibold ${scam ? "text-danger" : ""}`}>
+        <div className="flex flex-col gap-2">
+          <h2 id="guard-title" className={`section-title ${scam ? "text-danger" : ""}`}>
             {(first && TITLES[first.kind]) ?? "Check before sending"}
           </h2>
-          <p className="text-sm text-muted">
+          <hr className="rule-double" />
+          <p className="meta">
             {toneOnly
               ? "The other person reads a translation, and blunt words can land even harder. Nothing here is wrong to send."
               : "The other person reads a translation. Make sure it means what you mean."}
           </p>
         </div>
 
-        <blockquote lang={lang} className="rounded-lg border-l-4 border-border bg-bg px-3 py-2">
+        <blockquote lang={lang} className="well px-3 py-2">
           {text}
         </blockquote>
 
@@ -82,12 +83,12 @@ export function GuardSheet({ voice, text, issues, blocking, lang, onEdit, onUseS
             const suggestion = voice ? undefined : amount !== null ? formatPrice({ amount, currency: "INR" }, lang) : replaceable ? issue.suggestion : undefined;
             const danger = issue.kind === "scam_signal";
             return (
-              <li key={`${issue.kind}-${i}`} className={`rounded-lg p-3 ${danger ? "bg-danger-bg text-danger" : "bg-guard-bg text-guard"}`}>
+              <li key={`${issue.kind}-${i}`} className={`note ${danger ? "note-error" : "note-guard"}`}>
                 <p className="text-sm">
-                  <mark className="rounded bg-transparent font-semibold text-inherit underline decoration-2">{issue.span}</mark>
+                  <mark className="bg-transparent font-semibold text-inherit underline decoration-2">{issue.span}</mark>
                   {amount !== null && (
                     <>
-                      {" "}= <strong>{formatPrice({ amount, currency: "INR" }, lang)}</strong>
+                      {" "}= <strong className="agate">{formatPrice({ amount, currency: "INR" }, lang)}</strong>
                     </>
                   )}
                 </p>
@@ -103,7 +104,7 @@ export function GuardSheet({ voice, text, issues, blocking, lang, onEdit, onUseS
                   <button
                     type="button"
                     onClick={() => onUseSuggestion(issue.span, issue.suggestion!)}
-                    className="mt-2 min-h-tap rounded-lg border border-current px-3 text-sm font-medium"
+                    className="btn btn-secondary mt-2 px-3 text-sm"
                   >
                     Use softer wording
                   </button>
@@ -112,7 +113,7 @@ export function GuardSheet({ voice, text, issues, blocking, lang, onEdit, onUseS
                   <button
                     type="button"
                     onClick={() => onUseSuggestion(issue.span, suggestion)}
-                    className="mt-2 min-h-tap rounded-lg border border-current px-3 text-sm font-medium"
+                    className="btn btn-secondary mt-2 px-3 text-sm"
                   >
                     Use “{suggestion}”
                   </button>
@@ -124,27 +125,27 @@ export function GuardSheet({ voice, text, issues, blocking, lang, onEdit, onUseS
 
         {toneOnly ? (
           <div className="flex flex-col gap-2">
-            <button type="button" autoFocus onClick={() => onSendSofter!(softer!)} className="min-h-tap rounded-lg bg-brand px-4 font-medium text-brand-fg">
+            <button type="button" autoFocus onClick={() => onSendSofter!(softer!)} className="btn btn-primary">
               Send softer version
             </button>
             <div className="flex gap-2">
-              <button type="button" onClick={onEdit} className="min-h-tap flex-1 rounded-lg border border-border px-4 font-medium">
+              <button type="button" onClick={onEdit} className="btn btn-secondary flex-1">
                 Edit message
               </button>
-              <button type="button" onClick={onSendAnyway} className="min-h-tap flex-1 rounded-lg border border-border px-4 font-medium">
+              <button type="button" onClick={onSendAnyway} className="btn btn-secondary flex-1">
                 Send as is
               </button>
             </div>
           </div>
         ) : (
         <div className="flex gap-2">
-          <button type="button" autoFocus onClick={onEdit} className="min-h-tap flex-1 rounded-lg bg-brand px-4 font-medium text-brand-fg">
+          <button type="button" autoFocus onClick={onEdit} className="btn btn-primary flex-1">
             {voice ? "Don't send" : "Edit message"}
           </button>
           <button
             type="button"
             onClick={onSendAnyway}
-            className={`min-h-tap flex-1 rounded-lg border px-4 font-medium ${scam ? "border-danger text-danger" : "border-border"}`}
+            className={`btn flex-1 ${scam ? "btn-danger" : "btn-secondary"}`}
           >
             Send anyway
           </button>

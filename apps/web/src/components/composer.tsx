@@ -160,20 +160,20 @@ export function Composer({ channel, channelId, lang, token, disabled, onSent }: 
         />
       )}
       {failed && (
-        <p role="alert" className="text-sm text-danger">
+        <p role="alert" className="note note-error">
           {failed}
         </p>
       )}
       {recording ? (
-        <div className="flex min-h-tap items-center gap-2 rounded-2xl border border-danger bg-danger-bg px-3 py-1.5" role="group" aria-label="Recording a voice note">
-          <span aria-hidden="true" className="size-2.5 shrink-0 rounded-full bg-danger motion-safe:animate-pulse" />
-          <p className="flex-1 text-sm font-medium text-danger tabular-nums" aria-live="off">
+        <div className="note note-error flex min-h-tap items-center gap-2 py-1 pr-1" role="group" aria-label="Recording a voice note">
+          <span aria-hidden="true" className="size-2.5 shrink-0 bg-danger motion-safe:animate-pulse" />
+          <p className="agate flex-1 text-sm" aria-live="off">
             Recording {clock(recorder.seconds ?? 0)} / {clock(MAX_VOICE_SEC)}
           </p>
-          <button type="button" onClick={() => void recorder.cancel()} className="min-h-tap rounded-lg px-3 text-sm font-medium text-text">
+          <button type="button" onClick={() => void recorder.cancel()} className="btn btn-quiet">
             Cancel
           </button>
-          <button type="button" autoFocus onClick={() => void recorder.stop()} className="min-h-tap rounded-full bg-brand px-4 font-medium text-brand-fg">
+          <button type="button" autoFocus onClick={() => void recorder.stop()} className="btn btn-primary">
             Send
           </button>
         </div>
@@ -195,10 +195,10 @@ export function Composer({ channel, channelId, lang, token, disabled, onSent }: 
           }}
           aria-label="Record a voice note"
           title="Record a voice note"
-          className="flex min-h-tap min-w-tap shrink-0 items-center justify-center rounded-full border border-border bg-surface disabled:opacity-50"
+          className="btn btn-icon shrink-0"
         >
           <svg aria-hidden="true" viewBox="0 0 24 24" className="size-5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round">
-            <rect x="9" y="3" width="6" height="11" rx="3" />
+            <rect x="9" y="3" width="6" height="11" />
             <path d="M5 11a7 7 0 0 0 14 0M12 18v3" />
           </svg>
         </button>
@@ -216,19 +216,20 @@ export function Composer({ channel, channelId, lang, token, disabled, onSent }: 
           }}
           aria-label="Message"
           placeholder={disabled ? "Connecting…" : "Write a message"}
-          className="max-h-32 min-h-tap w-full resize-none rounded-2xl border border-border bg-surface px-3 py-2.5 text-base [field-sizing:content]"
+          className="field max-h-32 resize-none [field-sizing:content]"
         />
         <button
           type="submit"
           disabled={!text || sending || disabled}
-          className="min-h-tap shrink-0 rounded-full bg-brand px-4 font-medium text-brand-fg disabled:opacity-50"
+          aria-busy={sending}
+          className="btn btn-primary shrink-0"
         >
           {sending ? "Sending…" : "Send"}
         </button>
       </form>
       )}
       {draft.length > MAX - 100 && (
-        <p className="self-end text-xs text-muted">
+        <p className="agate self-end text-sm text-muted">
           {draft.length}/{MAX}
         </p>
       )}

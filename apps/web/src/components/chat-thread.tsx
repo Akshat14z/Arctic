@@ -117,19 +117,19 @@ export function ChatThread({ session, channel, channelId, emptyText, closedText,
   return (
     <>
       {state !== "connected" && (
-        <p role="status" className="mt-3 rounded-lg bg-guard-bg px-3 py-2 text-sm text-guard">
+        <p role="status" className="note note-guard mt-3">
           {state === "disconnected" ? "Chat is offline. Reconnecting…" : "Connecting to chat…"}
         </p>
       )}
       {error && (
-        <p role="alert" className="mt-3 rounded-lg bg-danger-bg px-3 py-2 text-sm text-danger">
+        <p role="alert" className="note note-error mt-3">
           {error}
         </p>
       )}
 
       <div className="flex flex-1 flex-col gap-3 py-4" aria-live="polite">
         {messages.length === 0 && state === "connected" && !error && (
-          <p className="m-auto max-w-xs text-center text-sm text-muted">{emptyText}</p>
+          <p className="meta m-auto max-w-xs text-center">{emptyText}</p>
         )}
         {messages.map((m) => {
           const d = parseExtra(m.extra);
@@ -148,7 +148,7 @@ export function ChatThread({ session, channel, channelId, emptyText, closedText,
 
       <div className="sticky bottom-0 bg-bg pb-4">
         {closedText ? (
-          <p className="border-t border-border bg-bg pt-3 text-center text-sm text-muted">{closedText}</p>
+          <p className="meta border-t border-border bg-bg pt-3 text-center">{closedText}</p>
         ) : (
           <>
           {deals?.canPropose && deals.myRole && (
@@ -156,7 +156,8 @@ export function ChatThread({ session, channel, channelId, emptyText, closedText,
               type="button"
               onClick={propose}
               disabled={proposing || state !== "connected"}
-              className="mb-2 min-h-tap w-full rounded-lg border border-brand px-4 text-sm font-medium disabled:opacity-50"
+              aria-busy={proposing}
+              className="btn btn-secondary w-full border-b-transparent"
             >
               {proposing ? "Writing up the deal…" : "Propose a deal from this chat"}
             </button>

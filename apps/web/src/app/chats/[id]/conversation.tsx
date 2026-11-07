@@ -45,14 +45,14 @@ export function Conversation() {
   if (error) {
     return (
       <section className="flex flex-1 flex-col items-start justify-center gap-4">
-        <h1 className="text-2xl font-semibold">{error.notFound ? "Chat not found" : "Couldn't open this chat"}</h1>
+        <h1 className="page-title">{error.notFound ? "Chat not found" : "Couldn't open this chat"}</h1>
         <p className="text-muted">{error.notFound ? "It may belong to someone else, or the link is old." : error.text}</p>
         {error.notFound ? (
-          <Link href="/chats" className="inline-flex min-h-tap items-center rounded-lg bg-brand px-4 font-medium text-brand-fg">
+          <Link href="/chats" className="btn btn-primary">
             Your chats
           </Link>
         ) : (
-          <button type="button" onClick={() => setAttempt((n) => n + 1)} className="min-h-tap rounded-lg bg-brand px-4 font-medium text-brand-fg">
+          <button type="button" onClick={() => setAttempt((n) => n + 1)} className="btn btn-primary">
             Try again
           </button>
         )}
@@ -60,27 +60,40 @@ export function Conversation() {
     );
   }
 
-  if (!session || !chat || !other || !channel) return <div aria-busy className="h-72 animate-pulse rounded-xl bg-surface" />;
+  if (!session || !chat || !other || !channel)
+    return (
+      <div aria-busy className="flex flex-col gap-4">
+        <div className="skeleton h-16" />
+        <div className="skeleton h-12 w-2/3" />
+        <div className="skeleton ml-auto h-12 w-1/2" />
+      </div>
+    );
 
   return (
     <section className="-my-6 flex min-h-[calc(100dvh-3.5rem)] flex-col">
-      <header className="sticky top-0 z-10 flex items-center gap-3 border-b border-border bg-bg py-3">
-        <Link href="/chats" aria-label="Back to chats" className="flex min-h-tap min-w-tap items-center justify-center rounded-lg text-xl">
-          ‹
+      <header className="sticky top-0 z-10 flex items-center gap-2 border-b border-border bg-bg py-2">
+        <Link href="/chats" aria-label="Back to chats" className="btn btn-icon shrink-0 border-transparent">
+          <svg aria-hidden="true" viewBox="0 0 24 24" className="size-5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="square">
+            <path d="M15 5l-7 7 7 7" />
+          </svg>
         </Link>
         <div className="min-w-0 flex-1">
-          <p className="truncate font-semibold">{other.displayName}</p>
-          <Link href={`/listings/${chat.listing.id}`} className="block truncate text-sm text-muted underline-offset-2 hover:underline">
-            <span lang={chat.listing.lang}>{chat.listing.title}</span> · {formatPrice(chat.listing.price, session.user.language)}
+          <h1 className="item-title truncate">{other.displayName}</h1>
+          <Link
+            href={`/listings/${chat.listing.id}`}
+            className="flex min-w-0 items-baseline gap-2 text-sm text-muted underline decoration-border underline-offset-2 hover:decoration-text"
+          >
+            <span lang={chat.listing.lang} className="truncate">{chat.listing.title}</span>
+            <span className="agate shrink-0 text-text">{formatPrice(chat.listing.price, session.user.language)}</span>
           </Link>
         </div>
         <CallButton peerId={other.id} peerName={other.displayName} myName={session.user.displayName} />
         {chat.openCaseId ? (
           <Link
             href={`/cases/${encodeURIComponent(chat.openCaseId)}`}
-            className="flex min-h-tap shrink-0 items-center rounded-lg bg-guard-bg px-3 text-sm font-medium text-guard"
+            className="btn btn-secondary shrink-0 px-3 text-sm"
           >
-            Help requested · View
+            Help requested, view
           </Link>
         ) : (
           <GetHelp channelId={chat.channelId} token={session.sessionToken} />
