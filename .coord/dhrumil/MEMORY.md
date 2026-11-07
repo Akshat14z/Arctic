@@ -155,3 +155,8 @@ Writer: **Agent Dhrumil only**. Long-lived knowledge that must survive between s
 - Did: T19 + T15 merged (smoke green via `pnpm --filter @convocart/server smoke`; the root `pnpm smoke` fails because corepack can't find pnpm 12). DHRUMIL-T16 tone sheet (c2e15c8); DHRUMIL-T17 share + link preview + guest language (baccf9d); DHRUMIL-019.
 - Lesson: under Cache Components, `generateMetadata` that awaits `params` needs a `<Suspense>` child that calls `await connection()` (blocking-prerender-metadata), or dev logs an error.
 - AI tools used: Claude Code (Claude Opus 5.5) for tone/share UI and puppeteer tests (a Hindi-browser guest).
+
+### 2026-11-07 · session 6
+- Did: /start (no new Akshat messages; Last read stays AKSHAT-009). DHRUMIL-T14 write-up draft + screenshots (2692106). DHRUMIL-021 (server tests write to the prod DB: 18 fake open cases in the agent queue), DHRUMIL-022 (humans fill the write-up).
+- Lesson: DON'T run `pnpm test` / smoke for apps/server until Akshat isolates the test DB. Nexconn is mocked there, but Postgres is the real one.
+- AI tools used: Claude Code (Claude Opus 5.5) for the write-up draft, claim checks against code, puppeteer screenshots.

@@ -312,3 +312,31 @@ I wrote them from your code and your MEMORY.md. Please reply with corrections, o
 - **README › Architecture:** the only LLM calls are translation and voice transcription (Gemini). Guard, scam, deal extraction and case summaries are listed as rule-based.
 - **AI_USAGE:** you use "Antigravity / Gemini", as your MEMORY says. Tell me if a specific model name should be listed.
 - Ports and commands: server on 4000; `pnpm dev:server`; `pnpm --filter @convocart/contracts build` before the first run.
+
+### DHRUMIL-021 · REVIEW · P1 · 2026-11-07
+**To:** Akshat (cc: Humans)
+**Re:** `apps/server/test/*`, AKSHAT-T09
+**Task:** demo readiness (Golden Path step 5)
+**Subject:** Server tests write to the production database: 18 fake open cases are in the real agent queue
+
+`GET /api/agent/queue` (as the demo agent) returns **18 open cases**: "Buyer Ankit / Seller Suresh", "Buyer Neha / Seller Deepak", "Buyer Simran / Seller Alok", "John (Buyer) / Aarav (Seller)" and more. They come from `cases.test.ts` and `golden-path.test.ts`, which run against the shared `DATABASE_URL`. My merge checks this week ran the suite and added some of them. Sorry.
+- Good news: Nexconn is mocked in the tests, so no fake users were registered on our Nexconn app (D-015 is safe).
+- **Please:**
+  1. Point the tests at a separate test database (or a schema, or a transaction that rolls back), never the production one.
+  2. Delete the existing test users, listings, chats and cases (non-`demo_`, created by tests).
+  3. Tell me when it's safe to run `pnpm test` / `pnpm smoke` again. Until then I'll only run web checks.
+- Judges open this queue in Golden Path step 5, and 18 fake cases make the console look broken.
+Also seen: after a server restart, old voice notes show "This voice recording is no longer available" (DHRUMIL-018 #1, in-memory audio).
+
+### DHRUMIL-022 · HEADS-UP · P2 · 2026-11-07
+**To:** Humans
+**Re:** DHRUMIL-T14
+**Task:** submission write-up
+**Subject:** Write-up draft is ready for you to fill in and review
+
+`docs/WRITEUP.md` on branch `dhrumil/DHRUMIL-T14-writeup` (2692106), in rubric order, with 9 named Nexconn SDK features and the prior-work statement. You need to fill the **⟦TO FILL⟧** spots:
+- the live URL and video link, and the production App Key (I don't handle it);
+- traction numbers after the Nov 10 launch;
+- the beachhead (H-04) and the next 3 steps after the challenge;
+- confirmation that calls connect once Call/VoIP is enabled.
+I'll turn it into the PDF once those are in and the screenshots are retaken on the deployed app.
