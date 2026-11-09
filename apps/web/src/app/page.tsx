@@ -1,135 +1,259 @@
 import Link from "next/link";
 import { LANGUAGES } from "@/lib/languages";
+import { VelocityMarquee } from "@/components/bits/velocity-marquee";
+import { LandingMotion } from "@/components/landing/landing-motion";
 import { HomeActions } from "./home-actions";
+import "./landing.css";
 
-/* The landing page (DHRUMIL-T12), in Akshat's site/ theme: dark panels on the pale frame.
-   Every picture is the real app (apps/web/public/screens), captured from the demo accounts. */
+/* The landing page (DHRUMIL-T14, motion T16). Editorial on grid paper; every picture is the real app
+   (public/screens), every drifting word and speech bubble comes from the real demo chat, and the people are
+   Open Peeps (CC0, public/people). The HTML is the finished page; LandingMotion only animates into it. */
 
-const panel = "rounded-[28px] bg-bg text-text";
-
-function Shot({ src, alt, w, h, className = "", hero = false }: { src: string; alt: string; w: number; h: number; className?: string; hero?: boolean }) {
+/** One word per span, so each inks in as it scrolls past (landing.css .l-ink). */
+function Ink({ children }: { children: string }) {
   return (
-    // eslint-disable-next-line @next/next/no-img-element -- static product captures, sized explicitly
-    <img src={src} alt={alt} width={w} height={h} loading={hero ? "eager" : "lazy"} fetchPriority={hero ? "high" : "auto"} className={`h-auto w-full rounded-[20px] border border-border ${className}`} />
+    <>
+      {children.split(" ").map((w, i) => (
+        <span key={i} className="l-ink">
+          {w}{" "}
+        </span>
+      ))}
+    </>
   );
 }
 
+// Lines from the seeded demo chat (Priya writes Hindi, Kenji writes Japanese), placed around the title.
+const DRIFT: { text: string; lang?: string; at: string }[] = [
+  { text: "पक्का", lang: "hi", at: "left-[6%] top-[8%]" },
+  { text: "₹15,000", at: "right-[9%] top-[6%]" },
+  { text: "決まり", lang: "ja", at: "left-[14%] bottom-[22%]" },
+  { text: "See original", at: "right-[3%] bottom-[12%]" },
+  { text: "कल शाम", lang: "hi", at: "left-[38%] top-[2%]" },
+  { text: "明日の夕方", lang: "ja", at: "right-[8%] bottom-[4%]" },
+  { text: "₹14,000", at: "left-[2%] top-[62%]" },
+];
+
+// The pinned chapter: what happens, one step per screen of scroll.
+const STEPS: [string, string][] = [
+  ["Priya writes in Hindi.", "Kenji reads it in Japanese."],
+  ["Kenji holds at ₹15,000.", "Priya sees the same number, not yen."],
+  ["They agree once.", "Both sign the same card, and it is sealed."],
+  ["If something goes wrong,", "a person who reads both sides steps in."],
+];
+
+// The street at the foot of the page.
+const STREET = ["p1", "p2", "p3", "p4", "p5", "p6", "p7", "p8"];
+
+const SPEC: [string, string][] = [
+  ["Translation", "Every message, in 8 languages, with the original one tap away"],
+  ["Meaning Guard", "Amounts like “2 lakh” checked before you send"],
+  ["Deal Card", "The terms, agreed by both sides in their own language"],
+  ["Handshake Seal", "A QR code anyone can scan to see the same deal"],
+  ["Get help", "A human agent who reads what each side wrote"],
+];
+
 export default function Home() {
+  const langs = LANGUAGES.map((l) => ({ code: l.code, native: l.native }));
   return (
-    <div data-landing className="flex flex-col gap-3 bg-[var(--color-frame)] p-3">
-      {/* Hero */}
-      <section className={`${panel} flex min-h-[calc(100dvh-1.5rem)] flex-col`}>
-        <header className="flex items-center gap-4 px-5 py-4 sm:px-8">
-          <Link href="/" className="font-display text-lg uppercase no-underline sm:text-xl">
+    <div data-landing className="min-h-dvh">
+      <LandingMotion />
+      <div className="l-wrap">
+        <header className="l-nav">
+          <Link href="/" className="l-mark">
             Handshake
           </Link>
-          <nav aria-label="Main" className="ml-auto flex items-center gap-1">
-            <Link href="/listings" className="btn btn-quiet no-underline hover:underline max-sm:hidden">
+          <nav aria-label="Main" className="flex items-center gap-5">
+            <Link href="/listings" className="l-link max-sm:hidden">
               Browse
             </Link>
-            <Link href="/listings/new" className="btn btn-quiet no-underline hover:underline max-sm:hidden">
-              Sell
-            </Link>
-            <Link href="/try" className="btn btn-primary">
+            <Link href="/try" className="l-link">
               Try the demo
             </Link>
           </nav>
         </header>
 
-        <div className="grid flex-1 grid-cols-[minmax(0,1fr)] items-center gap-10 px-5 pb-8 sm:px-8 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)] lg:gap-12 lg:px-14">
-          <div className="flex flex-col gap-6">
-            <h1 className="max-w-none font-display text-[clamp(1.5rem,3.7vw,3.25rem)] uppercase leading-[1.05] tracking-[0.02em]">
-              Same deal, in both <span className="whitespace-nowrap">languages.</span>
-            </h1>
-            <p className="max-w-[40ch] text-lg text-ink-2">Marketplace chat that translates every message and spells out every amount.</p>
-            <div className="flex flex-wrap items-center gap-3">
-              <Link href="/try" className="btn btn-primary">
-                Try both sides of a chat
-              </Link>
-              <HomeActions />
+        {/* Hero */}
+        <section className="l-hero">
+          <div className="l-drift" aria-hidden>
+            {DRIFT.map((d) => (
+              <span key={d.text} lang={d.lang} className={d.at}>
+                {d.text}
+              </span>
+            ))}
+          </div>
+          <h1 className="l-title z-[1]">
+            <span>Same deal.</span>
+            <span>Both languages.</span>
+          </h1>
+          <p className="l-sub relative z-[1]">Every message translated, every amount checked, one deal both sides can prove.</p>
+          <div className="l-actions relative z-[3]">
+            <Link href="/try" className="l-btn" data-magnet>
+              Try both sides of a chat
+            </Link>
+            <HomeActions />
+          </div>
+
+          <div className="l-cutouts">
+            <figure className="l-cutout l-cutout-a">
+              {/* eslint-disable-next-line @next/next/no-img-element -- static product captures, sized explicitly */}
+              <img src="/screens/chat-buyer.png" alt="Priya's screen: her question about the watch and Kenji's reply, both in Hindi" width={780} height={432} fetchPriority="high" />
+              <figcaption>Priya reads Hindi</figcaption>
+            </figure>
+            <figure className="l-cutout l-cutout-b">
+              {/* eslint-disable-next-line @next/next/no-img-element -- static product captures, sized explicitly */}
+              <img src="/screens/chat-seller.png" alt="Kenji's screen: the same question and reply, both in Japanese" width={780} height={426} fetchPriority="high" />
+              <figcaption>Kenji reads Japanese</figcaption>
+            </figure>
+          </div>
+        </section>
+
+      </div>
+
+      {/* The story, pinned: Priya and Kenji make one deal across two languages */}
+      <section data-chapter className="l-chapter" aria-labelledby="chapter-title">
+        <div className="l-chapter-pin l-wrap">
+          <div className="l-steps">
+            <h2 id="chapter-title" className="sr-only">
+              How one deal works
+            </h2>
+            <ol>
+              {STEPS.map(([a, b], i) => (
+                <li key={a} className="l-step" data-step={i + 1}>
+                  <p className="l-step-head">{a}</p>
+                  <p className="l-step-sub">{b}</p>
+                </li>
+              ))}
+            </ol>
+          </div>
+
+          <div className="l-stage" aria-hidden>
+            {/* eslint-disable-next-line @next/next/no-img-element -- static Open Peeps SVG */}
+            <img data-who="priya" className="l-person l-person-priya" src="/people/priya.svg" alt="" width={1200} height={2980} />
+            {/* eslint-disable-next-line @next/next/no-img-element -- static Open Peeps SVG */}
+            <img data-who="kenji" className="l-person l-person-kenji" src="/people/kenji.svg" alt="" width={1200} height={2980} />
+            {/* eslint-disable-next-line @next/next/no-img-element -- static Open Peeps SVG */}
+            <img data-who="sarah" className="l-person l-person-sarah" src="/people/sarah.svg" alt="" width={1450} height={2980} />
+
+            <p data-say="1a" className="l-say l-say-left l-say-mine" lang="hi">क्या आप ₹14,000 में देंगे?</p>
+            <p data-say="2b" className="l-say l-say-left l-say-low" lang="hi">₹15,000 अंतिम मूल्य है।</p>
+            <p data-say="1b" className="l-say l-say-right" lang="ja">₹14,000でいかがですか？</p>
+            <p data-say="2a" className="l-say l-say-right l-say-low l-say-mine" lang="ja">₹15,000が最終価格です。</p>
+            <p data-say="4" className="l-say l-say-sarah">I can read both sides.</p>
+
+            <div data-fly="1" className="l-fly"><span>₹14,000</span></div>
+            <div data-fly="2" className="l-fly l-fly-back"><span>₹15,000</span></div>
+
+            <div data-deal className="l-deal">
+              <p className="l-deal-k">Deal</p>
+              <p className="l-deal-v">₹15,000</p>
+              <p className="l-deal-ok">Agreed by both</p>
+              <span data-seal className="l-seal">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M12 3l2.2 1.6 2.7-.1.9 2.6 2.2 1.6-.8 2.6.8 2.6-2.2 1.6-.9 2.6-2.7-.1L12 21l-2.2-1.6-2.7.1-.9-2.6L4 15.3l.8-2.6L4 10.1l2.2-1.6.9-2.6 2.7.1z" />
+                  <path d="M8.8 12.2l2.2 2.1 4.2-4.4" />
+                </svg>
+                Sealed
+              </span>
             </div>
           </div>
-
-          {/* Signature: the same exchange on two screens */}
-          <div className="flex flex-col gap-4">
-            <figure className="flex w-full flex-col gap-2 sm:w-[88%]">
-              <Shot src="/screens/chat-buyer.png" alt="Priya's screen: her question about the watch and Kenji's reply, both in Hindi" w={780} h={432} hero />
-              <figcaption className="text-sm text-muted">Priya reads Hindi</figcaption>
-            </figure>
-            <figure className="flex w-full flex-col gap-2 self-end sm:w-[88%]">
-              <Shot src="/screens/chat-seller.png" alt="Kenji's screen: the same question and reply, both in Japanese" w={780} h={426} hero />
-              <figcaption className="text-sm text-muted">Kenji reads Japanese</figcaption>
-            </figure>
-          </div>
-        </div>
-
-        <div className="mx-5 mb-5 flex flex-wrap items-center gap-x-5 gap-y-1 rounded-[20px] border border-border bg-surface px-5 py-3 sm:mx-8 lg:mx-14">
-          <p className="text-sm text-muted">Reads in</p>
-          <ul className="flex flex-wrap gap-x-4 gap-y-1" aria-label="Supported languages">
-            {LANGUAGES.map(({ code, native }) => (
-              <li key={code} lang={code} className="text-sm">
-                {native}
-              </li>
-            ))}
-          </ul>
         </div>
       </section>
 
-      {/* Meaning Guard */}
-      <section className={`${panel} grid items-center gap-8 px-5 py-12 sm:px-8 grid-cols-[minmax(0,1fr)] md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:px-14 lg:py-20`}>
-        <div className="flex flex-col gap-4">
-          <h2 className="max-w-[18ch] font-display text-[clamp(1.75rem,3vw,2.75rem)] uppercase leading-[1.05]">Catch the amount before it&apos;s sent.</h2>
-          <p className="max-w-[44ch] text-ink-2">
-            Type &ldquo;2 lakh&rdquo; and Handshake asks first: it shows ₹2,00,000, so the buyer in Tokyo reads the same number you meant.
-          </p>
+      <div className="l-wrap">
+      </div>
+
+      {/* Spec sheet */}
+      <section className="l-wrap l-spec">
+        <div className="l-fan">
+          <figure className="l-fan-1">
+            {/* eslint-disable-next-line @next/next/no-img-element -- static product captures, sized explicitly */}
+            <img src="/screens/guard.png" alt="Meaning Guard: “2 lakh” becomes ₹2,00,000 before the message is sent" width={704} height={812} loading="lazy" />
+          </figure>
+          <figure className="l-fan-2">
+            {/* eslint-disable-next-line @next/next/no-img-element -- static product captures, sized explicitly */}
+            <img src="/screens/seal.png" alt="A sealed Deal Card: the agreed terms, both agree times and the Seal's QR code" width={716} height={934} loading="lazy" />
+          </figure>
         </div>
-        <Shot src="/screens/guard.png" alt="Meaning Guard: '2 lakh' becomes ₹2,00,000 before the message is sent" w={704} h={856} className="mx-auto max-w-sm" />
+        <div>
+          <h2 className="l-h2">Every amount checked. Every deal sealed.</h2>
+          <table className="l-table">
+            <tbody>
+              {SPEC.map(([k, v]) => (
+                <tr key={k}>
+                  <th scope="row">{k}</th>
+                  <td>{v}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          <Link href="/try" className="l-btn mt-8" data-magnet>
+            Try the demo
+          </Link>
+        </div>
       </section>
 
-      {/* Deal Card and Seal */}
-      <section className={`${panel} grid items-center gap-8 px-5 py-12 sm:px-8 grid-cols-[minmax(0,1fr)] md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:px-14 lg:py-20`}>
-        <Shot src="/screens/seal.png" alt="A sealed Deal Card: the agreed terms, both agree times and the Seal's QR code" w={716} h={1160} className="mx-auto max-w-sm md:order-first" />
-        <div className="flex flex-col gap-4">
-          <h2 className="max-w-[18ch] font-display text-[clamp(1.75rem,3vw,2.75rem)] uppercase leading-[1.05]">Agree once. Prove it at pickup.</h2>
-          <p className="max-w-[44ch] text-ink-2">
-            The chat becomes a Deal Card both sides agree to in their own language. Then it&apos;s sealed: a QR code anyone can scan to see the same terms.
-          </p>
-        </div>
-      </section>
+      {/* Every language it reads, and the deal in its own words: faster as you scroll */}
+      <div className="l-marquee">
+        <VelocityMarquee
+          label={`Reads ${langs.map((l) => l.native).join(", ")}`}
+          rows={[
+            { items: langs.map((l) => ({ text: l.native, lang: l.code })), className: "l-marquee-outline" },
+            {
+              items: [
+                { text: "पक्का", lang: "hi" },
+                { text: "₹15,000" },
+                { text: "決まり", lang: "ja" },
+                { text: "See original" },
+                { text: "कल शाम", lang: "hi" },
+                { text: "明日の夕方", lang: "ja" },
+              ],
+              className: "l-marquee-fill",
+            },
+          ]}
+        />
+      </div>
 
       {/* Support */}
-      <section className={`${panel} flex flex-col gap-8 px-5 py-12 sm:px-8 lg:px-14 lg:py-20`}>
-        <div className="flex flex-col gap-4">
-          <h2 className="max-w-[22ch] font-display text-[clamp(1.75rem,3vw,2.75rem)] uppercase leading-[1.05]">Help that reads both sides.</h2>
-          <p className="max-w-[56ch] text-ink-2">
-            Tap Get help and an agent joins the chat. They see what each side wrote, what each side read, and the deal you both agreed to.
-          </p>
+      <section className="l-wrap l-agent">
+        <div className="l-agent-head">
+          <h2 className="l-h2 max-w-[16ch]">Help that reads both sides.</h2>
+          <p className="l-lead">Tap Get help and a person joins the chat. They see each message in the original and in English, beside the deal you both agreed to.</p>
         </div>
-        <Shot src="/screens/agent.png" alt="The agent console: each message in the original and in English, beside the case summary and the frozen deal" w={2512} h={1524} />
+        <div className="l-agent-shot">
+          {/* eslint-disable-next-line @next/next/no-img-element -- static product capture, sized explicitly */}
+          <img src="/screens/agent.png" alt="The agent console: each message in the original and in English, beside the case summary and the frozen deal" width={2512} height={1490} loading="lazy" />
+        </div>
       </section>
 
       {/* Close */}
-      <section className={`${panel} flex flex-col items-center gap-6 px-5 py-12 text-center sm:px-8 lg:px-14 lg:py-20`}>
-        <h2 className="max-w-[20ch] text-balance font-display text-[clamp(1.75rem,3vw,2.75rem)] uppercase leading-[1.05]">Try both sides of a real chat.</h2>
-        <div className="flex flex-wrap justify-center gap-3">
-          <Link href="/try" className="btn btn-primary">
-            Try the demo
-          </Link>
-          <Link href="/listings" className="btn btn-secondary">
-            Browse listings
-          </Link>
-        </div>
+      <section className="l-wrap l-close">
+        <p className="l-story py-0">
+          <Ink>When both sides read the same deal, nothing gets lost in translation.</Ink>
+        </p>
+        <Link href="/try" className="l-btn" data-magnet>
+          Try both sides of a chat
+        </Link>
       </section>
 
-      <footer className={`${panel} flex flex-col gap-4 px-5 py-8 sm:flex-row sm:items-center sm:px-8 lg:px-14`}>
-        <p className="font-display text-lg uppercase">Handshake</p>
-        <nav aria-label="Footer" className="flex flex-wrap gap-x-5 gap-y-1 text-sm sm:ml-auto">
-          <Link href="/try" className="link">Try the demo</Link>
-          <Link href="/listings" className="link">Browse</Link>
-          <Link href="/listings/new" className="link">Sell</Link>
-          <a href="https://github.com/Akshat14z/Arctic" className="link">Source code</a>
+      {/* The street: everyone who might trade here, standing on the footer rule */}
+      <div className="l-wrap l-street" aria-hidden>
+        {STREET.map((n) => (
+          // eslint-disable-next-line @next/next/no-img-element -- static Open Peeps SVG
+          <img key={n} src={`/people/${n}.svg`} alt="" width={1200} height={2980} loading="lazy" />
+        ))}
+      </div>
+
+      <footer className="l-wrap l-footer">
+        <Link href="/" className="l-mark">
+          Handshake
+        </Link>
+        <nav aria-label="Footer">
+          <Link href="/try" className="l-link">Try the demo</Link>
+          <Link href="/listings" className="l-link">Browse</Link>
+          <Link href="/listings/new" className="l-link">Sell</Link>
+          <a href="https://github.com/Akshat14z/Arctic" className="l-link">Source code</a>
         </nav>
-        <p className="text-sm text-muted sm:basis-full">Built for the Nexconn Build Challenge 2026. Demo accounts are marked Demo.</p>
+        <p className="basis-full">Built for the Nexconn Build Challenge 2026. Demo accounts are marked Demo. People drawn from Open Peeps by Pablo Stanley (CC0).</p>
       </footer>
     </div>
   );

@@ -62,7 +62,7 @@ export function BottomTabs() {
                 aria-current={here ? "page" : undefined}
                 className={`flex min-h-14 flex-col items-center justify-center gap-1 text-xs font-medium no-underline ${here ? "text-text" : "text-muted"}`}
               >
-                <span className={`grid h-7 w-12 place-items-center rounded-full ${here ? "bg-text text-bg" : ""}`}>
+                <span className={`grid h-7 w-12 place-items-center rounded-full ${here ? "bg-accent text-[var(--color-accent-ink)]" : ""}`}>
                   <Icon name={t.icon} className="size-[18px]" />
                 </span>
                 {t.label}

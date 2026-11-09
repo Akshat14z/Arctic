@@ -1,12 +1,12 @@
 import type { Metadata, Viewport } from "next";
-import { Inter, Syne } from "next/font/google";
+import { Instrument_Serif, Inter } from "next/font/google";
 import { AppChrome } from "./app-chrome";
 import { HtmlLang } from "./html-lang";
 import { CallModal } from "@/components/call-modal";
 import "./globals.css";
 
-// Akshat's theme (site/): Syne for display heads, Inter for everything else. Only the weights used.
-const syne = Syne({ variable: "--font-syne", subsets: ["latin"], weight: ["700", "800"], display: "swap" });
+// One system (T15): Instrument Serif for the wordmark and page titles, Inter for everything else. Only the weights used.
+const serif = Instrument_Serif({ variable: "--font-instrument", subsets: ["latin"], weight: "400", display: "swap" });
 const inter = Inter({ variable: "--font-inter", subsets: ["latin"], weight: ["400", "500", "600"], display: "swap" });
 
 export const metadata: Metadata = {
@@ -14,12 +14,16 @@ export const metadata: Metadata = {
   description: "Marketplace chat that translates every message and spells out every amount, so both sides agree to the same deal.",
 };
 
-export const viewport: Viewport = { themeColor: "oklch(14.6% 0.004 286)" };
+export const viewport: Viewport = { themeColor: "oklch(96.4% 0.006 250)" };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     // "en" in the static HTML; HtmlLang switches it to the user's language after hydration.
-    <html lang="en" className={`${syne.variable} ${inter.variable} h-full antialiased`}>
+    <html lang="en" className={`${inter.variable} ${serif.variable} h-full antialiased`}>
+      <head>
+        {/* Before paint: with script and motion allowed, the landing hides its hero until GSAP takes it over (landing.css). */}
+        <script dangerouslySetInnerHTML={{ __html: "if(matchMedia('(prefers-reduced-motion: no-preference)').matches)document.documentElement.classList.add('js')" }} />
+      </head>
       <body className="flex min-h-full flex-col font-sans">
         <HtmlLang />
         <AppChrome>{children}</AppChrome>

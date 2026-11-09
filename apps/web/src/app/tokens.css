@@ -1,22 +1,27 @@
 :root {
-  color-scheme: dark;
+  color-scheme: light;
   --space-3xs: 2px; --space-2xs: 4px; --space-xs: 8px; --space-sm: 12px; --space-md: 16px; --space-lg: 24px; --space-xl: 40px; --space-2xl: 64px; --space-3xl: 96px; --space-4xl: 144px;
   --text-xs: 0.75rem; --text-sm: 0.875rem; --text-md: 1rem; --text-lg: 1.2rem; --text-xl: 1.44rem; --text-2xl: 1.728rem; --text-3xl: 2.074rem;
   --text-display-s: 1.44rem; --text-display: 1.728rem; --text-section: 1.2rem; --text-title: 1rem; --text-lead: 1rem;
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1); --ease-in: cubic-bezier(0.7, 0, 0.84, 0); --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
   --dur-micro: 120ms; --dur-short: 220ms; --dur-long: 420ms;
-  --color-error: oklch(70% 0.17 25); --color-success: oklch(76% 0.14 152);
+  --color-error: oklch(52% 0.19 27); --color-success: oklch(48% 0.13 152);
   --container: 1440px; --gutter: 64px; --gap-columns: 32px; --section-gap-s: 120px; --section-gap: 144px; --section-gap-l: 176px;
   --z-base: 1; --z-raised: 10; --z-dropdown: 100; --z-sticky: 200; --z-sticky-nav: 300; --z-modal: 400; --z-toast: 500; --z-tooltip: 600;
-  --color-paper: oklch(14.6% 0.004 286); --color-paper-2: oklch(19.5% 0.004 286); --color-paper-3: oklch(24% 0.005 286);
-  --color-ink: oklch(97.5% 0.003 286); --color-ink-2: oklch(88% 0.004 286); --color-muted: oklch(67% 0.006 286);
-  --color-rule: oklch(30% 0.004 286); --color-rule-2: oklch(44% 0.004 286);
-  --color-accent: oklch(93.2% 0.003 106); --color-accent-ink: oklch(14.6% 0.004 286); --color-focus: oklch(93.2% 0.003 106);
-  --font-display: "Syne", ui-sans-serif, system-ui, sans-serif; --font-body: "Inter", ui-sans-serif, system-ui, sans-serif; --font-outlier: var(--font-body);
+  /* One system (T15): the app and the landing share this paper, ink and blue. */
+  --color-paper: oklch(96.4% 0.006 250); --color-paper-2: oklch(99.2% 0.004 250); --color-paper-3: oklch(92.5% 0.01 250);
+  --color-ink: oklch(21% 0.02 262); --color-ink-2: oklch(38% 0.02 262); --color-muted: oklch(49% 0.016 262);
+  --color-rule: oklch(89% 0.01 250); --color-rule-2: oklch(80% 0.012 250);
+  --color-accent: oklch(43% 0.15 259); --color-accent-ink: oklch(97.5% 0.01 250); --color-focus: oklch(43% 0.15 259);
+  --color-faint: oklch(78% 0.012 262); --color-shadow: oklch(21% 0.02 262 / 0.22);
+  --font-display: "Instrument Serif", ui-serif, Georgia, serif; --font-body: "Inter", ui-sans-serif, system-ui, sans-serif; --font-outlier: var(--font-body);
+  /* the landing page (T14, light editorial) */
+  --l-paper: var(--color-paper); --l-grid: var(--color-rule); --l-ink: var(--color-ink); --l-ink-2: var(--color-ink-2);
+  --l-faint: var(--color-faint); --l-blue: var(--color-accent); --l-blue-ink: var(--color-accent-ink); --l-card: var(--color-paper-2); --l-shadow: var(--color-shadow);
   /* the one pale-blue hero tile (T13 reference) */
   --color-hero-1: oklch(93% 0.035 240); --color-hero-2: oklch(82% 0.075 245); --color-hero-ink: oklch(18% 0.02 255); --color-hero-muted: oklch(38% 0.03 255); --color-hero-go: oklch(98% 0.01 240);
   --radius-card: 24px; --radius-field: 14px; --radius-pill: 999px; --rule-hair: 1px; --shadow-card: none;
   --tracking-display: 0.02em; --display-weight: 800;
   /* the frame around the app: the template's pale device bezel */
-  --color-frame: oklch(93.2% 0.003 106);
+  --color-frame: var(--color-paper);
 }

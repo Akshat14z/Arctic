@@ -1,10 +1,9 @@
-/* Hallmark · shape: app screen · genre: atmospheric · theme: brand (site/, Akshat's landing template) · redesign: restyle · scope: app
- * paper: oklch(14.6% 0.004 286) · accent: oklch(93.2% 0.003 106) (the frame grey) · display: Syne 800 · body: Inter
- * nav: kept, inside the pale frame · signature: kept, the same message on two screens · states: loading, empty, error, busy, disabled, not found
- * axes: dark/display-heavy/neutral · posture: restrained (cinematic) · contrast: pass · v2.0.0 */
+/* Hallmark · shape: app screen · genre: atmospheric · theme: brand (one system with the T14 landing) · redesign: restyle · scope: app
+ * paper: oklch(96.4% 0.006 250) · accent: oklch(43% 0.15 259) · display: Instrument Serif · body: Inter
+ * nav: pill tabs, phone bottom bar · signature: kept, the same message on two screens · states: loading, empty, error, busy, disabled, not found
+ * axes: light/roman-serif/chromatic-blue · posture: committed (the landing title in the brand blue; the app keeps blue to actions and selection) · contrast: pass · v2.0.0 */
 /* Hallmark · pre-emit critique: P4 H4 E4 S4 R4 V4 · weakest: S, Syne is Latin only, so Indic and Japanese heads fall back to Noto Sans; kept heads short and in UI copy */
-/* Hallmark · waive 23 · the landing's root and the app body paint --color-frame behind the dark panels · the frame is the template's pale device bezel, a field colour that happens to share the accent's value; the accent itself only marks focus and selection */
-/* Hallmark · dismissed F4 · .tile-hero .btn-primary is the same primary button recoloured for contrast on the pale-blue hero tile, and each page still has one primary action */
+/* Hallmark · waive 23 · the landing's giant serif title and its primary buttons paint the brand blue, about a quarter of the first screen · the blue title is the page's signature and the stamp declares a committed posture; the app itself keeps blue to actions and selection */
 /* Hallmark · dismissed 28a · listing-card thumbnails sit below the page title and search field in a long list, so the largest paint is the title and lazy loading is right */
 @import "tailwindcss";
 @import "./tokens.css";
@@ -12,16 +11,16 @@
 @import "./primitives.css" layer(components);
 
 /* Page-level tokens on top of the brand tokens: next/font's generated families, Indic + Japanese fallbacks
-   (Syne and Inter are Latin only), and the state tints the product needs. */
+   (Instrument Serif and Inter are Latin only), and the state tints the product needs. */
 :root {
-  --font-display: var(--font-syne), "Noto Sans Devanagari", "Noto Sans JP", ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-instrument), "Noto Serif Devanagari", "Noto Serif JP", ui-serif, Georgia, serif;
   --font-body: var(--font-inter), "Noto Sans", "Noto Sans Devanagari", "Noto Sans Tamil", "Noto Sans Telugu",
     "Noto Sans Kannada", "Noto Sans Bengali", "Hiragino Sans", "Noto Sans JP", ui-sans-serif, system-ui, sans-serif;
   --font-outlier: var(--font-body);
-  --color-guard: oklch(82% 0.12 75);
-  --color-guard-bg: oklch(25% 0.045 70);
-  --color-danger-bg: oklch(25% 0.06 25);
-  --color-success-bg: oklch(25% 0.05 152);
+  --color-guard: oklch(62% 0.14 70);
+  --color-guard-bg: oklch(95.5% 0.04 85);
+  --color-danger-bg: oklch(95.5% 0.03 27);
+  --color-success-bg: oklch(95.5% 0.035 152);
 }
 
 /* The product's Tailwind names, resolved to the brand tokens. */
@@ -52,10 +51,13 @@
 
 /* The landing page brings its own masthead. */
 body:has([data-landing]) [data-app-chrome] { display: none; }
-/* The template's device frame: on wider screens the dark app sits inside a pale rounded bezel. */
-@media (min-width: 48rem) {
-  body:not(:has([data-landing])) { background: var(--color-frame); padding: var(--space-sm); }
-  body:not(:has([data-landing])) [data-shell] { background: var(--color-paper); border-radius: 28px; min-height: calc(100dvh - 2 * var(--space-sm)); overflow: clip; }
+/* One system: the app sits on the landing's grid paper, edge to edge (no device frame). */
+body:not(:has([data-landing])) {
+  background-color: var(--color-paper);
+  background-image: linear-gradient(var(--color-rule) 1px, transparent 1px), linear-gradient(90deg, var(--color-rule) 1px, transparent 1px);
+  background-size: 96px 96px;
+  background-position: center top;
+  background-attachment: fixed;
 }
 /* Wide screens (the agent console) widen the header with the page, so the wordmark lines up with the content. */
 
