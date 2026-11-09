@@ -74,7 +74,7 @@ export function HomeView() {
         </div>
       )}
 
-      <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
+      <div data-stagger className="grid grid-cols-1 gap-3 md:grid-cols-3">
         {/* Hero: pick up where you left off, or find something */}
         {loading ? (
           <div className="skeleton h-56 md:col-span-2" />

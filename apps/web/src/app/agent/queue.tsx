@@ -86,7 +86,7 @@ export function Queue() {
       </header>
 
       {items && (
-        <div className="grid grid-cols-3 gap-3">
+        <div data-stagger className="grid grid-cols-3 gap-3">
           {(
             [
               ["Open", items.filter((c) => c.status === "open").length],

@@ -96,3 +96,21 @@ a.row:hover .row-title { text-decoration: underline; text-underline-offset: 3px;
 .row-title { font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .tile-hero .note-error { color: var(--color-ink); }
 .bubble-mine a, .bubble-mine .link { color: inherit; text-decoration-color: currentColor; }
+
+/* ── App motion (T16): quick, state-only, compositor-only. Pages ease in, bento tiles and list rows
+   cascade once, new bubbles rise, buttons press. Nothing loops; all of it stops under reduced motion. ── */
+@media (prefers-reduced-motion: no-preference) {
+  [data-shell] main > :not([data-landing]) { animation: app-in var(--dur-short) var(--ease-out) both; }
+  [data-stagger] > *, .tile > ul > li { animation: app-rise var(--dur-short) var(--ease-out) both; }
+  [data-stagger] > :nth-child(2), .tile > ul > li:nth-child(2) { animation-delay: 40ms; }
+  [data-stagger] > :nth-child(3), .tile > ul > li:nth-child(3) { animation-delay: 80ms; }
+  [data-stagger] > :nth-child(4), .tile > ul > li:nth-child(4) { animation-delay: 120ms; }
+  [data-stagger] > :nth-child(n + 5), .tile > ul > li:nth-child(n + 5) { animation-delay: 160ms; }
+  .bubble { animation: app-rise var(--dur-short) var(--ease-out) both; }
+  .btn:active:not(:disabled), .tile-go:active { transform: scale(0.97); }
+  .tile-go > svg { transition: transform var(--dur-short) var(--ease-out); }
+  .tile-go:hover > svg { transform: translate(1px, -1px); }
+}
+.btn { transition-property: background-color, color, border-color, transform; }
+@keyframes app-in { from { opacity: 0; transform: translateY(6px); } }
+@keyframes app-rise { from { opacity: 0; transform: translateY(10px); } }
