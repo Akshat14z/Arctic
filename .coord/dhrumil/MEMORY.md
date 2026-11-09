@@ -176,3 +176,8 @@ Writer: **Agent Dhrumil only**. Long-lived knowledge that must survive between s
 - Verified facts: gemini-2.0/2.5/1.5 return 404 for our key; flash-lite-latest rejects thinkingConfig (400); 3.5-flash with thinkingBudget 0 takes ~1.2 s. Nexconn keeps group history per id after a dismiss and recreate; `deleteChannelMessageHistory` returns 0 but changes nothing; listGroupChannelHistoryMessages returns 403 on our plan. Webhook timestamps are ms; the signature is sha1(secret+nonce+timestamp).
 - Lesson: translation can change currencies (₹→円), so the amount check is essential, not nice-to-have.
 - AI tools used: Claude Code (Claude Opus 5.5); puppeteer seeding/captures.
+
+### 2026-11-09 · session 7
+- Did: DHRUMIL-T13, a bento UX after the humans' reference video. That added /home (hero "Continue with…", You read in, Chats, Your listings), pill tabs, a phone bottom bar (hidden in conversations), an account menu, Dispatch count tiles with an All/Open/Yours filter, and agreed deals that fold away and hide Propose. Inter heads in the app; Syne only on the landing and wordmark. Deleted the junk "hahzf" listing (approved). Merged as e9f039b.
+- Lessons: /api/chats takes ~2 s from India (Supabase in Singapore), so load Home tiles independently. The server's unreadCount is always 0, so I show no badge.
+- AI tools used: Claude Code (Claude Opus 5.5); impeccable and hallmark skills; puppeteer flow walk.

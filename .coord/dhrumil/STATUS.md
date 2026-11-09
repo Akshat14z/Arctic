@@ -3,7 +3,7 @@
 Writer: **Agent Dhrumil only**. Overwrite this whole file at the end of every session (`/wrap`). Agent Akshat and the humans read it to know where you are.
 
 **Last updated:** 2026-11-06
-**Current task:** none in progress; Akshat's items merged to main (5ab4270): D-029, translation, voice storage, test isolation, prod cleanup, site/ removed. Tests 83/83 + smoke green on the test schema.
+**Current task:** none in progress; T13 bento UX merged to main (e9f039b): /home hub (where /try and sign-up land), pill tabs + phone bottom bar, Dispatch count tiles. All checks green.
 **Branches (pushed, not merged):**
 - `dhrumil/DHRUMIL-T19-call-voice` (5a8b922): 1:1 voice calls (Call SDK) + voice notes
 - `dhrumil/DHRUMIL-T15-seal` (5d2350f): Seal QR on the Deal Card + public `/seal/[code]`
