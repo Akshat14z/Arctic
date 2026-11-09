@@ -56,7 +56,7 @@ body:has([data-landing]) { background: var(--l-paper); padding: 0; }
   .l-cutout { position: relative; inset: auto; width: 88%; }
   .l-cutout figcaption { display: none; }
   .l-cutout-a { rotate: -6deg; align-self: flex-start; }
-  .l-cutout-b { rotate: 5deg; align-self: flex-end; margin-top: calc(-1 * var(--space-xl)); }
+  .l-cutout-b { rotate: 5deg; align-self: flex-end; margin-top: calc(-1 * var(--space-md)); }
 }
 
 .l-drift { position: absolute; inset: 0; pointer-events: none; z-index: 0; }
@@ -109,15 +109,13 @@ body:has([data-landing]) { background: var(--l-paper); padding: 0; }
   .l-drift span { animation: l-float 9s var(--ease-in-out) infinite alternate; }
   .l-drift span:nth-child(2n) { animation-duration: 11s; animation-delay: -3s; }
   .l-drift span:nth-child(3n) { animation-duration: 13s; animation-delay: -6s; }
-  .l-cutout { animation: l-bob 7s var(--ease-in-out) infinite alternate; }
-  .l-cutout-b { animation-delay: -3.5s; }
+  [data-landing].is-away .l-drift span { animation-play-state: paused; }
 
   @supports (animation-timeline: view()) {
     .l-ink { color: var(--l-faint); animation: l-ink linear both; animation-timeline: view(); animation-range: entry 40% cover 50%; }
   }
 }
 @keyframes l-float { from { transform: translate3d(0, 0, 0) rotate(-2deg); } to { transform: translate3d(14px, -18px, 0) rotate(3deg); } }
-@keyframes l-bob { from { transform: translateY(0); } to { transform: translateY(-12px); } }
 @keyframes l-ink { to { color: var(--l-ink); } }
 
 /* ── The chapter (T16): one deal, pinned. Base CSS is the finished scene: every step, bubble, the deal,
@@ -128,8 +126,8 @@ body:has([data-landing]) { background: var(--l-paper); padding: 0; }
 .l-steps ol { display: grid; gap: var(--space-lg); margin: 0; padding: 0; list-style: none; }
 .l-step-head { font-family: var(--font-serif-stack); font-size: clamp(2rem, 4.2vw, 3.75rem); line-height: 1; letter-spacing: -0.02em; color: var(--l-ink); overflow-wrap: break-word; min-width: 0; }
 .l-step-sub { margin-top: var(--space-sm); max-width: 28ch; font-size: clamp(1.05rem, 1.4vw, 1.25rem); line-height: 1.45; color: var(--l-ink-2); }
-[data-landing].is-live .l-steps ol { position: relative; min-height: 14rem; }
-[data-landing].is-live .l-step { position: absolute; inset: 0 0 auto 0; }
+[data-chapter].is-pinned .l-steps ol { position: relative; min-height: 14rem; }
+[data-chapter].is-pinned .l-step { position: absolute; inset: 0 0 auto 0; }
 
 .l-stage { position: relative; aspect-ratio: 16 / 11; border-radius: 28px; background: var(--l-card); border: 1px solid var(--l-grid); overflow: clip; }
 .l-person { position: absolute; bottom: -2%; height: 64%; width: auto; transform-origin: 50% 100%; }
@@ -137,15 +135,25 @@ body:has([data-landing]) { background: var(--l-paper); padding: 0; }
 .l-person-kenji { right: 4%; }
 .l-person-sarah { left: 50%; translate: -32% 0; height: 58%; z-index: 0; }
 .l-say { position: absolute; z-index: 2; max-width: 34%; padding: var(--space-xs) var(--space-md); border-radius: 18px; background: var(--l-card); box-shadow: inset 0 0 0 1px var(--l-grid), 0 10px 24px -14px var(--l-shadow); font-size: clamp(0.8rem, 1.15vw, 1rem); line-height: 1.35; color: var(--l-ink); }
+.l-say::after { content: ""; position: absolute; bottom: -5px; left: 20px; width: 10px; height: 10px; background: inherit; rotate: 45deg; }
+.l-say-right::after { left: auto; right: 20px; }
 .l-say-mine { background: var(--l-blue); color: var(--l-blue-ink); box-shadow: 0 10px 24px -14px var(--l-shadow); }
 .l-say-left { left: 4%; top: 6%; }
 .l-say-right { right: 4%; top: 6%; text-align: right; }
 .l-say-low { top: 20%; }
 .l-say-sarah { left: 50%; top: 50%; translate: -110% 0; }
+.l-say-sarah::after { left: auto; right: 20px; }
+@media (min-width: 64rem) {
+  .l-say-left, .l-say-right { top: 26%; }
+  .l-say-low { top: 42%; }
+  .l-say-sarah { top: 60%; }
+  .l-fly { top: 32%; }
+  .l-fly-back { top: 48%; }
+}
 .l-fly { position: absolute; z-index: 3; left: 30%; right: 30%; top: 14%; display: none; }
 .l-fly span { display: inline-block; padding: var(--space-2xs) var(--space-sm); border-radius: var(--radius-pill); background: var(--l-blue); color: var(--l-blue-ink); font: 600 var(--text-sm)/1.2 var(--font-body); }
 .l-fly-back { top: 30%; }
-[data-landing].is-live .l-fly { display: block; }
+[data-chapter].is-pinned .l-fly { display: block; }
 .l-deal { position: absolute; z-index: 2; left: 50%; top: 8%; translate: -50% 0; min-width: 11rem; padding: var(--space-md) var(--space-2xl) var(--space-md) var(--space-lg); border-radius: 20px; background: var(--l-card); box-shadow: inset 0 0 0 1px var(--l-grid), 0 24px 50px -24px var(--l-shadow); text-align: left; }
 .l-deal-k { font-size: var(--text-sm); color: var(--l-ink-2); }
 .l-deal-v { font-family: var(--font-serif-stack); font-size: clamp(2rem, 3.4vw, 2.75rem); line-height: 1; color: var(--l-ink); }
@@ -155,14 +163,14 @@ body:has([data-landing]) { background: var(--l-paper); padding: 0; }
 @media (max-width: 47.99rem) {
   .l-chapter-pin { gap: var(--space-lg); }
   .l-stage { aspect-ratio: 1 / 1.02; }
-  .l-say { max-width: 46%; }
+  .l-say { max-width: none; white-space: nowrap; font-size: var(--text-xs); }
   .l-say-low { top: 23%; }
-  .l-deal { top: 40%; min-width: 9rem; padding: var(--space-sm) var(--space-md); }
-  .l-seal { width: 3.75rem; height: 3.75rem; right: -0.9rem; top: -0.9rem; }
+  .l-deal { top: 34%; min-width: 9rem; padding: var(--space-sm) var(--space-md); }
+  .l-seal { width: 3.75rem; height: 3.75rem; left: -0.9rem; right: auto; top: -0.9rem; }
   .l-say-sarah { display: none; }
   .l-person { height: 50%; }
-  .l-person-sarah { height: 44%; }
-  [data-landing].is-live .l-steps ol { min-height: 9rem; }
+  .l-person-sarah { height: 40%; }
+  [data-chapter].is-pinned .l-steps ol { min-height: 9rem; }
 }
 
 /* The street: people standing on the footer rule */
@@ -172,3 +180,8 @@ body:has([data-landing]) { background: var(--l-paper); padding: 0; }
 .l-street img:nth-child(4n) { height: 96%; }
 @media (max-width: 47.99rem) { .l-street img:nth-child(n + 6) { display: none; } }
 .l-footer { border-top-width: 1.5px; }
+
+/* Before GSAP takes over (script + motion only): the hero waits hidden instead of painting, blinking and
+   replaying. A 2.5s failsafe shows it anyway if the script never arrives. */
+html.js [data-landing]:not(.is-live) :is(.l-title, .l-sub, .l-actions, .l-cutouts, .l-drift) { visibility: hidden; animation: l-failsafe 0s 2.5s forwards; }
+@keyframes l-failsafe { to { visibility: visible; } }

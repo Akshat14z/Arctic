@@ -8,6 +8,7 @@ import { useLayoutEffect, useRef, useState } from "react";
 import {
   motion,
   useAnimationFrame,
+  useInView,
   useMotionValue,
   useReducedMotion,
   useScroll,
@@ -28,6 +29,8 @@ function Row({ items, baseVelocity, className }: { items: { text: string; lang?:
   const factor = useTransform(smooth, [0, 1000], [0, 4], { clamp: false });
   const reduce = useReducedMotion();
   const copy = useRef<HTMLDivElement>(null);
+  const box = useRef<HTMLDivElement>(null);
+  const inView = useInView(box);
   const [w, setW] = useState(0);
   const hovered = useRef(false);
   const dir = useRef(1);
@@ -44,7 +47,7 @@ function Row({ items, baseVelocity, className }: { items: { text: string; lang?:
   const x = useTransform(baseX, (v) => (w ? `${wrap(-w, 0, v)}px` : "0px"));
 
   useAnimationFrame((_, delta) => {
-    if (reduce) return;
+    if (reduce || !inView) return;
     pace.current += ((hovered.current ? 0 : 1) - pace.current) * (1 - Math.exp(-delta / 150));
     const f = factor.get();
     if (f < 0) dir.current = -1;
@@ -65,7 +68,7 @@ function Row({ items, baseVelocity, className }: { items: { text: string; lang?:
   );
 
   return (
-    <div onPointerEnter={() => (hovered.current = true)} onPointerLeave={() => (hovered.current = false)} className="overflow-clip">
+    <div ref={box} onPointerEnter={() => (hovered.current = true)} onPointerLeave={() => (hovered.current = false)} className="overflow-clip">
       <motion.div style={{ x }} className={`flex w-max ${className}`}>
         {[0, 1, 2].map(line)}
       </motion.div>

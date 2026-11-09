@@ -38,19 +38,62 @@ export function LandingMotion() {
       gsap.ticker.add(tick);
       gsap.ticker.lagSmoothing(0);
 
-      // Hero entrance: lines rise out of a mask, then the screens and the drifting words.
+      // Hero entrance. SplitText re-splits on resize and waits for the web font (autoSplit), and each split
+      // plays its own rise, so the masked lines are never measured on the fallback face.
       const title = q(".l-title")[0];
-      const split = title ? SplitText.create(title, { type: "lines", mask: "lines", linesClass: "l-line" }) : null;
-      const intro = gsap.timeline({ defaults: { ease: "expo.out" } });
-      if (split) intro.from(split.lines, { yPercent: 110, duration: 1.1, stagger: 0.12 });
+      const split = title
+        ? SplitText.create(title, {
+            type: "lines",
+            mask: "lines",
+            linesClass: "l-line",
+            autoSplit: true,
+            onSplit: (self) => gsap.from(self.lines, { yPercent: 110, duration: 1.1, stagger: 0.12, ease: "expo.out" }),
+          })
+        : null;
+      const intro = gsap.timeline({ defaults: { ease: "expo.out" }, delay: 0.25 });
       intro
-        .from(q(".l-sub, .l-actions"), { y: 18, autoAlpha: 0, duration: 0.8, stagger: 0.08 }, "-=0.7")
-        .from(q(".l-cutout"), { y: 60, autoAlpha: 0, rotate: 0, duration: 1.1, stagger: 0.12 }, "-=0.8")
-        .from(q(".l-drift span"), { autoAlpha: 0, duration: 1.2, stagger: 0.05 }, "-=0.9");
+        .from(q(".l-sub, .l-actions"), { y: 18, autoAlpha: 0, duration: 0.8, stagger: 0.08 })
+        .from(q(".l-cutout"), { y: 60, autoAlpha: 0, duration: 1.1, stagger: 0.12 }, "-=0.6")
+        .from(q(".l-drift span"), { autoAlpha: 0, duration: 1.2, stagger: 0.05 }, "-=0.9")
+        .add(() => {
+          gsap.to(q(".l-cutout"), { y: -12, duration: 3.5, ease: "sine.inOut", yoyo: true, repeat: -1, stagger: 1.75 });
+        });
 
+      // Loops only run while they are on screen: the drifting words pause once the hero is scrolled away.
+      ScrollTrigger.create({ trigger: q(".l-hero")[0], start: "top top", end: "bottom top", onToggle: (self) => root.classList.toggle("is-away", !self.isActive) });
+
+      // Footer street: step up onto the rule, then sway from the feet.
+      const people = q(".l-street img");
+      if (people.length) {
+        gsap.from(people, {
+          yPercent: 100,
+          duration: 1,
+          ease: "expo.out",
+          stagger: { each: 0.07, from: "random" },
+          scrollTrigger: { trigger: q(".l-street")[0], start: "top 92%" },
+        });
+        const sway = gsap.timeline({ paused: true });
+        people.forEach((p, i) => {
+          sway.to(p, { rotate: i % 2 ? 2.2 : -2.2, duration: 2.4 + (i % 4) * 0.5, ease: "sine.inOut", yoyo: true, repeat: -1 }, i * 0.13);
+        });
+        ScrollTrigger.create({ trigger: q(".l-street")[0], start: "top bottom", end: "bottom top", onToggle: (self) => (self.isActive ? sway.play() : sway.pause()) });
+      }
+
+      return () => {
+        root.classList.remove("is-live", "is-away");
+        gsap.ticker.remove(tick);
+        gsap.ticker.lagSmoothing(500, 33);
+        lenis.destroy();
+        split?.revert();
+      };
+    });
+
+    // The pinned chapter needs a screen tall enough to hold its stage; short screens keep the still scene.
+    mm.add("(prefers-reduced-motion: no-preference) and (min-height: 40rem)", () => {
       // Story chapter: pinned, scrubbed. Every element already sits at its end state; we play from hidden.
       const chapter = q("[data-chapter]")[0];
       if (chapter) {
+        chapter.classList.add("is-pinned");
         const s = (sel: string) => chapter.querySelectorAll(sel);
         const tl = gsap.timeline({
           defaults: { ease: "power3.out", duration: 1 },
@@ -95,28 +138,7 @@ export function LandingMotion() {
           .fromTo(s("[data-say='4']"), { y: 16, scale: 0.92 }, { autoAlpha: 1, y: 0, scale: 1 }, "-=0.3")
           .to({}, { duration: 0.6 }); // hold the last frame before the pin releases
       }
-
-      // Footer street: step up onto the rule, then sway from the feet.
-      const people = q(".l-street img");
-      if (people.length) {
-        gsap.from(people, {
-          yPercent: 100,
-          duration: 1,
-          ease: "expo.out",
-          stagger: { each: 0.07, from: "random" },
-          scrollTrigger: { trigger: q(".l-street")[0], start: "top 92%" },
-        });
-        people.forEach((p, i) => {
-          gsap.to(p, { rotate: i % 2 ? 2.2 : -2.2, duration: 2.4 + (i % 4) * 0.5, ease: "sine.inOut", yoyo: true, repeat: -1, delay: i * 0.13 });
-        });
-      }
-
-      return () => {
-        root.classList.remove("is-live");
-        gsap.ticker.remove(tick);
-        lenis.destroy();
-        split?.revert();
-      };
+      return () => chapter?.classList.remove("is-pinned");
     });
 
     // Magnet: the primary buttons lean toward a fine pointer.

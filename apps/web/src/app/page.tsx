@@ -37,7 +37,7 @@ const DRIFT: { text: string; lang?: string; at: string }[] = [
 const STEPS: [string, string][] = [
   ["Priya writes in Hindi.", "Kenji reads it in Japanese."],
   ["Kenji holds at ₹15,000.", "Priya sees the same number, not yen."],
-  ["They agree once.", "The deal is sealed with a code anyone can scan."],
+  ["They agree once.", "Both sign the same card, and it is sealed."],
   ["If something goes wrong,", "a person who reads both sides steps in."],
 ];
 

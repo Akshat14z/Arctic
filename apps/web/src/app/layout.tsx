@@ -20,6 +20,10 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     // "en" in the static HTML; HtmlLang switches it to the user's language after hydration.
     <html lang="en" className={`${inter.variable} ${serif.variable} h-full antialiased`}>
+      <head>
+        {/* Before paint: with script and motion allowed, the landing hides its hero until GSAP takes it over (landing.css). */}
+        <script dangerouslySetInnerHTML={{ __html: "if(matchMedia('(prefers-reduced-motion: no-preference)').matches)document.documentElement.classList.add('js')" }} />
+      </head>
       <body className="flex min-h-full flex-col font-sans">
         <HtmlLang />
         <AppChrome>{children}</AppChrome>
