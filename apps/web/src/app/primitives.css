@@ -3,9 +3,9 @@
    dark panels, white pills for the primary action, glass pills for the rest. Every control: rest, hover, active, focus-visible,
    disabled, and busy via aria-busy.
    --------------------------------------------------------------------------------------------- */
-/* Inside the app, heads are Inter in sentence case (the reference); Syne stays on the landing and the wordmark via .font-display. */
+/* Inside the app, heads are Inter in sentence case; page titles take the landing's serif (.page-title), so both read as one book. */
 :where([data-shell]) :is(h1, h2, h3) { font-family: var(--font-body); font-weight: 600; letter-spacing: -0.01em; line-height: 1.2; }
-.page-title { font-size: var(--text-2xl); max-width: 28ch; }
+.page-title { font-family: var(--font-display); font-weight: 400; font-size: clamp(2.25rem, 5vw, 3.25rem); letter-spacing: -0.02em; line-height: 1; max-width: 22ch; }
 .section-title { font-size: var(--text-xl); max-width: 36ch; }
 .item-title { font-family: var(--font-body); font-weight: 600; letter-spacing: 0; font-size: var(--text-lg); line-height: 1.25; max-width: 40ch; }
 .meta { font-size: var(--text-sm); font-weight: 500; color: var(--color-muted); }
@@ -23,9 +23,9 @@
 }
 .btn:disabled, .btn[aria-disabled="true"] { opacity: 0.5; cursor: not-allowed; }
 .btn[aria-busy="true"] { cursor: progress; }
-.btn-primary { background: var(--color-ink); color: var(--color-paper); }
-.btn-primary:hover:not(:disabled) { background: var(--color-ink-2); }
-.btn-primary:active:not(:disabled) { background: var(--color-muted); }
+.btn-primary { background: var(--color-accent); color: var(--color-accent-ink); }
+.btn-primary:hover:not(:disabled) { background: color-mix(in oklab, var(--color-accent) 88%, var(--color-ink)); }
+.btn-primary:active:not(:disabled) { background: color-mix(in oklab, var(--color-accent) 76%, var(--color-ink)); }
 .btn-secondary { background: var(--color-paper-2); color: var(--color-ink); border-color: var(--color-rule-2); }
 .btn-secondary:hover:not(:disabled) { background: var(--color-paper-3); border-color: var(--color-ink-2); }
 .btn-secondary:active:not(:disabled) { background: var(--color-paper-3); }
@@ -59,21 +59,21 @@
 .note-guard { border-color: var(--color-guard); background: var(--color-guard-bg); color: var(--color-ink); }
 .note-success { border-color: var(--color-success); background: var(--color-success-bg); color: var(--color-ink); }
 
-/* Chat: rounded bubbles. Mine in white, theirs on the raised dark panel with a hairline. */
+/* Chat: rounded bubbles. Mine in the brand blue, theirs white on the paper with a hairline. */
 .bubble { padding: var(--space-xs) var(--space-md); border: var(--rule-hair) solid var(--color-rule); border-radius: var(--radius-lg, 20px); background: var(--color-paper-2); color: var(--color-ink); white-space: pre-wrap; overflow-wrap: anywhere; }
-.bubble-mine { background: var(--color-ink); border-color: var(--color-ink); color: var(--color-paper); }
+.bubble-mine { background: var(--color-accent); border-color: var(--color-accent); color: var(--color-accent-ink); }
 
 .skeleton { background: var(--color-paper-2); border-radius: var(--radius-field); }
 @media (prefers-reduced-motion: no-preference) { .skeleton { animation: skeleton-pulse 1.4s var(--ease-in-out) infinite alternate; } }
 @keyframes skeleton-pulse { from { opacity: 1; } to { opacity: 0.55; } }
 
 /* ── Bento (T13, after the reference): rounded dark tiles, a round ↗ to open, one pale-blue hero. ── */
-.tile { position: relative; display: flex; flex-direction: column; gap: var(--space-sm); padding: var(--space-lg); border-radius: var(--radius-card); background: var(--color-paper-2); color: var(--color-ink); min-width: 0; }
+.tile { position: relative; display: flex; flex-direction: column; gap: var(--space-sm); padding: var(--space-lg); border-radius: var(--radius-card); background: var(--color-paper-2); border: var(--rule-hair) solid var(--color-rule); color: var(--color-ink); min-width: 0; }
 .tile-title { font-size: var(--text-lg); font-weight: 500; padding-right: 3rem; }
-.tile-hero { background: linear-gradient(135deg, var(--color-hero-1), var(--color-hero-2)); color: var(--color-hero-ink); }
+.tile-hero { border-color: transparent; background: linear-gradient(135deg, var(--color-hero-1), var(--color-hero-2)); color: var(--color-hero-ink); }
 .tile-hero .meta, .tile-hero .text-muted { color: var(--color-hero-muted); }
 .tile-go { position: absolute; top: var(--space-md); right: var(--space-md); display: grid; place-items: center; width: 2.75rem; height: 2.75rem; border-radius: var(--radius-pill); background: var(--color-paper-3); color: var(--color-ink); transition: background-color var(--dur-micro) var(--ease-out), transform var(--dur-micro) var(--ease-out); }
-.tile-go:hover { background: var(--color-rule-2); }
+.tile-go:hover { background: var(--color-rule); }
 .tile-go:active { transform: scale(0.94); }
 .tile-hero .tile-go { background: var(--color-hero-go); color: var(--color-hero-ink); }
 .tile-hero .tile-go:hover { background: color-mix(in oklab, var(--color-hero-go) 80%, transparent); }
@@ -85,7 +85,7 @@
 .seg { display: inline-flex; gap: var(--space-2xs); padding: var(--space-2xs); border-radius: var(--radius-pill); background: var(--color-paper-3); }
 .seg > button, .seg > a { min-height: 2.75rem; padding: 0 var(--space-md); border-radius: var(--radius-pill); font: 500 var(--text-sm)/1 var(--font-body); color: var(--color-muted); background: transparent; border: 0; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; transition: background-color var(--dur-micro) var(--ease-out), color var(--dur-micro) var(--ease-out); }
 .seg > :hover { color: var(--color-ink); }
-.seg > [aria-pressed="true"], .seg > [aria-current="page"] { background: var(--color-ink); color: var(--color-paper); }
+.seg > [aria-pressed="true"], .seg > [aria-current="page"] { background: var(--color-accent); color: var(--color-accent-ink); }
 
 /* List row: icon tile, title over meta, figure on the right. */
 .row { display: flex; align-items: center; gap: var(--space-sm); padding: var(--space-sm) 0; color: var(--color-ink); text-decoration: none; min-width: 0; }
@@ -94,6 +94,5 @@
 .row-icon > img { width: 100%; height: 100%; object-fit: cover; }
 a.row:hover .row-title { text-decoration: underline; text-underline-offset: 3px; }
 .row-title { font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.tile-hero .btn-primary { background: var(--color-hero-ink); color: var(--color-hero-go); }
-.tile-hero .btn-primary:hover:not(:disabled) { background: color-mix(in oklab, var(--color-hero-ink) 85%, var(--color-hero-2)); }
 .tile-hero .note-error { color: var(--color-ink); }
+.bubble-mine a, .bubble-mine .link { color: inherit; text-decoration-color: currentColor; }

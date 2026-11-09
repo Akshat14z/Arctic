@@ -76,7 +76,7 @@ function Transcript({ detail, lang }: { detail: CaseDetailResponse; lang: LangCo
               type="button"
               aria-pressed={view === v}
               onClick={() => setView(v)}
-              className={`btn px-3 text-sm ${view === v ? "bg-text font-medium text-bg" : "text-muted hover:text-text"}`}
+              className={`btn px-3 text-sm ${view === v ? "bg-accent font-medium text-[var(--color-accent-ink)]" : "text-muted hover:text-text"}`}
             >
               {label}
             </button>

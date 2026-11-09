@@ -3,7 +3,7 @@
    Scoped to [data-landing]; the app keeps its dark tokens. Every motion has a still fallback. */
 
 [data-landing] {
-  --font-serif-stack: var(--font-serif), "Noto Serif Devanagari", "Noto Serif JP", ui-serif, Georgia, serif;
+  --font-serif-stack: var(--font-instrument), "Noto Serif Devanagari", "Noto Serif JP", ui-serif, Georgia, serif;
 
   color-scheme: light;
   background-color: var(--l-paper);

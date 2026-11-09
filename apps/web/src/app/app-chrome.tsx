@@ -6,9 +6,9 @@ import { AccountMenu, BottomTabs, NavTabs } from "@/components/nav-links";
 export function AppChrome({ children }: { children: React.ReactNode }) {
   return (
     <div data-shell className="flex min-h-full flex-1 flex-col">
-      <header data-app-chrome className="bg-bg">
+      <header data-app-chrome className="border-b border-border bg-bg">
         <div className="mx-auto flex h-16 w-full max-w-6xl items-center gap-3 px-4">
-          <Link href="/" className="flex min-h-tap shrink-0 items-center font-display text-base uppercase no-underline sm:text-lg">
+          <Link href="/" className="flex min-h-tap shrink-0 items-center font-display text-2xl leading-none no-underline">
             Handshake
           </Link>
           <div className="flex flex-1 justify-center">

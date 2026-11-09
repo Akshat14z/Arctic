@@ -120,7 +120,7 @@ export default function Home() {
           </figure>
           <figure className="l-fan-2">
             {/* eslint-disable-next-line @next/next/no-img-element -- static product captures, sized explicitly */}
-            <img src="/screens/seal.png" alt="A sealed Deal Card: the agreed terms, both agree times and the Seal's QR code" width={716} height={886} loading="lazy" />
+            <img src="/screens/seal.png" alt="A sealed Deal Card: the agreed terms, both agree times and the Seal's QR code" width={716} height={934} loading="lazy" />
           </figure>
         </div>
         <div>
@@ -160,7 +160,7 @@ export default function Home() {
         </div>
         <div className="l-agent-shot">
           {/* eslint-disable-next-line @next/next/no-img-element -- static product capture, sized explicitly */}
-          <img src="/screens/agent.png" alt="The agent console: each message in the original and in English, beside the case summary and the frozen deal" width={2512} height={1452} loading="lazy" />
+          <img src="/screens/agent.png" alt="The agent console: each message in the original and in English, beside the case summary and the frozen deal" width={2512} height={1490} loading="lazy" />
         </div>
       </section>
 
