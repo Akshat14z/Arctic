@@ -13,6 +13,8 @@
   --color-rule: oklch(30% 0.004 286); --color-rule-2: oklch(44% 0.004 286);
   --color-accent: oklch(93.2% 0.003 106); --color-accent-ink: oklch(14.6% 0.004 286); --color-focus: oklch(93.2% 0.003 106);
   --font-display: "Syne", ui-sans-serif, system-ui, sans-serif; --font-body: "Inter", ui-sans-serif, system-ui, sans-serif; --font-outlier: var(--font-body);
+  /* the one pale-blue hero tile (T13 reference) */
+  --color-hero-1: oklch(93% 0.035 240); --color-hero-2: oklch(82% 0.075 245); --color-hero-ink: oklch(18% 0.02 255); --color-hero-muted: oklch(38% 0.03 255); --color-hero-go: oklch(98% 0.01 240);
   --radius-card: 24px; --radius-field: 14px; --radius-pill: 999px; --rule-hair: 1px; --shadow-card: none;
   --tracking-display: 0.02em; --display-weight: 800;
   /* the frame around the app: the template's pale device bezel */

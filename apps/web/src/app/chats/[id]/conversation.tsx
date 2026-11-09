@@ -70,7 +70,7 @@ export function Conversation() {
     );
 
   return (
-    <section className="-my-6 flex min-h-[calc(100dvh-3.5rem)] flex-col">
+    <section className="-mt-4 -mb-24 flex min-h-[calc(100dvh-4rem)] flex-col md:-mb-8">
       <header className="sticky top-0 z-10 flex items-center gap-2 border-b border-border bg-bg py-2">
         <Link href="/chats" aria-label="Back to chats" className="btn btn-icon shrink-0">
           <svg aria-hidden="true" viewBox="0 0 24 24" className="size-5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="square">
@@ -78,7 +78,7 @@ export function Conversation() {
           </svg>
         </Link>
         <div className="min-w-0 flex-1">
-          <h1 className="item-title break-words">{other.displayName}</h1>
+          <h1 className="truncate text-base font-semibold">{other.displayName}</h1>
           <Link
             href={`/listings/${chat.listing.id}`}
             className="flex min-w-0 items-baseline gap-2 text-sm text-muted underline decoration-border underline-offset-2 hover:decoration-text"
@@ -93,7 +93,7 @@ export function Conversation() {
             href={`/cases/${encodeURIComponent(chat.openCaseId)}`}
             className="btn btn-secondary shrink-0 px-3 text-sm"
           >
-            Help requested, view
+            Help requested
           </Link>
         ) : (
           <GetHelp channelId={chat.channelId} token={session.sessionToken} />

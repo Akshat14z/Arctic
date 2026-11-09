@@ -121,43 +121,54 @@ export function ListingDetail() {
   const textLang = original ? lang : listing.lang; // the server translates title + description for ?lang=
 
   return (
-    <article className="flex flex-col gap-5">
+    <article className="flex flex-col gap-3">
       {listing.imageUrl && (
         // eslint-disable-next-line @next/next/no-img-element -- arbitrary seller URLs
-        <img src={listing.imageUrl} alt={listing.title} className="aspect-[4/3] w-full border border-border object-cover" />
+        <img src={listing.imageUrl} alt={listing.title} className="aspect-[4/3] w-full rounded-[var(--radius-card)] object-cover" />
       )}
 
-      <div className="flex flex-col gap-2">
-        <h1 lang={textLang} className="page-title text-balance">
-          {listing.title}
-        </h1>
-        <div className="flex items-center gap-3">
-          <p className="agate text-xl">{formatPrice(listing.price, lang)}</p>
-          {listing.isDemo && <DemoBadge />}
-        </div>
-        {original && (
-          <p className="meta">
-            Written in <span lang={original.code}>{original.native}</span>
+      <section className="tile tile-hero gap-4">
+        <div className="flex flex-col gap-1">
+          <h1 lang={textLang} className="page-title text-balance">
+            {listing.title}
+          </h1>
+          <p className="meta flex flex-wrap items-center gap-2">
+            {listing.isDemo && <DemoBadge />}
+            {original && (
+              <span>
+                Written in <span lang={original.code}>{original.native}</span>, shown in your language
+              </span>
+            )}
           </p>
+        </div>
+        <p className="figure">{formatPrice(listing.price, lang)}</p>
+        {mine ? <p className="meta">This is your listing.</p> : <ChatWithSeller listingId={listing.id} />}
+      </section>
+
+      <section className="tile">
+        <h2 className="tile-title">About this item</h2>
+        <p lang={textLang} className="max-w-prose whitespace-pre-line text-pretty">
+          {listing.description}
+        </p>
+        {listing.seller && (
+          <div className="row mt-1 border-t border-border">
+            <span className="row-icon" aria-hidden>
+              {listing.seller.displayName.trim().charAt(0).toUpperCase()}
+            </span>
+            <span className="flex min-w-0 flex-1 flex-col">
+              <span className="row-title">{listing.seller.displayName}</span>
+              <span className="meta">Seller</span>
+            </span>
+            <time dateTime={listing.createdAt} className="meta shrink-0">
+              Listed {new Date(listing.createdAt).toLocaleDateString(localeFor(lang), { day: "numeric", month: "short" })}
+            </time>
+          </div>
         )}
-      </div>
+      </section>
 
-      <p lang={textLang} className="max-w-prose whitespace-pre-line text-pretty">
-        {listing.description}
-      </p>
-
-      {!mine && <ChatWithSeller listingId={listing.id} />}
-
-      <div className="border-t border-border pt-4">
+      <section className="tile">
         <ShareListing listing={listing} lang={lang} mine={mine} />
-      </div>
-
-      <div className="meta flex items-center justify-between gap-3 border-t border-border pt-4">
-        <span>{mine ? "This is your listing." : listing.seller ? `Sold by ${listing.seller.displayName}` : null}</span>
-        <time dateTime={listing.createdAt} className="agate">
-          {new Date(listing.createdAt).toLocaleDateString(localeFor(lang), { day: "numeric", month: "short" })}
-        </time>
-      </div>
+      </section>
     </article>
   );
 }

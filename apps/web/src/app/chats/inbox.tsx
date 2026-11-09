@@ -32,7 +32,6 @@ export function Inbox() {
   return (
     <section className="flex flex-col gap-4">
       <h1 className="page-title">Chats</h1>
-      <hr className="rule-double" />
 
       {error && (
         <div role="alert" className="note note-error flex items-center justify-between gap-3">
@@ -52,7 +51,7 @@ export function Inbox() {
       )}
 
       {items?.length === 0 && (
-        <div className="well flex flex-col items-start gap-3 px-4 py-6">
+        <div className="tile items-start">
           <h2 className="item-title">No chats yet.</h2>
           <p className="text-muted">Find something you like and tap “Chat with seller”.</p>
           <Link href="/listings" className="btn btn-primary">
@@ -62,16 +61,19 @@ export function Inbox() {
       )}
 
       {items && items.length > 0 && (
-        <ul className="flex flex-col border-b border-border">
+        <ul className="tile gap-0 py-2">
           {items.map((c) => (
             <li key={c.channelId} className="border-t border-border first:border-t-0">
               <Link
                 href={`/chats/${encodeURIComponent(c.channelId)}`}
-                className="flex items-center gap-3 py-3 transition-colors hover:bg-surface"
+                className="row py-3"
               >
+                <span className="row-icon" aria-hidden>
+                  {c.otherUser.displayName.trim().charAt(0).toUpperCase()}
+                </span>
                 <div className="min-w-0 flex-1">
                   <div className="flex items-baseline justify-between gap-2">
-                    <h2 className="item-title truncate">{c.otherUser.displayName}</h2>
+                    <h2 className="row-title text-base">{c.otherUser.displayName}</h2>
                     {c.lastMessage && (
                       <time dateTime={c.lastMessage.at} className="agate shrink-0 text-sm text-muted">
                         {new Date(c.lastMessage.at).toLocaleDateString(localeFor(lang), { day: "numeric", month: "short" })}
@@ -84,7 +86,7 @@ export function Inbox() {
                   {c.lastMessage && <p className="mt-0.5 truncate">{c.lastMessage.text}</p>}
                 </div>
                 {c.unreadCount > 0 && (
-                  <span className="agate min-w-6 shrink-0 bg-brand px-1.5 py-0.5 text-center text-sm text-brand-fg" aria-label={`${c.unreadCount} unread`}>
+                  <span className="agate min-w-6 shrink-0 rounded-full bg-brand px-1.5 py-0.5 text-center text-sm text-brand-fg" aria-label={`${c.unreadCount} unread`}>
                     {c.unreadCount}
                   </span>
                 )}

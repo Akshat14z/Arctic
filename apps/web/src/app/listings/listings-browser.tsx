@@ -60,7 +60,6 @@ export function ListingsBrowser() {
   return (
     <section className="flex flex-col gap-4">
       <h1 className="page-title">Browse</h1>
-      <hr className="rule-double" />
 
       <form
         role="search"
@@ -68,7 +67,7 @@ export function ListingsBrowser() {
           e.preventDefault();
           setQ(draft.trim());
         }}
-        className="flex gap-2 border-b border-border pb-4"
+        className="flex gap-2"
       >
         <input
           type="search"
@@ -93,10 +92,10 @@ export function ListingsBrowser() {
       )}
 
       {!page && !error && (
-        <ul aria-busy className="flex flex-col">
+        <ul aria-busy className="tile gap-0 py-2">
           {[0, 1, 2].map((i) => (
-            <li key={i} className="flex gap-3 border-b border-border py-4">
-              <div className="skeleton size-16 shrink-0 sm:size-20" />
+            <li key={i} className="flex gap-3 border-b border-border py-4 last:border-b-0">
+              <div className="skeleton size-14 shrink-0" />
               <div className="flex flex-1 flex-col gap-2">
                 <div className="skeleton h-5 w-2/3" />
                 <div className="skeleton h-4 w-full" />
@@ -108,7 +107,7 @@ export function ListingsBrowser() {
       )}
 
       {page && page.items.length === 0 && (
-        <div className="flex flex-col items-start gap-3 py-6">
+        <div className="tile items-start">
           <h2 className="section-title">{q ? `Nothing matches "${q}".` : "No listings yet."}</h2>
           <p className="text-muted">{q ? "Try a shorter word." : "Be the first to post something for sale."}</p>
           <Link href="/listings/new" className="btn btn-primary">
@@ -118,9 +117,9 @@ export function ListingsBrowser() {
       )}
 
       {page && page.items.length > 0 && (
-        <ul className="flex flex-col">
+        <ul className="tile gap-0 py-2">
           {page.items.map((l) => (
-            <li key={l.id} className="border-b border-border">
+            <li key={l.id} className="border-b border-border last:border-b-0">
               <ListingCard listing={l} lang={lang} />
             </li>
           ))}

@@ -115,6 +115,12 @@ export function ChatThread({ session, channel, channelId, emptyText, closedText,
     if (d?.kind === "deal_card" && d.deal) latestDealMessage.set(d.deal.id, m.id);
   }
 
+  // Once a deal is agreed (and sealed), proposing another from the same chat only confuses: hide it.
+  const hasAgreedDeal = messages.some((m) => {
+    const d = parseExtra(m.extra);
+    return d?.kind === "deal_card" && d.deal?.status === "agreed" && latestDealMessage.get(d.deal.id) === m.id;
+  });
+
   return (
     <>
       {state !== "connected" && (
@@ -155,7 +161,7 @@ export function ChatThread({ session, channel, channelId, emptyText, closedText,
           <p className="meta border-t border-border bg-bg pt-3 text-center">{closedText}</p>
         ) : (
           <>
-          {deals?.canPropose && deals.myRole && (
+          {deals?.canPropose && deals.myRole && !hasAgreedDeal && (
             <button
               type="button"
               onClick={propose}

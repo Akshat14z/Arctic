@@ -8,7 +8,6 @@ import { api, friendlyMessage } from "@/lib/api/client";
 import { minutesText, reasonLabel } from "@/lib/cases";
 import { LANGUAGES } from "@/lib/languages";
 import { localeFor } from "@/lib/format";
-import { clearSession } from "@/lib/session";
 import { useRequireAgent } from "@/lib/use-require-agent";
 
 const POLL_MS = 5000; // D-011
@@ -22,6 +21,7 @@ export function Queue() {
   const [error, setError] = useState<string | null>(null);
   const [claiming, setClaiming] = useState<string | null>(null);
   const [, setTick] = useState(0); // re-renders "Waiting N min" on every poll
+  const [view, setView] = useState<"all" | "open" | "mine">("all");
 
   useEffect(() => {
     if (!token) return;
@@ -83,10 +83,40 @@ export function Queue() {
             ))}
           </p>
         </div>
-        <button type="button" onClick={clearSession} className="btn btn-quiet">
-          Sign out
-        </button>
       </header>
+
+      {items && (
+        <div className="grid grid-cols-3 gap-3">
+          {(
+            [
+              ["Open", items.filter((c) => c.status === "open").length],
+              ["Overdue", items.filter((c) => c.status === "open" && Date.parse(c.slaDueAt) < now).length],
+              ["Yours", items.filter((c) => c.agent?.id === me.id).length],
+            ] as const
+          ).map(([label, n], i) => (
+            <div key={label} className={`tile gap-2 ${i === 0 ? "tile-hero" : ""}`}>
+              <p className="text-sm font-medium">{label}</p>
+              <p className="figure">{n}</p>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {items && items.length > 0 && (
+        <div role="group" aria-label="Show" className="seg self-start">
+          {(
+            [
+              ["all", "All"],
+              ["open", "Open"],
+              ["mine", "Yours"],
+            ] as const
+          ).map(([v, label]) => (
+            <button key={v} type="button" aria-pressed={view === v} onClick={() => setView(v)}>
+              {label}
+            </button>
+          ))}
+        </div>
+      )}
 
       {error && (
         <p role="alert" className="note note-error">
@@ -125,7 +155,7 @@ export function Queue() {
             </tr>
           </thead>
           <tbody aria-live="polite" className="max-md:block">
-            {items.map((c) => {
+            {items.filter((c) => view === "all" || (view === "open" ? c.status === "open" : c.agent?.id === me.id)).map((c) => {
               const overdue = c.status === "open" && Date.parse(c.slaDueAt) < now;
               const matches = c.languages.every((l) => helps.includes(l));
               const mine = c.agent?.id === me.id;

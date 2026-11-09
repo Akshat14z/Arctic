@@ -1,8 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { LANGUAGES } from "@/lib/languages";
-import { clearSession, useSession } from "@/lib/session";
+import { useSession } from "@/lib/session";
 
 export function HomeActions() {
   const session = useSession();
@@ -20,16 +19,9 @@ export function HomeActions() {
     );
   }
 
-  const { user } = session;
-  const lang = LANGUAGES.find((l) => l.code === user.language);
   return (
-    <div className="flex flex-wrap items-center gap-3">
-      <p>
-        Signed in as <strong>{user.displayName}</strong>, reading in <span lang={user.language}>{lang?.native}</span>
-      </p>
-      <button type="button" onClick={clearSession} className="btn btn-quiet -ms-[var(--space-xs)] text-sm">
-        Sign out
-      </button>
-    </div>
+    <Link href={session.user.role === "agent" ? "/agent" : "/home"} className="btn btn-secondary self-start">
+      Continue as {session.user.displayName}
+    </Link>
   );
 }
