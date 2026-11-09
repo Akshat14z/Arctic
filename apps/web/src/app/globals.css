@@ -3,6 +3,7 @@
  * nav: pill tabs, phone bottom bar · signature: kept, the same message on two screens · states: loading, empty, error, busy, disabled, not found
  * axes: light/roman-serif/chromatic-blue · posture: committed (the landing title in the brand blue; the app keeps blue to actions and selection) · contrast: pass · v2.0.0 */
 /* Hallmark · pre-emit critique: P4 H4 E4 S4 R4 V4 · weakest: S, Syne is Latin only, so Indic and Japanese heads fall back to Noto Sans; kept heads short and in UI copy */
+/* Hallmark · waive 23 · the landing's giant serif title and its primary buttons paint the brand blue, about a quarter of the first screen · the blue title is the page's signature and the stamp declares a committed posture; the app itself keeps blue to actions and selection */
 /* Hallmark · dismissed 28a · listing-card thumbnails sit below the page title and search field in a long list, so the largest paint is the title and lazy loading is right */
 @import "tailwindcss";
 @import "./tokens.css";
