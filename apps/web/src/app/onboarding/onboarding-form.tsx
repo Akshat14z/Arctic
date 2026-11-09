@@ -10,7 +10,7 @@ import { saveSession, useSession } from "@/lib/session";
 /** Where to go after sign-in. Only same-site paths, so `?next=` can't be used as an open redirect. */
 function nextPath(): string {
   const next = new URLSearchParams(window.location.search).get("next");
-  return next?.startsWith("/") && !next.startsWith("//") ? next : "/";
+  return next?.startsWith("/") && !next.startsWith("//") ? next : "/home";
 }
 
 export function OnboardingForm() {

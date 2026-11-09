@@ -4,6 +4,7 @@
  * axes: dark/display-heavy/neutral · posture: restrained (cinematic) · contrast: pass · v2.0.0 */
 /* Hallmark · pre-emit critique: P4 H4 E4 S4 R4 V4 · weakest: S, Syne is Latin only, so Indic and Japanese heads fall back to Noto Sans; kept heads short and in UI copy */
 /* Hallmark · waive 23 · the landing's root and the app body paint --color-frame behind the dark panels · the frame is the template's pale device bezel, a field colour that happens to share the accent's value; the accent itself only marks focus and selection */
+/* Hallmark · dismissed F4 · .tile-hero .btn-primary is the same primary button recoloured for contrast on the pale-blue hero tile, and each page still has one primary action */
 /* Hallmark · dismissed 28a · listing-card thumbnails sit below the page title and search field in a long list, so the largest paint is the title and lazy loading is right */
 @import "tailwindcss";
 @import "./tokens.css";
@@ -27,6 +28,7 @@
 @theme inline {
   --color-bg: var(--color-paper);
   --color-surface: var(--color-paper-2);
+  --color-surface-2: var(--color-paper-3);
   --color-text: var(--color-ink);
   --color-ink-2: var(--color-ink-2);
   --color-muted: var(--color-muted);
@@ -56,7 +58,6 @@ body:has([data-landing]) [data-app-chrome] { display: none; }
   body:not(:has([data-landing])) [data-shell] { background: var(--color-paper); border-radius: 28px; min-height: calc(100dvh - 2 * var(--space-sm)); overflow: clip; }
 }
 /* Wide screens (the agent console) widen the header with the page, so the wordmark lines up with the content. */
-body:has([data-wide]) [data-app-chrome] > div { max-width: 72rem; }
 
 /* Product screenshots are not photographs: no mono treatment. */
 [data-slot][data-kind="product"] > img { filter: none; object-fit: cover; object-position: top center; }

@@ -48,9 +48,8 @@ export function DealCard({ deal, lang, myRole, names, onAgree }: Props) {
   }
 
   return (
-    <article aria-label="Deal" className="flex w-full flex-col bg-bg">
-      <hr className="rule-double" />
-      <div className="flex items-baseline justify-between gap-3 pt-3">
+    <article aria-label="Deal" className="tile w-full gap-0">
+      <div className="flex items-baseline justify-between gap-3">
         <h3 className="item-title">Deal</h3>
         <p className={`meta ${agreed ? "text-success" : ""}`}>{agreed ? "Agreed by both" : "Waiting for agreement"}</p>
       </div>
@@ -69,6 +68,10 @@ export function DealCard({ deal, lang, myRole, names, onAgree }: Props) {
         )}
       </div>
 
+      <details open={!agreed} className="group">
+        <summary className="meta flex min-h-tap cursor-pointer list-none items-center gap-1 [&::-webkit-details-marker]:hidden">
+          <span className="transition-transform group-open:rotate-90" aria-hidden>›</span> Terms and who agreed
+        </summary>
       {conditions.length > 0 && (
         <ul lang={lang} className="border-t border-border text-sm">
           {conditions.map((c) => (
@@ -91,6 +94,7 @@ export function DealCard({ deal, lang, myRole, names, onAgree }: Props) {
           </li>
         ))}
       </ul>
+      </details>
 
       {canAgree && (
         <button type="button" onClick={agree} disabled={busy} aria-busy={busy} className="btn btn-primary mt-4 w-full">
@@ -103,7 +107,6 @@ export function DealCard({ deal, lang, myRole, names, onAgree }: Props) {
         </p>
       )}
       {agreed && deal.sealCode && <SealBlock code={deal.sealCode} />}
-      <hr className="rule-double mt-4" />
     </article>
   );
 }

@@ -110,7 +110,7 @@ export function CaseView() {
   const me = session.user.id;
 
   return (
-    <section className="-my-6 flex min-h-[calc(100dvh-3.5rem)] flex-col">
+    <section className="-mt-4 -mb-24 flex min-h-[calc(100dvh-4rem)] flex-col md:-mb-8">
       <header className="sticky top-0 z-10 flex items-center gap-3 border-b border-border bg-bg py-3">
         <Link href={`/chats/${encodeURIComponent(c.channelId)}`} aria-label="Back to the chat" className="btn btn-icon shrink-0">
           <svg aria-hidden="true" viewBox="0 0 20 20" className="size-5" fill="none" stroke="currentColor" strokeWidth="2">

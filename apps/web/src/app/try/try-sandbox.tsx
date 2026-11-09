@@ -10,8 +10,8 @@ type Role = "buyer" | "seller" | "agent";
 
 // The fixed demo_ accounts the server seeds (D-015): signing in never creates a new user.
 const ROLES: { as: Role; name: string; reads: string; does: string; next: string }[] = [
-  { as: "buyer", name: "Priya", reads: "हिन्दी", does: "Asks about a 1978 Seiko watch and makes an offer.", next: "/chats" },
-  { as: "seller", name: "Kenji", reads: "日本語", does: "Sells the watch and reads Priya in Japanese.", next: "/chats" },
+  { as: "buyer", name: "Priya", reads: "हिन्दी", does: "Asks about a 1978 Seiko watch and makes an offer.", next: "/home" },
+  { as: "seller", name: "Kenji", reads: "日本語", does: "Sells the watch and reads Priya in Japanese.", next: "/home" },
   { as: "agent", name: "Sarah", reads: "English", does: "Answers help requests from the dispatch console.", next: "/agent" },
 ];
 
