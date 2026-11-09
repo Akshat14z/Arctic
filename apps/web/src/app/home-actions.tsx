@@ -12,7 +12,7 @@ export function HomeActions() {
     return (
       <Link
         href="/onboarding"
-        className="btn btn-secondary self-start"
+        className="l-btn l-btn-ghost"
       >
         Get started
       </Link>
@@ -20,7 +20,7 @@ export function HomeActions() {
   }
 
   return (
-    <Link href={session.user.role === "agent" ? "/agent" : "/home"} className="btn btn-secondary self-start">
+    <Link href={session.user.role === "agent" ? "/agent" : "/home"} className="l-btn l-btn-ghost">
       Continue as {session.user.displayName}
     </Link>
   );

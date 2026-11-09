@@ -13,6 +13,16 @@
   --color-rule: oklch(30% 0.004 286); --color-rule-2: oklch(44% 0.004 286);
   --color-accent: oklch(93.2% 0.003 106); --color-accent-ink: oklch(14.6% 0.004 286); --color-focus: oklch(93.2% 0.003 106);
   --font-display: "Syne", ui-sans-serif, system-ui, sans-serif; --font-body: "Inter", ui-sans-serif, system-ui, sans-serif; --font-outlier: var(--font-body);
+  /* the landing page (T14, light editorial) */
+  --l-paper: oklch(96.4% 0.006 250);
+  --l-grid: oklch(89% 0.01 250);
+  --l-ink: oklch(21% 0.02 262);
+  --l-ink-2: oklch(38% 0.02 262);
+  --l-faint: oklch(78% 0.012 262);
+  --l-blue: oklch(43% 0.15 259);
+  --l-blue-ink: oklch(97% 0.01 250);
+  --l-card: oklch(99% 0.004 250);
+  --l-shadow: oklch(21% 0.02 262 / 0.22);
   /* the one pale-blue hero tile (T13 reference) */
   --color-hero-1: oklch(93% 0.035 240); --color-hero-2: oklch(82% 0.075 245); --color-hero-ink: oklch(18% 0.02 255); --color-hero-muted: oklch(38% 0.03 255); --color-hero-go: oklch(98% 0.01 240);
   --radius-card: 24px; --radius-field: 14px; --radius-pill: 999px; --rule-hair: 1px; --shadow-card: none;

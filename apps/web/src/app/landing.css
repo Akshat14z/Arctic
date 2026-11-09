@@ -1,0 +1,113 @@
+/* The landing page (DHRUMIL-T14): light editorial on grid paper, one deep blue, a giant serif title with the
+   real chat cut out over it, the deal drifting in its own languages, words that ink in as you scroll.
+   Scoped to [data-landing]; the app keeps its dark tokens. Every motion has a still fallback. */
+
+[data-landing] {
+  --font-serif-stack: var(--font-serif), "Noto Serif Devanagari", "Noto Serif JP", ui-serif, Georgia, serif;
+
+  color-scheme: light;
+  background-color: var(--l-paper);
+  background-image:
+    linear-gradient(var(--l-grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--l-grid) 1px, transparent 1px);
+  background-size: 96px 96px;
+  background-position: center top;
+  color: var(--l-ink);
+  font-family: var(--font-body);
+  overflow-x: clip;
+}
+body:has([data-landing]) { background: var(--l-paper); padding: 0; }
+
+.l-wrap { width: min(100% - 2rem, 76rem); margin-inline: auto; }
+
+/* Nav */
+.l-nav { display: flex; align-items: center; justify-content: space-between; gap: var(--space-md); padding-block: var(--space-md); }
+.l-mark { font-family: var(--font-serif-stack); font-size: 1.6rem; line-height: 1; color: var(--l-ink); text-decoration: none; }
+.l-link { white-space: nowrap; color: var(--l-ink); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 4px; font-weight: 500; min-height: 2.75rem; display: inline-flex; align-items: center; }
+.l-link:hover { text-decoration-thickness: 2px; }
+
+/* Buttons */
+.l-btn { display: inline-flex; align-items: center; justify-content: center; gap: var(--space-xs); min-height: 3.25rem; padding: 0 var(--space-xl); border-radius: var(--radius-pill); background: var(--l-blue); color: var(--l-blue-ink); font: 500 var(--text-md)/1 var(--font-body); text-decoration: none; white-space: nowrap; transition: transform var(--dur-micro) var(--ease-out), background-color var(--dur-micro) var(--ease-out); }
+.l-btn:hover { background: color-mix(in oklab, var(--l-blue) 88%, var(--l-ink)); }
+.l-btn:active { transform: scale(0.97); }
+.l-btn-ghost { background: transparent; color: var(--l-ink); box-shadow: inset 0 0 0 1px var(--l-ink); }
+.l-btn-ghost:hover { background: var(--l-card); }
+[data-landing] :focus-visible { outline: 2px solid var(--l-blue); outline-offset: 3px; }
+
+/* Hero: the title, the cut-out chat over it, the deal drifting around */
+.l-hero { position: relative; display: flex; flex-direction: column; align-items: center; text-align: center; padding-block: var(--space-xl) var(--space-2xl); }
+.l-kicker { font-family: var(--font-serif-stack); font-size: clamp(1.25rem, 2.2vw, 1.75rem); color: var(--l-ink-2); }
+.l-title { position: relative; margin: var(--space-sm) 0 0; font-family: var(--font-serif-stack); font-weight: 400; color: var(--l-blue); font-size: clamp(3.75rem, 12.5vw, 11.5rem); line-height: 0.86; letter-spacing: -0.035em; overflow-wrap: break-word; min-width: 0; }
+.l-title span { display: block; }
+.l-sub { max-width: 34ch; margin-top: var(--space-lg); font-size: clamp(1.125rem, 1.6vw, 1.3rem); line-height: 1.45; color: var(--l-ink-2); }
+.l-actions { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: var(--space-sm) var(--space-md); margin-top: var(--space-lg); }
+
+.l-cutout { position: absolute; z-index: 2; width: clamp(15rem, 24vw, 21rem); border-radius: 22px; box-shadow: 0 24px 60px -18px var(--l-shadow), 0 2px 6px var(--l-shadow); }
+.l-cutout img { display: block; width: 100%; height: auto; border-radius: 22px; }
+.l-cutout figcaption { position: absolute; left: 0; right: 0; top: calc(100% + 0.6rem); font-family: var(--font-serif-stack); font-size: 1.25rem; color: var(--l-ink); }
+.l-cutout-a { left: 2%; top: 16%; rotate: -7deg; }
+.l-cutout-b { right: 2%; top: 30%; rotate: 6deg; }
+@media (max-width: 63.99rem) {
+  .l-cutouts { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--space-2xl); width: min(100%, 24rem); margin-top: var(--space-2xl); }
+  .l-cutout { position: relative; inset: auto; width: 100%; }
+  .l-cutout-a { rotate: -3deg; } .l-cutout-b { rotate: 3deg; }
+}
+
+.l-drift { position: absolute; inset: 0; pointer-events: none; z-index: 0; }
+.l-drift span { position: absolute; font-family: var(--font-serif-stack); font-size: clamp(1rem, 1.6vw, 1.35rem); color: var(--l-blue); opacity: 0.55; white-space: nowrap; }
+@media (max-width: 47.99rem) { .l-drift span:nth-child(n + 2) { display: none; } .l-drift span:first-child { top: 1%; } }
+
+/* Scroll story: a big serif paragraph whose words ink in as it passes; small chips sit between the words */
+.l-story { font-family: var(--font-serif-stack); font-size: clamp(1.9rem, 4.4vw, 3.6rem); line-height: 1.12; letter-spacing: -0.015em; text-align: center; max-width: 22ch; margin-inline: auto; padding-block: var(--space-3xl); color: var(--l-ink); text-wrap: balance; }
+.l-chip { display: inline-flex; align-items: center; gap: 0.3em; vertical-align: 0.12em; margin-inline: 0.12em; padding: var(--space-2xs) var(--space-xs); border-radius: var(--radius-pill); background: var(--l-card); box-shadow: inset 0 0 0 1px var(--l-grid); font: 500 0.38em/1.2 var(--font-body); letter-spacing: 0; color: var(--l-ink); }
+.l-chip-blue { background: var(--l-blue); color: var(--l-blue-ink); box-shadow: none; }
+
+/* Spec sheet: the real screens fanned on the left, what it does as a ruled table on the right */
+.l-spec { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--space-2xl); align-items: center; padding-block: var(--space-2xl); }
+@media (min-width: 64rem) { .l-spec { grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); } }
+.l-fan { position: relative; min-height: 34rem; }
+.l-fan figure { position: absolute; width: min(62%, 21rem); border-radius: 20px; overflow: hidden; background: var(--l-card); box-shadow: 0 24px 60px -18px var(--l-shadow); }
+.l-fan figure img { display: block; width: 100%; height: auto; }
+.l-fan .l-fan-1 { left: 0; top: 4%; rotate: -5deg; }
+.l-fan .l-fan-2 { right: 0; top: 0; rotate: 4deg; z-index: 1; }
+.l-h2 { font-family: var(--font-serif-stack); font-weight: 400; font-size: clamp(2.25rem, 4.6vw, 4rem); line-height: 0.98; letter-spacing: -0.02em; color: var(--l-ink); overflow-wrap: break-word; min-width: 0; }
+.l-table { width: 100%; margin-top: var(--space-lg); border-collapse: collapse; }
+.l-table th, .l-table td { padding: var(--space-sm) 0; border-top: 1px solid var(--l-ink); text-align: left; vertical-align: baseline; font-size: var(--text-md); }
+.l-table tr:last-child th, .l-table tr:last-child td { border-bottom: 1px solid var(--l-ink); }
+.l-table th { font-weight: 600; padding-right: var(--space-md); white-space: nowrap; }
+.l-table td { color: var(--l-ink-2); }
+
+/* The marquee: every language Handshake reads, in outlined serif */
+.l-marquee { overflow: clip; padding-block: var(--space-xl); border-block: 1px solid var(--l-ink); }
+.l-marquee-track { display: flex; width: max-content; gap: 0.5em; font-family: var(--font-serif-stack); font-size: clamp(3.5rem, 10vw, 8.5rem); line-height: 1; color: transparent; -webkit-text-stroke: 1.5px var(--l-ink); }
+.l-marquee-track span { padding-right: 0.5em; }
+
+/* Agent */
+.l-agent { padding-block: var(--space-3xl) 0; display: grid; gap: var(--space-xl); }
+.l-agent-shot { border-radius: 24px; overflow: hidden; box-shadow: 0 30px 80px -24px var(--l-shadow); }
+.l-agent-shot img { display: block; width: 100%; height: auto; }
+.l-lead { max-width: 46ch; font-size: clamp(1.05rem, 1.4vw, 1.2rem); line-height: 1.5; color: var(--l-ink-2); }
+
+/* Close + footer */
+.l-close { display: flex; flex-direction: column; align-items: center; text-align: center; gap: var(--space-xl); padding-block: var(--space-2xl) var(--space-3xl); }
+.l-footer { display: flex; flex-wrap: wrap; gap: var(--space-md) var(--space-xl); align-items: baseline; justify-content: space-between; padding-block: var(--space-xl); border-top: 1px solid var(--l-ink); font-size: var(--text-sm); color: var(--l-ink-2); }
+.l-footer nav { display: flex; flex-wrap: wrap; gap: 0 var(--space-lg); }
+
+/* ── Motion: all of it optional ── */
+@media (prefers-reduced-motion: no-preference) {
+  .l-drift span { animation: l-float 9s var(--ease-in-out) infinite alternate; }
+  .l-drift span:nth-child(2n) { animation-duration: 11s; animation-delay: -3s; }
+  .l-drift span:nth-child(3n) { animation-duration: 13s; animation-delay: -6s; }
+  .l-marquee-track { animation: l-marquee 38s linear infinite; }
+  .l-marquee:hover .l-marquee-track { animation-play-state: paused; }
+  .l-cutout { animation: l-bob 7s var(--ease-in-out) infinite alternate; }
+  .l-cutout-b { animation-delay: -3.5s; }
+
+  @supports (animation-timeline: view()) {
+    .l-ink { color: var(--l-faint); animation: l-ink linear both; animation-timeline: view(); animation-range: entry 40% cover 50%; }
+  }
+}
+@keyframes l-float { from { transform: translate3d(0, 0, 0) rotate(-2deg); } to { transform: translate3d(14px, -18px, 0) rotate(3deg); } }
+@keyframes l-bob { from { transform: translateY(0); } to { transform: translateY(-12px); } }
+@keyframes l-marquee { to { transform: translateX(-50%); } }
+@keyframes l-ink { to { color: var(--l-ink); } }
