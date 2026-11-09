@@ -24,10 +24,10 @@ const DRIFT: { text: string; lang?: string; at: string }[] = [
   { text: "पक्का", lang: "hi", at: "left-[6%] top-[8%]" },
   { text: "₹15,000", at: "right-[9%] top-[6%]" },
   { text: "決まり", lang: "ja", at: "left-[14%] bottom-[22%]" },
-  { text: "See original", at: "right-[5%] bottom-[30%]" },
+  { text: "See original", at: "right-[3%] bottom-[12%]" },
   { text: "कल शाम", lang: "hi", at: "left-[38%] top-[2%]" },
   { text: "明日の夕方", lang: "ja", at: "right-[8%] bottom-[4%]" },
-  { text: "₹14,000", at: "left-[3%] top-[48%]" },
+  { text: "₹14,000", at: "left-[2%] top-[62%]" },
 ];
 
 const SPEC: [string, string][] = [
@@ -95,11 +95,19 @@ export default function Home() {
         {/* The story, inked in as you scroll */}
         <p className="l-story">
           <Ink>Priya reads</Ink>
-          <span className="l-chip" lang="hi">हिन्दी</span> <Ink>and Kenji reads</Ink>
-          <span className="l-chip" lang="ja">日本語</span><span className="l-ink">. </span><Ink>She offers</Ink>
-          <span className="l-chip l-chip-blue">₹14,000</span> <Ink>and he sees the same number, not yen. They agree once, each in their own words, and the deal is</Ink>
-          <span className="l-chip">sealed</span>
-          <span className="l-ink">.</span>
+          <span className="l-chip l-chip-gap" lang="hi">हिन्दी</span> <Ink>and Kenji reads</Ink>
+          <span className="whitespace-nowrap"><span className="l-chip" lang="ja">日本語</span><span className="l-ink">.</span></span> <Ink>She offers</Ink>
+          <span className="l-chip l-chip-blue l-chip-gap">₹14,000</span> <Ink>and he sees the same number, not yen. They agree once, each in their own words, and the deal is</Ink>
+          <span className="whitespace-nowrap">
+            <span className="l-chip l-chip-blue">
+              <svg aria-hidden="true" viewBox="0 0 24 24" className="size-[1.1em]" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M12 3l2.2 1.6 2.7-.1.9 2.6 2.2 1.6-.8 2.6.8 2.6-2.2 1.6-.9 2.6-2.7-.1L12 21l-2.2-1.6-2.7.1-.9-2.6L4 15.3l.8-2.6L4 10.1l2.2-1.6.9-2.6 2.7.1z" />
+                <path d="M8.8 12.2l2.2 2.1 4.2-4.4" />
+              </svg>
+              sealed
+            </span>
+            <span className="l-ink">.</span>
+          </span>
         </p>
       </div>
 
@@ -116,7 +124,7 @@ export default function Home() {
           </figure>
         </div>
         <div>
-          <h2 className="l-h2">Not just a translator. A deal both sides can prove.</h2>
+          <h2 className="l-h2">Every amount checked. Every deal sealed.</h2>
           <table className="l-table">
             <tbody>
               {SPEC.map(([k, v]) => (
@@ -146,7 +154,7 @@ export default function Home() {
 
       {/* Support */}
       <section className="l-wrap l-agent">
-        <div className="flex flex-col gap-4">
+        <div className="l-agent-head">
           <h2 className="l-h2 max-w-[16ch]">Help that reads both sides.</h2>
           <p className="l-lead">Tap Get help and a person joins the chat. They see each message in the original and in English, beside the deal you both agreed to.</p>
         </div>

@@ -42,15 +42,21 @@ body:has([data-landing]) { background: var(--l-paper); padding: 0; }
 .l-sub { max-width: 34ch; margin-top: var(--space-lg); font-size: clamp(1.125rem, 1.6vw, 1.3rem); line-height: 1.45; color: var(--l-ink-2); }
 .l-actions { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: var(--space-sm) var(--space-md); margin-top: var(--space-lg); }
 
-.l-cutout { position: absolute; z-index: 2; width: clamp(15rem, 24vw, 21rem); border-radius: 22px; box-shadow: 0 24px 60px -18px var(--l-shadow), 0 2px 6px var(--l-shadow); }
+.l-cutout { position: absolute; z-index: 2; width: clamp(14rem, 19vw, 19rem); border-radius: 22px; box-shadow: 0 24px 60px -18px var(--l-shadow), 0 2px 6px var(--l-shadow); }
 .l-cutout img { display: block; width: 100%; height: auto; border-radius: 22px; }
-.l-cutout figcaption { position: absolute; left: 0; right: 0; top: calc(100% + 0.6rem); font-family: var(--font-serif-stack); font-size: 1.25rem; color: var(--l-ink); }
-.l-cutout-a { left: 2%; top: 16%; rotate: -7deg; }
-.l-cutout-b { right: 2%; top: 30%; rotate: 6deg; }
+.l-cutout figcaption { position: absolute; left: 0; right: 0; top: calc(100% + 0.6rem); font-family: var(--font-serif-stack); font-size: 1.25rem; color: var(--l-ink); text-shadow: 0 0 6px var(--l-paper), 0 0 12px var(--l-paper); }
+.l-cutout-a { left: -2%; top: 8%; rotate: -7deg; }
+.l-cutout-b { right: -3%; top: 50%; rotate: 6deg; }
+/* Wide screens: the title grows to its cap, so the screens step out into the gutters instead of onto the last word. */
+@media (min-width: 100rem) { .l-cutout-a { left: -12%; } .l-cutout-b { right: -12%; } .l-drift span:nth-child(4) { display: none; } }
+/* Phones and tablets: the screens still land on the letters, stacked and overlapping under the title. */
 @media (max-width: 63.99rem) {
-  .l-cutouts { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--space-2xl); width: min(100%, 24rem); margin-top: var(--space-2xl); }
-  .l-cutout { position: relative; inset: auto; width: 100%; }
-  .l-cutout-a { rotate: -3deg; } .l-cutout-b { rotate: 3deg; }
+  .l-title { order: 1; } .l-cutouts { order: 2; } .l-sub { order: 3; } .l-actions { order: 4; }
+  .l-cutouts { position: relative; z-index: 2; display: flex; flex-direction: column; width: min(92%, 24rem); margin-top: -0.6rem; }
+  .l-cutout { position: relative; inset: auto; width: 88%; }
+  .l-cutout figcaption { display: none; }
+  .l-cutout-a { rotate: -6deg; align-self: flex-start; }
+  .l-cutout-b { rotate: 5deg; align-self: flex-end; margin-top: -2.5rem; }
 }
 
 .l-drift { position: absolute; inset: 0; pointer-events: none; z-index: 0; }
@@ -59,7 +65,8 @@ body:has([data-landing]) { background: var(--l-paper); padding: 0; }
 
 /* Scroll story: a big serif paragraph whose words ink in as it passes; small chips sit between the words */
 .l-story { font-family: var(--font-serif-stack); font-size: clamp(1.9rem, 4.4vw, 3.6rem); line-height: 1.12; letter-spacing: -0.015em; text-align: center; max-width: 22ch; margin-inline: auto; padding-block: var(--space-3xl); color: var(--l-ink); text-wrap: balance; }
-.l-chip { display: inline-flex; align-items: center; gap: 0.3em; vertical-align: 0.12em; margin-inline: 0.12em; padding: var(--space-2xs) var(--space-xs); border-radius: var(--radius-pill); background: var(--l-card); box-shadow: inset 0 0 0 1px var(--l-grid); font: 500 0.38em/1.2 var(--font-body); letter-spacing: 0; color: var(--l-ink); }
+.l-chip { display: inline-flex; align-items: center; gap: 0.3em; vertical-align: 0.12em; margin-inline: 0.12em 0; padding: var(--space-2xs) var(--space-xs); border-radius: var(--radius-pill); background: var(--l-card); box-shadow: inset 0 0 0 1px var(--l-grid); font: 500 0.38em/1.2 var(--font-body); letter-spacing: 0; color: var(--l-ink); }
+.l-chip-gap { margin-inline-end: 0.12em; }
 .l-chip-blue { background: var(--l-blue); color: var(--l-blue-ink); box-shadow: none; }
 
 /* Spec sheet: the real screens fanned on the left, what it does as a ruled table on the right */
@@ -84,12 +91,15 @@ body:has([data-landing]) { background: var(--l-paper); padding: 0; }
 
 /* Agent */
 .l-agent { padding-block: var(--space-3xl) 0; display: grid; gap: var(--space-xl); }
+.l-agent-head { display: flex; flex-direction: column; gap: var(--space-md); }
+@media (min-width: 64rem) { .l-agent-head { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: end; gap: var(--space-xl); } }
 .l-agent-shot { border-radius: 24px; overflow: hidden; box-shadow: 0 30px 80px -24px var(--l-shadow); }
 .l-agent-shot img { display: block; width: 100%; height: auto; }
 .l-lead { max-width: 46ch; font-size: clamp(1.05rem, 1.4vw, 1.2rem); line-height: 1.5; color: var(--l-ink-2); }
 
-/* Close + footer */
-.l-close { display: flex; flex-direction: column; align-items: center; text-align: center; gap: var(--space-xl); padding-block: var(--space-2xl) var(--space-3xl); }
+/* Close + footer: the page ends on a statement as big as its opening */
+.l-close .l-story { font-size: clamp(2.5rem, 7vw, 6.5rem); max-width: 18ch; line-height: 1; }
+.l-close { display: flex; flex-direction: column; align-items: center; text-align: center; gap: var(--space-lg); padding-block: var(--space-2xl) var(--space-3xl); }
 .l-footer { display: flex; flex-wrap: wrap; gap: var(--space-md) var(--space-xl); align-items: baseline; justify-content: space-between; padding-block: var(--space-xl); border-top: 1px solid var(--l-ink); font-size: var(--text-sm); color: var(--l-ink-2); }
 .l-footer nav { display: flex; flex-wrap: wrap; gap: 0 var(--space-lg); }
 
