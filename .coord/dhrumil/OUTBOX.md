@@ -385,3 +385,49 @@ My human told me we're allowed to do these, so I did them. Please `git pull --re
 - **New dependencies in `apps/web`** (the humans approved them): `gsap`, `@gsap/react`, `lenis`, `motion`, `react-peeps`. This changed `pnpm-lock.yaml` at the root, which is your file, so please `git pull --rebase` and `pnpm install` before you next touch it.
 - **Hand-drawn people** live in `apps/web/public/people/` as static SVGs (Open Peeps, CC0). Nothing on your side changes.
 - **Nothing in `apps/server` changed.**
+
+### DHRUMIL-026 · DECISION · P0 · 2026-11-12
+**To:** Humans (cc: Akshat)
+**Re:** AKSHAT-010 (DHRUMIL-T20, the B2B marketplace request)
+**Task:** none yet; nothing is built until you decide
+**Subject:** Recommend: B2B as our market story, not a B2B storefront build. Please decide and record it in DECISIONS.md / BACKLOG.md.
+
+AKSHAT-010 asks me to add a catalog with filters, a product page with bulk tiers, offers, profile, cart and orders, a mega-menu with search, and a mock catalog (24 products, 8 sellers, sample chats). None of it is in BACKLOG. It's a scope change, so it's yours to decide. My human had me check the competitors (as of today) first.
+
+**What competitors already do (Nov 2026)**
+- **Alibaba.com:**
+  - Built-in chat translation (18+ languages) and live translated video captions.
+  - Accio AI agents. The Sourcing Toolkit (July 2026) contacts suppliers in bulk, negotiates and follows up.
+  - Trade Assurance (escrow plus disputes).
+- **IndiaMART:**
+  - A multilingual voice agent (Hindi, Tamil, Hinglish) handling 1 lakh+ calls a day, plus multilingual search.
+  - AI spend doubling every 6 months.
+- **Made-in-China.com** (SourcingAI 2.0) and **Udaan** (negotiation chat in your language), plus newer AI B2B entrants (Ecer, Jliveo, Scopio).
+- **WhatsApp:** free translation in every chat since Sept 2025. Serious B2B deals often move there.
+
+So catalogs, filters, MOQ tiers and translated chat are table stakes, and they're those players' home ground.
+
+**The gap nobody fills, which is what we already built**
+- **Meaning:** no one checks that a translated amount kept its meaning. In our own test, ₹14,000 was mistranslated to 14,000円 until our amount check caught it.
+- **Agreed record:** no one gives both sides one deal record in their own language. Trade Assurance covers whether the delivered goods match the order, not terms agreed outside it, and custom-order disputes hinge on how specific the agreement was. Our Deal Card + Seal is that agreed record.
+- **Human check:** sourcing guides still advise a bilingual person before signing. That's our agent who reads both sides.
+
+**Problems with the request as written**
+1. **Honesty:** the mock catalog shows invented sellers, ratings ("★ 4.8 (124 reviews)"), counts ("1,248 products", "50,000+ products") and badges ("GST Verified", "ISO 9001"). Judges would read them as real, which breaks our honest-data rule (D-015) and the no-invented-numbers rule.
+2. **Scoring:** seven half-built new surfaces by Nov 21 hurt the 50% (completeness), and catalog and cart features are generic for the 30% (innovation). Mock data adds no real users for the 20% (traction).
+3. **Time:** we're still not deployed, and real users were due Nov 10.
+4. **Design mismatch:** it mandates the old dark-template details (#0b0b0d, #e9e9e7 frame, glassmorphism, notches) and an emoji icon. We merged a light system (DHRUMIL-025).
+
+**My proposal**
+- **A (story):** write B2B into the write-up and demo as the path to a product: "the trust layer for cross-language deals; next, wholesale buyers and manufacturers, where a misread number costs lakhs." Possibly also as a layer marketplaces could embed.
+- **B (small builds, all on the Golden Path, about 1–2 days in total):**
+  - UI-01: a person walks across the footer street as you scroll and turns back (`scaleX(-1)`).
+  - Part of UI-04: two-pane chat on desktop, the listing pinned on top of each chat, a chat link in the header. "Make an offer" maps onto our existing Deal Card.
+  - Part of UI-05: "My chats" and "My listings" in the account menu.
+- **C (cut list or after the challenge):** catalog filters and sort, an Amazon-style product page, cart, orders, profile hub, mega-menu and search, and the mock catalog.
+- **Needs Akshat:** an unread badge needs a real `unreadCount` from `GET /api/chats`; today it's always 0.
+- **Top priority for both of us, either way:** deploy, then real users.
+
+**Please answer:** A + B + C as proposed, or which parts you want instead. I'll start B only after you record it.
+
+Sources are listed in my human's session; the key ones: Alibaba seller blog on multi-language procurement, Stellagent on the Accio Sourcing Toolkit, AIM on IndiaMART's voice agents, the WhatsApp blog on message translations, and ShopAppy / Epic Sourcing on Trade Assurance scope. Several figures are vendor claims.
