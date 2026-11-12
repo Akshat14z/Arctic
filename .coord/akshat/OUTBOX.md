@@ -234,3 +234,240 @@ All backend development phases (AKSHAT-T01 through AKSHAT-T15) are now completel
 
 **Action for Dhrumil:**
 You can now safely switch all frontend calls (Listings, Chats, Messages Prepare, Deals, Handshake Seal, Cases, Agent Queue, and Demo Fast Login) to the live backend.
+
+
+---
+
+### AKSHAT-010 · REQUEST · P0 · 2026-11-12
+**To:** Dhrumil (cc: Humans)
+**Task:** DHRUMIL-T20
+**Subject:** Comprehensive B2B Marketplace UI Change Requests: Landing Animation, Catalog & Filters, Product Detail, In-Chat Negotiation, Profile, Cart/Orders, and Navigation
+
+---
+
+## 1. Context & Design System Mandate
+
+* **Preserve the Established Design System:** The current light editorial theme (tactile grid-paper background, deep ink `#0b0b0d`, brand blue accents, `#e9e9e7` frame accents, Instrument Serif display headers, Inter body typography, concave notch corners, glass cards, and pill buttons) is established and approved. **Do NOT redesign or replace this visual identity.** All changes must strictly extend and harmoniously fit the existing design system.
+* **Product Domain:** Handshake is a high-trust **B2B e-commerce platform** where buyers browse wholesale/catalog products and chat directly with verified sellers/manufacturers to negotiate bulk tiers, terms, and delivery. **Direct buyer-seller negotiation chat is the core platform capability**, not an auxiliary widget.
+* **Instructions for Implementing Agent:**
+  1. **Audit First:** Inspect the existing page routes and component hierarchy in `apps/web/src/` (`app-chrome.tsx`, `primitives.css`, `tokens.css`, `components/bits/`, `components/landing/`, etc.) before writing new code.
+  2. **Extend & Restyle:** Reuse existing UI components and restyle existing pages (`/listings`, `/chats`, `/`, etc.) instead of introducing redundant duplicate pages.
+  3. **Content File:** Maintain centralized copy, mock catalogs, and metadata in clean data/content files (`apps/web/src/content.ts` or `apps/web/src/data/mockCatalog.ts`).
+  4. **Quality Gates:** Verify responsive layouts across desktop (1440px), laptop/tablet (1024px, 768px), and mobile (390px). Verify that `pnpm -r run typecheck` and `pnpm -r run build` pass with zero console errors.
+
+---
+
+## 2. Specification of UI Change Requests
+
+### UI-01 (P1) · Landing Page: Animate the Standing Man at the Bottom
+* **Location:** On the landing page (`/`), near the bottom of the page before the footer where the character graphic is situated.
+* **Dictated Behavior:** As the user scrolls down, the standing character must animate across the screen from left to right, then turn and walk back from right to left (either continuous loop or scrubbed via GSAP ScrollTrigger).
+* **Implementation Guidance:**
+  * Use a transparent PNG/WebP walk-cycle sprite sheet, a Lottie animation, or frame-based GSAP animation.
+  * Move the character horizontally across the screen width (`translateX`).
+  * When reversing direction, invert orientation using `scaleX(-1)` so the character always faces the direction of travel.
+  * Animate **only** GPU-accelerated properties (`transform`, `opacity`) to ensure solid 60fps performance without layout thrashing or cumulative layout shift (CLS = 0).
+  * If only a single static character illustration exists initially, implement a realistic stepping/bobbing translation with a dynamic ground shadow under the feet, and document in code where a multi-frame sprite can be slotted in.
+  * **Accessibility:** Must respect `prefers-reduced-motion: reduce` by remaining fixed in position.
+* **Acceptance Criteria:**
+  - [ ] Character moves smoothly from left to right, turns with `scaleX(-1)`, and walks back from right to left.
+  - [ ] 60fps motion with zero layout shifts.
+  - [ ] Respects `prefers-reduced-motion` without breaking layout.
+
+---
+
+### UI-02 (P0) · Product Listing & Catalog Page (`/listings`)
+* **Benchmark:** Incorporate best-in-class catalog UX from Nike, Adidas, Puma (clean, image-first, spacious cards) combined with Amazon and Flipkart (dense filtering, MOQ, rating, and B2B trust indicators).
+* **Layout Structure:**
+  * **Desktop (≥ 1024px):** Sticky left sidebar for filters, responsive product grid on the right (4 columns at ≥ 1280px, 3 columns at 1024px).
+  * **Mobile & Tablet (< 1024px):** Fixed/sticky filter bar triggering a smooth bottom drawer / slide-over sheet with "Apply Filters" and "Clear All" buttons. Product grid renders 2 columns on mobile (≥ 360px).
+* **Top Catalog Control Bar:**
+  * Breadcrumb trail (`Home / Products / All Categories`).
+  * Category title with live counter (e.g., "Showing 1,248 products").
+  * Sort dropdown: Relevance, Price: Low to High, Price: High to Low, Newest Arrivals, Top Rated, Best Selling, Minimum Order Quantity (MOQ: Low to High).
+  * Grid density switcher (compact 4-column vs. comfortable 3-column view).
+  * Active filter chip bar: Displays individual removable pill chips with "x" and a "Clear all" link.
+* **Filter Accordions (Collapsible):**
+  * Category & Sub-category tree (multi-select checkboxes with counts).
+  * Price Range: Interactive dual-thumb range slider + explicit numeric Min / Max inputs.
+  * Brand / Manufacturer / Seller search & select.
+  * Minimum Order Quantity (MOQ) presets (e.g., "1–50 units", "50–200 units", "500+ units").
+  * Seller Verification: "Verified Handshake Sellers only" toggle.
+  * Seller Type: Manufacturer, Wholesaler, Authorized Distributor.
+  * Rating filter: "4★ & above", "3★ & above".
+  * Delivery & Lead Time: "Ready to Ship (< 48 hrs)", "Under 7 days", "Custom Production".
+  * Stock Availability: "In Stock", "Made to Order".
+  * Technical Specs: Material, Color swatches, Size dimensions (where relevant).
+  * "Negotiable Price Only" filter toggle.
+* **Product Card Specification:**
+  * 4:5 aspect ratio image wrapper with subtle hover zoom and smooth swap to secondary product angle image.
+  * Wishlist heart button (top right of image) and Quick View button.
+  * Status badges: "Verified Seller", "Negotiable", "Bestseller", "Low MOQ".
+  * Brand / Seller name with verified badge icon and location (e.g., "Apex Industrial · Tokyo, JP").
+  * Product title with truncation at 2 lines.
+  * **B2B Bulk Pricing Display:** Highlight unit price with volume tier preview (e.g., "₹1,250 / unit (100–499 units) · ₹980 / unit (500+ units)") alongside struck-through list price.
+  * MOQ label (e.g., "MOQ: 50 pcs").
+  * Star rating with review count (e.g., "★ 4.8 (124 reviews)").
+  * Color/finish swatch indicators.
+  * **Primary Action:** Prominent **"Chat with Seller"** pill button (directly launches the chat flow with product pre-attached as context).
+  * **Secondary Actions:** "Request Quote" and "Add to Inquiry List".
+* **Interaction & Performance:**
+  * Client-side reactive filtering and sorting with Framer Motion layout / FLIP animations.
+  * Deep-linked URL query synchronization (`?category=...&minPrice=...&sort=...`) for shareable search states.
+  * Skeleton shimmer loader cards for loading states.
+* **Acceptance Criteria:**
+  - [ ] Desktop sticky sidebar and mobile filter bottom drawer work smoothly.
+  - [ ] All filter accordions and sort options filter mock catalog data accurately.
+  - [ ] URL reflects filter/sort state bidirectionally.
+  - [ ] Product cards showcase bulk pricing tiers, MOQ, ratings, and prominent "Chat with Seller" CTA.
+  - [ ] Smooth grid reflow with zero visual stutter.
+
+---
+
+### UI-03 (P0) · Product Detail Page (`/listings/[id]`)
+* **Benchmark:** Amazon, Flipkart, and Nike PDP design patterns adapted to B2B volume commerce.
+* **Layout:**
+  * **Left Column (Visuals):**
+    * High-resolution image gallery with thumbnail rail.
+    * Interactive hover zoom lens / pan effect.
+    * Click-to-open full-screen lightbox image viewer.
+  * **Right Column (Commerce & Trust):**
+    * Category breadcrumbs, product title, and SKU / Model number.
+    * **Seller Trust Card:** Manufacturer/Seller name, verified checkmark, responsiveness badge ("Avg. reply: 15 min"), location, ratings, and "View Storefront" link.
+    * **Tiered Bulk Pricing Table:** Clear table showing volume tiers:
+      * Tier 1: 10 – 49 units → ₹1,400/unit
+      * Tier 2: 50 – 199 units → ₹1,150/unit (18% off)
+      * Tier 3: 200+ units → ₹920/unit (34% off)
+    * MOQ and Stock Status: "MOQ: 50 units · 4,200 units available in warehouse".
+    * Variant Pickers: Color swatches, size/specification buttons, and material selector.
+    * Quantity input with live total calculation according to pricing tiers.
+    * **Primary Action Bar (Sticky on scroll / mobile):**
+      * Prominent CTA: **"Chat with Seller / Negotiate Price"** (immediately opens chat with product context card pinned).
+      * Secondary CTAs: "Request Official Quote", "Add to Inquiry List", "Save to Wishlist".
+  * **Below the Fold:**
+    * Tabbed Information Hub: "Product Overview & Description", "Technical Specifications" (structured key-value table), "Packaging & Shipping", "Seller Verification & Compliance", "Buyer Reviews & Q&A".
+    * Carousels: "Similar Products in this Category" and "More from this Manufacturer".
+* **Acceptance Criteria:**
+  - [ ] Interactive thumbnail gallery with zoom and lightbox.
+  - [ ] Dynamic bulk tier pricing table updating totals based on selected quantity.
+  - [ ] Clicking "Chat with Seller" transitions into chat with this listing context pinned.
+  - [ ] Responsive stacked layout on mobile with sticky bottom CTA bar.
+
+---
+
+### UI-04 (P0) · Global Chat Button & Two-Pane Negotiation Chat (`/chats`)
+* **Navbar Integration:**
+  * Chat icon button permanently visible in the top navigation bar across all pages with an unread message badge count pill.
+* **Chat Interface (`/chats`):**
+  * WhatsApp Web / Amazon Seller Messaging layout styled in our editorial light paper & ink theme.
+  * **Left Pane (Conversations Directory):**
+    * Search bar to filter conversations by seller name or product title.
+    * Filter tabs: "All", "Unread", "In Negotiation", "Deals Agreed".
+    * Conversation list items: Counterparty avatar, company/seller name, verified badge, product thumbnail thumbnail, snippet of latest message, relative timestamp, and unread count badge.
+  * **Right Pane (Active Negotiation Room):**
+    * **Header:** Counterparty name, online indicator, verification badge, voice call button (`📞 Call`), and "View Listing" button.
+    * **Pinned Product Context Card:** Top of thread displays a compact card of the product under discussion (image, title, list price, MOQ).
+    * **Message Thread:** Chat bubbles with sender/receiver alignment, timestamps, delivery/read receipts, and system events.
+    * **Structured "Make an Offer" Feature:**
+      * Buyer or seller clicks "Make an Offer" button in the composer or header.
+      * Modal/sheet allows entering: Proposed Quantity + Proposed Unit Price + Optional Terms.
+      * Sends an interactive **Deal Offer Card** message inside the chat:
+        * Displays proposed unit price, quantity, total price, and calculated savings against list price.
+        * Recipient sees 3 action buttons: **"Accept Offer"**, **"Counter Offer"**, and **"Decline"**.
+        * Dynamic status chips: `Offer Pending`, `Offer Accepted`, `Offer Declined`.
+        * When accepted, reveals a **"Proceed to Handshake Agreement / Generate Seal"** action button.
+    * **Composer:** Auto-expanding textarea, file/image attachment button, predefined quick negotiation phrase pills ("Can you ship by Friday?", "Can we get sample units?"), and Send button.
+* **Mobile View (< 768px):**
+  * Conversation list and active chat thread behave as two separate views with a clear back button navigation (`‹ All Chats`).
+* **Architecture:**
+  * Implement clean service abstractions (`chatService.ts`) with mock conversation threads and state management so WebSocket or live backend hooks can be connected seamlessly.
+* **Acceptance Criteria:**
+  - [ ] Navbar Chat icon with unread badge present on every page.
+  - [ ] Two-pane layout on desktop; single-pane drilldown on mobile.
+  - [ ] Pinned product card context visible in active conversation.
+  - [ ] "Make an Offer" structured cards with Accept / Counter / Decline action flows.
+  - [ ] Decoupled mock service layer for easy live integration.
+
+---
+
+### UI-05 (P0) · Profile Button & User Account Hub (`/profile`)
+* **Navbar Integration:**
+  * User profile avatar in top-right navbar with a dropdown menu:
+    * User name, company name, and role badge ("Verified Buyer" or "Verified Manufacturer").
+    * Menu items: "Dashboard / Profile", "My Chats", "Orders & Quotes", "Saved Products", "Company Settings", "Sign Out".
+* **Profile Page (`/profile`):**
+  * **Header:** Avatar upload/change, user full name, business name, verification badge ("GST Verified", "ISO 9001"), role switcher (preview as Buyer vs. Seller), and "Edit Profile" button.
+  * **Tabbed Sections:**
+    1. **Overview:** Quick metric tiles (Active Inquiries, Ongoing Negotiations, Sealed Deals, Saved Items).
+    2. **Orders & Quotes:** Interactive table of active B2B quotes and orders with status chips (`Requested`, `Quoted`, `Sealed`, `Dispatched`).
+    3. **Saved Products (Wishlist):** Product grid with "Move to Inquiry" and "Chat Seller" quick actions.
+    4. **Company & Compliance:** Legal entity details, GSTIN/Tax ID, registered address, billing & warehouse addresses, and uploaded certificates.
+    5. **Account Settings:** Notification toggles, language preferences, password/security.
+    6. **Seller Hub Tab (Visible when Seller role is toggled):** "My Catalog Listings" management table with an "Add New Product" modal/form, stock toggles, and price editors.
+* **Acceptance Criteria:**
+  - [ ] Profile avatar button with functional dropdown on every page.
+  - [ ] Complete profile hub with tabbed sections for Buyer and Seller personas.
+  - [ ] Fully responsive on desktop, tablet, and mobile.
+
+---
+
+### UI-06 (P1) · Platform Extensions: Cart/Inquiry List & Orders Dashboard
+* **Cart / Bulk Inquiry Page (`/cart` or `/inquiry`):**
+  * Grouped by Seller/Manufacturer so inquiries can be sent in structured batches.
+  * Product row with thumbnail, title, volume tier pricing selector, quantity adjuster, and calculated line total.
+  * Comparison bar showing: Total List Price vs. Volume Tiered Price vs. Total Net Savings.
+  * Primary Action: "Request Bulk Quote / Checkout" button.
+* **Orders & Quotes Dashboard (`/orders`):**
+  * Filter tabs: "All", "Quote Requested", "Under Negotiation", "Agreement Sealed", "Dispatched", "Delivered".
+  * Order cards displaying PO number, date, counterparty company, total items, total amount, and a **"Open Chat Negotiation"** button linking directly to the corresponding chat room.
+* **Acceptance Criteria:**
+  - [ ] Bulk inquiry list grouped by seller with dynamic tier pricing calculation.
+  - [ ] Orders dashboard with status filters and direct links back into chat rooms.
+
+---
+
+### UI-07 (P0) · Global Navigation & Header/Footer Update
+* **Header / Navigation Bar:**
+  * **Left:** Brand Logo ("Handshake") linking to `/`.
+  * **Center:**
+    * Primary Navigation: "Home", "Products" (with Mega-Menu dropdown categorizing major wholesale sectors: Electronics, Industrial, Textiles, Agro, Machinery), "Sellers & Manufacturers", "About", "Contact".
+    * **Prominent Search Bar (Amazon/Flipkart style):** Category scope selector ("All Categories" dropdown) + Search text input ("Search 50,000+ products, suppliers, or materials...") + search icon button. Autocomplete preview popup showing matching products and trending searches.
+  * **Right Utility Bar:**
+    * Wishlist Heart icon with count badge.
+    * Inquiry / Cart Bag icon with item count badge.
+    * Chat Bubble icon with unread message badge (from UI-04).
+    * User Profile Avatar with dropdown (from UI-05).
+  * **Mobile Navigation (< 768px):**
+    * Hamburger menu drawer for full category browsing and secondary links.
+    * **Persistent Bottom Tab Bar:** Fixed at screen bottom with 4 primary destinations: Home, Products, Chat (with badge), Profile.
+* **Footer:**
+  * Multi-column layout: Marketplace categories, Buyer resources, Seller registration, Trust & Safety / Handshake Seal verification, Legal & Compliance.
+  * Region and currency selector.
+  * Handshake platform copyright notice.
+* **Acceptance Criteria:**
+  - [ ] Desktop Mega-Menu for category exploration.
+  - [ ] Prominent functional search bar with category scoping.
+  - [ ] Dynamic badge counts on Wishlist, Cart, and Chat buttons.
+  - [ ] Persistent bottom tab bar on mobile viewports.
+
+---
+
+## 3. Global Implementation Rules & Quality Standards
+
+1. **Design System Consistency:** Every new and modified page must strictly utilize the existing design tokens and stylesheet patterns:
+   - Grid paper background pattern and deep ink text (`#0b0b0d`).
+   - `#e9e9e7` frame accents and concave notch corners where applicable.
+   - Glassmorphic panels (`backdrop-filter: blur(16px)` with subtle border).
+   - Pill buttons with rotating action arrows on hover.
+   - Typography: *Instrument Serif* display headings and *Inter* body/metadata.
+2. **Motion & Smooth Scrolling:** Maintain Lenis smooth scrolling and GPU-accelerated GSAP / Framer Motion transitions (`transform`, `opacity` only). Always wrap animations with checks for `prefers-reduced-motion`.
+3. **Aspect Ratios & Placeholders:** Standardize all product card image containers to a **4:5 aspect ratio** with shimmer skeleton loader placeholders.
+4. **Mock Data Layer:** Supply a comprehensive, realistic mock data repository (`src/data/mockCatalog.ts`) containing:
+   - At least 24 realistic B2B products across 5+ diverse categories.
+   - At least 8 verified sellers/manufacturers with realistic location and response stats.
+   - Sample active chat threads with mock negotiation offers and history.
+5. **No Regression:** Do NOT delete or break existing verified flows (Golden Path, Handshake Seal, Meaning Guard, Nexconn voice/chat integrations). Restyle and integrate seamlessly.
+6. **Build Verification:** The implementation is complete only when:
+   - `pnpm -r run typecheck` passes with 0 errors.
+   - `pnpm -r run build` completes cleanly without warnings or errors.
+   - Chrome console runs completely free of errors or unhandled warnings.
