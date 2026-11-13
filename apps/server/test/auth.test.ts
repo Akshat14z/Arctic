@@ -207,3 +207,62 @@ describe('Auth & Session API Integration', () => {
   });
 });
 
+
+describe('Email + password accounts (DHRUMIL-T21)', () => {
+  beforeEach(() => {
+    vi.restoreAllMocks();
+    resetConfigForTesting();
+    vi.spyOn(nexconnTokens, 'issueNexconnToken').mockResolvedValue('test_nexconn_access_token_123');
+  });
+  const email = () => `t21_${Date.now()}_${Math.random().toString(36).slice(2, 8)}@example.com`;
+
+  it('signs up, refuses a second account on the same email, and signs back in', async () => {
+    const app = await buildApp();
+    const e = email();
+    const up = await app.inject({ method: 'POST', url: '/api/auth/signup', payload: { displayName: 'Asha', language: 'hi', email: e.toUpperCase(), password: 'correct-horse' } });
+    expect(up.statusCode).toBe(201);
+    const body = up.json();
+    expect(body.email).toBe(e); // stored lower-cased
+    expect(body.user.email).toBeUndefined(); // never on the public User
+    expect(body.user.passwordHash).toBeUndefined();
+
+    const again = await app.inject({ method: 'POST', url: '/api/auth/signup', payload: { displayName: 'Other', language: 'en', email: e, password: 'another-pass' } });
+    expect(again.statusCode).toBe(409);
+
+    const inn = await app.inject({ method: 'POST', url: '/api/auth/signin', payload: { email: e, password: 'correct-horse' } });
+    expect(inn.statusCode).toBe(200);
+    expect(inn.json().user.id).toBe(body.user.id);
+  });
+
+  it('gives the same answer for a wrong password and an unknown email', async () => {
+    const app = await buildApp();
+    const e = email();
+    await app.inject({ method: 'POST', url: '/api/auth/signup', payload: { displayName: 'Ravi', language: 'en', email: e, password: 'correct-horse' } });
+    const wrong = await app.inject({ method: 'POST', url: '/api/auth/signin', payload: { email: e, password: 'nope-nope' } });
+    const unknown = await app.inject({ method: 'POST', url: '/api/auth/signin', payload: { email: email(), password: 'nope-nope' } });
+    expect(wrong.statusCode).toBe(401);
+    expect(unknown.statusCode).toBe(401);
+    expect(wrong.json()).toEqual(unknown.json());
+  });
+
+  it('upgrades a signed-in guest into an account, keeping the same user', async () => {
+    const app = await buildApp();
+    const guest = (await app.inject({ method: 'POST', url: '/api/auth/guest', payload: { displayName: 'Guest G', language: 'ja' } })).json();
+    const up = await app.inject({
+      method: 'POST',
+      url: '/api/auth/signup',
+      headers: { authorization: `Bearer ${guest.sessionToken}` },
+      payload: { displayName: 'Guest G', language: 'ja', email: email(), password: 'correct-horse' },
+    });
+    expect(up.statusCode).toBe(201);
+    expect(up.json().user.id).toBe(guest.user.id);
+  });
+
+  it('rejects short passwords and bad emails with a validation error', async () => {
+    const app = await buildApp();
+    const short = await app.inject({ method: 'POST', url: '/api/auth/signup', payload: { displayName: 'A', language: 'en', email: email(), password: 'short' } });
+    const bad = await app.inject({ method: 'POST', url: '/api/auth/signup', payload: { displayName: 'A', language: 'en', email: 'not-an-email', password: 'long-enough-1' } });
+    expect(short.statusCode).toBe(400);
+    expect(bad.statusCode).toBe(400);
+  });
+});

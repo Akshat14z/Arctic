@@ -2,7 +2,9 @@
 // Matches .coord/ARCHITECTURE.md §5 Data Model
 
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  // One SQL query per read instead of one per relation (DHRUMIL-T21): each DB round trip costs ~0.4 s from far away.
+  previewFeatures = ["relationJoins"]
 }
 
 datasource db {
@@ -18,6 +20,8 @@ model User {
   role           String    @default("user") // "user" | "agent"
   isDemo         Boolean   @default(false)
   agentLanguages String[]  @default([])
+  email          String?   @unique // lower-cased; set when someone creates an account (DHRUMIL-T21)
+  passwordHash   String?   // scrypt$<salt hex>$<key hex>
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
 

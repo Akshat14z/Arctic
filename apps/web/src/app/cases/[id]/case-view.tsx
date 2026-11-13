@@ -46,7 +46,7 @@ function Person({ user, role, me }: { user?: User; role: string; me: boolean }) 
   const lang = user && LANGUAGES.find((l) => l.code === user.language);
   return (
     <li className="flex items-baseline justify-between gap-3 border-b border-border py-2">
-      <span className="min-w-0 truncate">
+      <span className="min-w-0 break-words">
         {user ? user.displayName : "Joining soon…"} {me && <span className="text-muted">(you)</span>}
         <span className="meta block">{role}</span>
       </span>
@@ -119,7 +119,7 @@ export function CaseView() {
         </Link>
         <div className="min-w-0">
           <h1 className="item-title">Help request</h1>
-          <p className="meta truncate">{reasonLabel(c.reason)}</p>
+          <p className="meta break-words">{reasonLabel(c.reason)}</p>
         </div>
       </header>
 

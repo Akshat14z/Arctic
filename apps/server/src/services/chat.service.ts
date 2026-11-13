@@ -120,6 +120,7 @@ export async function createOrGetChat(
 
 export async function getChats(currentUserId: string): Promise<ChatListResponse> {
   const chats = await prisma.chat.findMany({
+    relationLoadStrategy: 'join',
     where: {
       OR: [
         { buyerId: currentUserId },
@@ -168,6 +169,7 @@ export async function getChatById(
   currentUserRole: string
 ): Promise<ChatDetailResponse> {
   const chat = await prisma.chat.findUnique({
+    relationLoadStrategy: 'join',
     where: { channelId },
     include: {
       buyer: true,

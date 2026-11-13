@@ -19,7 +19,8 @@ export const viewport: Viewport = { themeColor: "oklch(96.4% 0.006 250)" };
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     // "en" in the static HTML; HtmlLang switches it to the user's language after hydration.
-    <html lang="en" className={`${inter.variable} ${serif.variable} h-full antialiased`}>
+    // suppressHydrationWarning: the pre-paint script below adds the "js" class to <html> before React hydrates.
+    <html lang="en" className={`${inter.variable} ${serif.variable} h-full antialiased`} suppressHydrationWarning>
       <head>
         {/* Before paint: with script and motion allowed, the landing hides its hero until GSAP takes it over (landing.css). */}
         <script dangerouslySetInnerHTML={{ __html: "if(matchMedia('(prefers-reduced-motion: no-preference)').matches)document.documentElement.classList.add('js')" }} />

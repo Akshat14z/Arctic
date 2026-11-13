@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useEffect, useRef } from "react";
 import { LANGUAGES } from "@/lib/languages";
 import { clearSession, useSession } from "@/lib/session";
 import { Icon, type IconName } from "./icons";
@@ -11,6 +12,10 @@ const PEOPLE: Tab[] = [
   { href: "/home", label: "Home", icon: "home" },
   { href: "/listings", label: "Browse", icon: "browse" },
   { href: "/chats", label: "Chats", icon: "chats" },
+  { href: "/listings/new", label: "Sell", icon: "sell" },
+];
+const VISITOR: Tab[] = [
+  { href: "/listings", label: "Browse", icon: "browse" },
   { href: "/listings/new", label: "Sell", icon: "sell" },
 ];
 const AGENT: Tab[] = [
@@ -25,7 +30,8 @@ function isHere(path: string, href: string) {
 
 function useTabs() {
   const session = useSession();
-  return session?.user.role === "agent" ? AGENT : PEOPLE;
+  if (!session) return VISITOR;
+  return session.user.role === "agent" ? AGENT : PEOPLE;
 }
 
 /** Desktop: the reference's pill tab bar, the current tab filled white. */
@@ -75,35 +81,86 @@ export function BottomTabs() {
   );
 }
 
-/** Who you are, what you read, and the way out, behind your initial (a native disclosure: no script menu to break). */
+/** Signed out: Sign in and Get started. Signed in: your initial opens who you are, where to go, and the way out. */
 export function AccountMenu() {
   const session = useSession();
-  if (session === undefined) return <span className="size-11" aria-hidden />;
+  const box = useRef<HTMLDetailsElement>(null);
+  const path = usePathname();
+
+  // A native disclosure (no script menu to break), closed on navigation and on a click or Escape outside it.
+  useEffect(() => {
+    if (box.current) box.current.open = false;
+  }, [path]);
+  useEffect(() => {
+    const close = (e: Event) => {
+      const d = box.current;
+      if (!d?.open) return;
+      if (e instanceof KeyboardEvent ? e.key === "Escape" : !d.contains(e.target as Node)) d.open = false;
+    };
+    document.addEventListener("click", close);
+    document.addEventListener("keydown", close);
+    return () => {
+      document.removeEventListener("click", close);
+      document.removeEventListener("keydown", close);
+    };
+  }, []);
+
+  if (session === undefined) return <span className="h-11 w-24" aria-hidden />;
   if (!session)
     return (
-      <Link href="/try" className="btn btn-primary">
-        Try the demo
-      </Link>
+      <div className="flex shrink-0 items-center gap-1">
+        <Link href="/signin" className="btn btn-quiet px-3">
+          Sign in
+        </Link>
+        <Link href="/signup" className="btn btn-primary px-4">
+          Get started
+        </Link>
+      </div>
     );
-  const { user } = session;
+
+  const { user, email } = session;
   const lang = LANGUAGES.find((l) => l.code === user.language);
-  const isDemo = user.id.startsWith("demo_");
+  const isAgent = user.role === "agent";
+  const isGuest = !isAgent && !user.isDemo && !email;
+  const links = isAgent
+    ? [{ href: "/agent", label: "Dispatch" }]
+    : [
+        { href: "/home", label: "Home" },
+        { href: "/chats", label: "My chats" },
+        { href: "/listings?mine=1", label: "My listings" },
+      ];
+
   return (
-    <details className="relative">
+    <details ref={box} className="relative shrink-0">
       <summary
         aria-label={`Account: ${user.displayName}`}
-        className="grid size-11 cursor-pointer list-none place-items-center rounded-full bg-surface-2 font-semibold text-text [&::-webkit-details-marker]:hidden"
+        className="grid size-11 cursor-pointer list-none place-items-center rounded-full bg-surface-2 font-semibold text-text transition-colors hover:bg-[var(--color-rule)] [&::-webkit-details-marker]:hidden"
       >
         {user.displayName.trim().charAt(0).toUpperCase()}
       </summary>
-      <div className="absolute right-0 z-[var(--z-dropdown)] mt-2 flex w-64 flex-col gap-3 rounded-[20px] border border-border bg-surface p-4">
-        <div>
-          <p className="font-medium">{user.displayName}</p>
+      <div className="absolute right-0 z-[var(--z-dropdown)] mt-2 flex w-72 max-w-[calc(100vw-2rem)] flex-col gap-3 rounded-[20px] border border-border bg-surface p-4 shadow-[0_18px_40px_-18px_var(--color-shadow)]">
+        <div className="flex flex-col gap-0.5">
+          <p className="font-medium break-words">{user.displayName}</p>
+          <p className="meta break-all">{email ?? (user.isDemo ? "Demo account" : isAgent ? "Support agent" : "Guest account, on this device only")}</p>
           <p className="meta">
             Reads <span lang={user.language}>{lang?.native}</span>
           </p>
         </div>
-        {isDemo && (
+        {isGuest && (
+          <Link href="/signup" className="btn btn-primary w-full">
+            Save your account
+          </Link>
+        )}
+        <ul className="-mx-2 flex flex-col">
+          {links.map((l) => (
+            <li key={l.href}>
+              <Link href={l.href} className="flex min-h-tap items-center rounded-[var(--radius-field)] px-2 text-sm font-medium no-underline hover:bg-surface-2">
+                {l.label}
+              </Link>
+            </li>
+          ))}
+        </ul>
+        {user.isDemo && (
           <Link href="/try" className="btn btn-secondary w-full">
             Switch demo account
           </Link>

@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { ChatListResponseSchema, type ChatSummary } from "@convocart/contracts";
 import { api, friendlyMessage } from "@/lib/api/client";
@@ -28,6 +29,7 @@ export function Inbox() {
   }, [token, attempt]);
 
   const lang = session?.user.language ?? "en";
+  const path = usePathname();
 
   return (
     <section className="flex flex-col gap-4">
@@ -66,10 +68,16 @@ export function Inbox() {
             <li key={c.channelId} className="border-t border-border first:border-t-0">
               <Link
                 href={`/chats/${encodeURIComponent(c.channelId)}`}
-                className="row py-3"
+                aria-current={path === `/chats/${encodeURIComponent(c.channelId)}` ? "page" : undefined}
+                className="row -mx-3 items-start rounded-[var(--radius-field)] px-3 py-3 aria-[current=page]:bg-surface-2"
               >
                 <span className="row-icon" aria-hidden>
-                  {c.otherUser.displayName.trim().charAt(0).toUpperCase()}
+                  {c.listing.imageUrl ? (
+                    // eslint-disable-next-line @next/next/no-img-element -- arbitrary seller URLs
+                    <img src={c.listing.imageUrl} alt="" loading="lazy" />
+                  ) : (
+                    c.otherUser.displayName.trim().charAt(0).toUpperCase()
+                  )}
                 </span>
                 <div className="min-w-0 flex-1">
                   <div className="flex items-baseline justify-between gap-2">
@@ -80,10 +88,11 @@ export function Inbox() {
                       </time>
                     )}
                   </div>
-                  <p lang={c.listing.lang} className="meta truncate">
+                  <p lang={c.listing.lang} className="meta break-words">
                     {c.listing.title}
                   </p>
-                  {c.lastMessage && <p className="mt-0.5 truncate">{c.lastMessage.text}</p>}
+                  {/* A preview, like any inbox: at most two lines; the full message is one tap away. */}
+                  {c.lastMessage && <p className="mt-0.5 line-clamp-2 text-sm break-words">{c.lastMessage.text}</p>}
                 </div>
                 {c.unreadCount > 0 && (
                   <span className="agate min-w-6 shrink-0 rounded-full bg-brand px-1.5 py-0.5 text-center text-sm text-brand-fg" aria-label={`${c.unreadCount} unread`}>

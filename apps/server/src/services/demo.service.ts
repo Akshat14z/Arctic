@@ -90,11 +90,13 @@ export async function seedDemoEnvironment(): Promise<void> {
     },
   });
 
-  // 4. Ensure demo listing exists
+  // 4. Ensure demo listing exists. Its photo is served by the web app (Unsplash, free licence; credited in the footer).
+  const demoPhoto = `${getConfig().WEB_ORIGIN.split(',')[0].trim().replace(/\/$/, '')}/demo/watch.jpg`;
   await prisma.listing.upsert({
     where: { id: DEMO_LISTING_ID },
-    update: {},
+    update: { imageUrl: demoPhoto },
     create: {
+      imageUrl: demoPhoto,
       id: DEMO_LISTING_ID,
       sellerId: DEMO_USERS.seller.id,
       title: 'Vintage Seiko Automatic Watch (1978)',

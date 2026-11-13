@@ -11,7 +11,7 @@ export function HomeActions() {
   if (!session) {
     return (
       <Link
-        href="/onboarding"
+        href="/signup"
         className="l-btn l-btn-ghost"
       >
         Get started

@@ -71,33 +71,41 @@ export function Conversation() {
 
   return (
     <section className="-mt-4 -mb-24 flex min-h-[calc(100dvh-4rem)] flex-col md:-mb-8">
-      <header className="sticky top-0 z-10 flex items-center gap-2 border-b border-border bg-bg py-2">
-        <Link href="/chats" aria-label="Back to chats" className="btn btn-icon shrink-0">
-          <svg aria-hidden="true" viewBox="0 0 24 24" className="size-5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="square">
-            <path d="M15 5l-7 7 7 7" />
-          </svg>
-        </Link>
-        <div className="min-w-0 flex-1">
-          <h1 className="truncate text-base font-semibold">{other.displayName}</h1>
-          <Link
-            href={`/listings/${chat.listing.id}`}
-            className="flex min-w-0 items-baseline gap-2 text-sm text-muted underline decoration-border underline-offset-2 hover:decoration-text"
-          >
-            <span lang={chat.listing.lang} className="truncate">{chat.listing.title}</span>
-            <span className="agate shrink-0 text-text">{formatPrice(chat.listing.price, session.user.language)}</span>
+      <header className="sticky top-0 z-10 flex flex-col gap-2 border-b border-border bg-bg py-2">
+        <div className="flex items-center gap-2">
+          <Link href="/chats" aria-label="Back to chats" className="btn btn-icon shrink-0 lg:hidden">
+            <svg aria-hidden="true" viewBox="0 0 24 24" className="size-5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="square">
+              <path d="M15 5l-7 7 7 7" />
+            </svg>
           </Link>
+          <h1 className="min-w-0 flex-1 text-base leading-snug font-semibold break-words">{other.displayName}</h1>
+          <CallButton peerId={other.id} peerName={other.displayName} myName={session.user.displayName} />
+          {chat.openCaseId ? (
+            <Link href={`/cases/${encodeURIComponent(chat.openCaseId)}`} className="btn btn-secondary shrink-0 px-3 text-sm">
+              Help requested
+            </Link>
+          ) : (
+            <GetHelp channelId={chat.channelId} token={session.sessionToken} />
+          )}
         </div>
-        <CallButton peerId={other.id} peerName={other.displayName} myName={session.user.displayName} />
-        {chat.openCaseId ? (
-          <Link
-            href={`/cases/${encodeURIComponent(chat.openCaseId)}`}
-            className="btn btn-secondary shrink-0 px-3 text-sm"
-          >
-            Help requested
-          </Link>
-        ) : (
-          <GetHelp channelId={chat.channelId} token={session.sessionToken} />
-        )}
+        {/* The listing this chat is about, pinned on top (Vinted, Carousell). */}
+        <Link href={`/listings/${chat.listing.id}`} className="group flex items-center gap-3 rounded-[var(--radius-field)] border border-border bg-surface p-2 text-text no-underline hover:border-[var(--color-rule-2)]">
+          <span className="row-icon size-12" aria-hidden>
+            {chat.listing.imageUrl ? (
+              // eslint-disable-next-line @next/next/no-img-element -- arbitrary seller URLs
+              <img src={chat.listing.imageUrl} alt="" />
+            ) : (
+              chat.listing.title.trim().charAt(0).toUpperCase()
+            )}
+          </span>
+          <span className="flex min-w-0 flex-1 flex-col">
+            <span lang={chat.listing.lang} className="text-sm leading-snug font-medium break-words group-hover:underline">
+              {chat.listing.title}
+            </span>
+            <span className="agate text-sm font-semibold">{formatPrice(chat.listing.price, session.user.language)}</span>
+          </span>
+          <span className="meta shrink-0 pr-1 max-sm:hidden">View listing</span>
+        </Link>
       </header>
 
       <ChatThread
