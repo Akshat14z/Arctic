@@ -25,11 +25,14 @@ body:has([data-landing]) { background: var(--l-paper); padding: 0; }
 .l-mark { font-family: var(--font-serif-stack); font-size: 1.6rem; line-height: 1; color: var(--l-ink); text-decoration: none; }
 .l-link { white-space: nowrap; color: var(--l-ink); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 4px; font-weight: 500; min-height: 2.75rem; display: inline-flex; align-items: center; }
 .l-link:hover { text-decoration-thickness: 2px; }
+/* Tailwind's max-md:hidden loses to .l-link (unlayered), so the phone hide lives here. */
+@media (max-width: 47.99rem) { .l-link-wide { display: none; } }
 
 /* Buttons */
 .l-btn { display: inline-flex; align-items: center; justify-content: center; gap: var(--space-xs); min-height: 3.25rem; padding: 0 var(--space-xl); border-radius: var(--radius-pill); background: var(--l-blue); color: var(--l-blue-ink); font: 500 var(--text-md)/1 var(--font-body); text-decoration: none; white-space: nowrap; transition: transform var(--dur-micro) var(--ease-out), background-color var(--dur-micro) var(--ease-out); }
 .l-btn:hover { background: color-mix(in oklab, var(--l-blue) 88%, var(--l-ink)); }
 .l-btn:active { transform: scale(0.97); }
+.l-btn-sm { min-height: 2.75rem; padding: 0 var(--space-md); font-size: var(--text-sm); }
 .l-btn-ghost { background: transparent; color: var(--l-ink); box-shadow: inset 0 0 0 1px var(--l-ink); }
 .l-btn-ghost:hover { background: var(--l-card); }
 [data-landing] :focus-visible { outline: 2px solid var(--l-blue); outline-offset: 3px; }
@@ -48,6 +51,8 @@ body:has([data-landing]) { background: var(--l-paper); padding: 0; }
 .l-cutout-a { left: -2%; top: 8%; rotate: -7deg; }
 .l-cutout-b { right: -3%; top: 50%; rotate: 6deg; }
 /* Wide screens: the title grows to its cap, so the screens step out into the gutters instead of onto the last word. */
+/* Laptops: keep both screens and their captions inside the page. */
+@media (min-width: 64rem) and (max-width: 79.99rem) { .l-cutout-a { left: 0; } .l-cutout-b { right: 0; } }
 @media (min-width: 100rem) { .l-cutout-a { left: -12%; } .l-cutout-b { right: -12%; } .l-drift span:nth-child(4) { display: none; } }
 /* Phones and tablets: the screens still land on the letters, stacked and overlapping under the title. */
 @media (max-width: 63.99rem) {
@@ -99,7 +104,7 @@ body:has([data-landing]) { background: var(--l-paper); padding: 0; }
 .l-lead { max-width: 46ch; font-size: clamp(1.05rem, 1.4vw, 1.2rem); line-height: 1.5; color: var(--l-ink-2); }
 
 /* Close + footer: the page ends on a statement as big as its opening */
-.l-close .l-story { font-size: clamp(2.5rem, 7vw, 6.5rem); max-width: 18ch; line-height: 1; }
+.l-close .l-story { font-size: clamp(2.5rem, 7vw, 6.5rem); max-width: 18ch; line-height: 1; padding-block: 0; }
 .l-close { display: flex; flex-direction: column; align-items: center; text-align: center; gap: var(--space-lg); padding-block: var(--space-2xl) var(--space-3xl); }
 .l-footer { display: flex; flex-wrap: wrap; gap: var(--space-md) var(--space-xl); align-items: baseline; justify-content: space-between; padding-block: var(--space-xl); border-top: 1px solid var(--l-ink); font-size: var(--text-sm); color: var(--l-ink-2); }
 .l-footer nav { display: flex; flex-wrap: wrap; gap: 0 var(--space-lg); }
@@ -174,11 +179,14 @@ body:has([data-landing]) { background: var(--l-paper); padding: 0; }
 }
 
 /* The street: people standing on the footer rule */
-.l-street { display: flex; justify-content: center; align-items: flex-end; gap: clamp(var(--space-xs), 3vw, var(--space-xl)); height: clamp(7rem, 14vw, 11rem); margin-top: var(--space-2xl); overflow: clip; }
-.l-street img { height: 100%; width: auto; transform-origin: 50% 100%; }
-.l-street img:nth-child(3n + 2) { height: 92%; }
-.l-street img:nth-child(4n) { height: 96%; }
-@media (max-width: 47.99rem) { .l-street img:nth-child(n + 6) { display: none; } }
+.l-street { position: relative; display: flex; justify-content: center; align-items: flex-end; gap: clamp(var(--space-xs), 3vw, var(--space-xl)); height: clamp(7rem, 14vw, 11rem); margin-top: var(--space-2xl); overflow: clip; }
+.l-street > img { height: 100%; width: auto; transform-origin: 50% 100%; }
+.l-street > img:nth-child(3n + 2) { height: 92%; }
+.l-street > img:nth-child(4n) { height: 96%; }
+@media (max-width: 47.99rem) { .l-street > img:nth-child(n + 6) { display: none; } }
+.l-walker { position: absolute; left: 0; bottom: 0; z-index: 1; height: 100%; aspect-ratio: 1200 / 2980; }
+.l-walker img { display: block; width: 100%; height: 100%; transform-origin: 50% 100%; }
+.l-walker-shadow { position: absolute; left: 15%; right: 15%; bottom: -3px; height: 6px; border-radius: 50%; background: var(--l-shadow); opacity: 0.6; }
 .l-footer { border-top-width: 1.5px; }
 
 /* Before GSAP takes over (script + motion only): the hero waits hidden instead of painting, blinking and

@@ -1,5 +1,8 @@
-import { randomBytes, createHash } from 'crypto';
+import { randomBytes, createHash, scrypt, timingSafeEqual } from 'crypto';
+import { promisify } from 'util';
 import type {
+  SignupRequest,
+  SigninRequest,
   GuestAuthRequest,
   AgentAuthRequest,
   AuthResponse,
@@ -156,6 +159,109 @@ export async function loginAgent(input: AgentAuthRequest): Promise<AuthResponse>
   };
 }
 
+/* ── Email + password accounts (DHRUMIL-T21) ── */
+
+const scryptAsync = promisify(scrypt) as (pw: string, salt: Buffer, keylen: number) => Promise<Buffer>;
+
+export async function hashPassword(password: string): Promise<string> {
+  const salt = randomBytes(16);
+  const key = await scryptAsync(password, salt, 64);
+  return `scrypt$${salt.toString('hex')}$${key.toString('hex')}`;
+}
+
+export async function verifyPassword(password: string, stored: string): Promise<boolean> {
+  const [scheme, saltHex, keyHex] = stored.split('$');
+  if (scheme !== 'scrypt' || !saltHex || !keyHex) return false;
+  const expected = Buffer.from(keyHex, 'hex');
+  const key = await scryptAsync(password, Buffer.from(saltHex, 'hex'), expected.length);
+  return key.length === expected.length && timingSafeEqual(key, expected);
+}
+
+// ponytail: in-memory sign-in throttle per email (10 failures per 15 min), per server instance.
+// Move it to the DB or Redis if the server ever runs as more than one instance.
+const failures = new Map<string, { count: number; until: number }>();
+const WINDOW_MS = 15 * 60 * 1000;
+function checkThrottle(email: string) {
+  const f = failures.get(email);
+  if (f && f.until > Date.now() && f.count >= 10) {
+    throw new AppError('TOO_MANY_ATTEMPTS', 'Too many sign-in attempts. Try again in a few minutes.', 429, true);
+  }
+}
+function noteFailure(email: string) {
+  const f = failures.get(email);
+  const fresh = !f || f.until <= Date.now();
+  failures.set(email, { count: fresh ? 1 : f.count + 1, until: fresh ? Date.now() + WINDOW_MS : f.until });
+}
+
+async function issueSession(user: DbUserLike & { email?: string | null }): Promise<AuthResponse> {
+  const config = getConfig();
+  const sessionToken = generateSessionToken();
+  await prisma.session.create({
+    data: { tokenHash: hashToken(sessionToken), userId: user.id, expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) },
+  });
+  const nexconnToken = await obtainNexconnToken(user.id, user.displayName);
+  return {
+    sessionToken,
+    user: formatUser(user),
+    nexconn: { appKey: config.NEXCONN_APP_KEY || 'mock_app_key', token: nexconnToken, area: config.NEXCONN_AREA || 'SG' },
+    ...(user.email ? { email: user.email } : {}),
+  };
+}
+
+const EMAIL_TAKEN = () => new AppError('EMAIL_TAKEN', 'An account with this email already exists. Sign in instead.', 409, false);
+
+/**
+ * Creates an account. With a guest's session token, that guest becomes the account (chats and listings kept);
+ * otherwise a new user is created. Demo and agent sessions are never upgraded.
+ */
+export async function signup(input: SignupRequest, guestToken?: string): Promise<AuthResponse> {
+  if (await prisma.user.findUnique({ where: { email: input.email } })) throw EMAIL_TAKEN();
+
+  const passwordHash = await hashPassword(input.password);
+  let guestId: string | undefined;
+  if (guestToken) {
+    const session = await prisma.session.findUnique({ where: { tokenHash: hashToken(guestToken) }, include: { user: true } });
+    const u = session && session.expiresAt > new Date() ? session.user : null;
+    if (u && u.role === 'user' && !u.isDemo && !u.email) guestId = u.id;
+  }
+
+  try {
+    const user = guestId
+      ? await prisma.user.update({
+          where: { id: guestId },
+          data: { email: input.email, passwordHash, displayName: input.displayName.trim(), language: input.language },
+        })
+      : await prisma.user.create({
+          data: {
+            id: generateUserId('u'),
+            displayName: input.displayName.trim(),
+            language: input.language,
+            role: 'user',
+            isDemo: false,
+            agentLanguages: [],
+            email: input.email,
+            passwordHash,
+          },
+        });
+    return await issueSession(user);
+  } catch (err: unknown) {
+    if ((err as { code?: string })?.code === 'P2002') throw EMAIL_TAKEN();
+    throw err;
+  }
+}
+
+export async function signin(input: SigninRequest): Promise<AuthResponse> {
+  checkThrottle(input.email);
+  const user = await prisma.user.findUnique({ where: { email: input.email } });
+  // The same answer for an unknown email and a wrong password, so the form can't be used to find accounts.
+  if (!user?.passwordHash || !(await verifyPassword(input.password, user.passwordHash))) {
+    noteFailure(input.email);
+    throw new AppError('BAD_CREDENTIALS', 'That email and password don’t match. Check them and try again.', 401, false);
+  }
+  failures.delete(input.email);
+  return issueSession(user);
+}
+
 export async function validateSession(rawToken: string): Promise<User> {
   const tokenHash = hashToken(rawToken);
 
@@ -195,6 +301,7 @@ export async function getMe(userId: string): Promise<MeResponse> {
       token: nexconnToken,
       area: config.NEXCONN_AREA || 'SG',
     },
+    ...(user.email ? { email: user.email } : {}),
   };
 }
 

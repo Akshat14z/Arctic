@@ -18,12 +18,13 @@ export function ensureConnected(session: AuthResponse): Promise<string> {
   started ??= (async () => {
     try {
       const me = await api("/api/me", { token: session.sessionToken, schema: MeResponseSchema });
-      saveSession({ ...session, user: me.user, nexconn: me.nexconn });
+      saveSession({ ...session, user: me.user, nexconn: me.nexconn, ...(me.email ? { email: me.email } : {}) });
       return await connect(me.nexconn);
     } catch (e) {
       started = null; // let the next screen retry
+      // Only a dead Handshake session signs you out. A Nexconn rejection (e.g. 31004) after a fresh token from
+      // /api/me is Nexconn failing, and signing out would not fix it: the chat screen shows the error instead.
       if (e instanceof ApiError && e.status === 401) clearSession();
-      if (e instanceof Error && e.message.includes("31004")) clearSession();
       throw e;
     }
   })();

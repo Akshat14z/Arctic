@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { safeLocalPath } from "@/lib/safe-path";
 import { AuthResponseSchema, type LangCode } from "@convocart/contracts";
 import { api, friendlyMessage } from "@/lib/api/client";
 import { LANGUAGES } from "@/lib/languages";
@@ -9,7 +10,8 @@ import { saveSession, useSession } from "@/lib/session";
 
 function nextPath(): string {
   const next = new URLSearchParams(window.location.search).get("next");
-  return next?.startsWith("/agent") && !next.startsWith("//") ? next : "/agent";
+  const safe = safeLocalPath(next);
+  return safe?.startsWith("/agent") ? safe : "/agent";
 }
 
 export function AgentSignInForm() {

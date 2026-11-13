@@ -93,7 +93,7 @@ export function CallModal() {
                     ? "Connecting…"
                     : "On a voice call"}
             </p>
-            <h2 id="call-title" className="section-title mx-auto truncate">
+            <h2 id="call-title" className="section-title mx-auto break-words text-center">
               {call.peerName}
             </h2>
             {call.status === "connected" && (

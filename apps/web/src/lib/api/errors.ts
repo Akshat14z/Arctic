@@ -20,6 +20,9 @@ const MESSAGES: Record<string, string> = {
   CHAT_NOT_FOUND: "This chat isn't available any more.",
   CASE_ALREADY_CLAIMED: "Another agent took this case.",
   BAD_AGENT_CODE: "That access code isn't right.",
+  EMAIL_TAKEN: "An account with this email already exists. Sign in instead.",
+  BAD_CREDENTIALS: "That email and password don't match. Check them and try again.",
+  TOO_MANY_ATTEMPTS: "Too many tries. Wait a few minutes, then sign in again.",
 };
 
 export function friendlyMessage(e: unknown): string {

@@ -29,6 +29,7 @@ export function LandingMotion() {
     const mm = gsap.matchMedia();
 
     mm.add("(prefers-reduced-motion: no-preference)", () => {
+      let streetIO: IntersectionObserver | undefined;
       root.classList.add("is-live");
 
       // Smooth scroll on one ticker with ScrollTrigger.
@@ -63,7 +64,7 @@ export function LandingMotion() {
       ScrollTrigger.create({ trigger: q(".l-hero")[0], start: "top top", end: "bottom top", onToggle: (self) => root.classList.toggle("is-away", !self.isActive) });
 
       // Footer street: step up onto the rule, then sway from the feet.
-      const people = q(".l-street img");
+      const people = q(".l-street > img");
       if (people.length) {
         gsap.from(people, {
           yPercent: 100,
@@ -76,10 +77,26 @@ export function LandingMotion() {
         people.forEach((p, i) => {
           sway.to(p, { rotate: i % 2 ? 2.2 : -2.2, duration: 2.4 + (i % 4) * 0.5, ease: "sine.inOut", yoyo: true, repeat: -1 }, i * 0.13);
         });
-        ScrollTrigger.create({ trigger: q(".l-street")[0], start: "top bottom", end: "bottom top", onToggle: (self) => (self.isActive ? sway.play() : sway.pause()) });
+        // The walker: the length of the street, a turn (scaleX -1, so they always face the way they go), and back.
+        // Transform only. ponytail: one still figure with a step bob; swap in a sprite sheet for real leg frames.
+        const street = q(".l-street")[0];
+        const walker = q<HTMLElement>(".l-walker")[0];
+        const figure = walker?.querySelector("img");
+        if (street && walker && figure) {
+          const far = () => street.clientWidth - walker.offsetWidth;
+          const pace = () => Math.max(6, far() / 90); // ~90px per second, whatever the screen width
+          sway
+            .to(walker, { x: far, duration: pace, ease: "none", repeat: -1, repeatRefresh: true, yoyo: true,
+              onRepeat: () => gsap.set(figure, { scaleX: gsap.getProperty(figure, "scaleX") === 1 ? -1 : 1 }) }, 0)
+            .to(figure, { y: -5, duration: 0.32, ease: "sine.inOut", yoyo: true, repeat: -1 }, 0);
+        }
+        // Play only while the street is on screen (an observer: reliable at the very bottom of the page).
+        streetIO = new IntersectionObserver(([e]) => (e.isIntersecting ? sway.play() : sway.pause()));
+        if (street) streetIO.observe(street);
       }
 
       return () => {
+        streetIO?.disconnect();
         root.classList.remove("is-live", "is-away");
         gsap.ticker.remove(tick);
         gsap.ticker.lagSmoothing(500, 33);

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { safeLocalPath } from "@/lib/safe-path";
 import { AuthResponseSchema } from "@convocart/contracts";
 import { api, friendlyMessage } from "@/lib/api/client";
 import { saveSession } from "@/lib/session";
@@ -17,7 +18,7 @@ const ROLES: { as: Role; name: string; reads: string; does: string; next: string
 
 /** Only same-site paths, so ?next= can't be used as an open redirect. */
 function safeNext(next: string | null, fallback: string) {
-  return next?.startsWith("/") && !next.startsWith("//") ? next : fallback;
+  return safeLocalPath(next) ?? fallback;
 }
 
 /** DHRUMIL-T11 judge sandbox: one click into the product as a demo buyer, seller or agent. */

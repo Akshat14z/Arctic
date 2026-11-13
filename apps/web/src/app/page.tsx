@@ -62,12 +62,18 @@ export default function Home() {
           <Link href="/" className="l-mark">
             Handshake
           </Link>
-          <nav aria-label="Main" className="flex items-center gap-5">
-            <Link href="/listings" className="l-link max-sm:hidden">
+          <nav aria-label="Main" className="flex items-center gap-x-5 gap-y-1">
+            <Link href="/listings" className="l-link l-link-wide">
               Browse
             </Link>
-            <Link href="/try" className="l-link">
+            <Link href="/try" className="l-link l-link-wide">
               Try the demo
+            </Link>
+            <Link href="/signin" className="l-link">
+              Sign in
+            </Link>
+            <Link href="/signup" className="l-btn l-btn-sm">
+              Get started
             </Link>
           </nav>
         </header>
@@ -227,7 +233,7 @@ export default function Home() {
 
       {/* Close */}
       <section className="l-wrap l-close">
-        <p className="l-story py-0">
+        <p className="l-story">
           <Ink>When both sides read the same deal, nothing gets lost in translation.</Ink>
         </p>
         <Link href="/try" className="l-btn" data-magnet>
@@ -241,6 +247,12 @@ export default function Home() {
           // eslint-disable-next-line @next/next/no-img-element -- static Open Peeps SVG
           <img key={n} src={`/people/${n}.svg`} alt="" width={1200} height={2980} loading="lazy" />
         ))}
+        {/* The walker: strolls the length of the street, turns, and walks back (landing-motion). Still under reduced motion. */}
+        <span className="l-walker">
+          {/* eslint-disable-next-line @next/next/no-img-element -- static Open Peeps SVG */}
+          <img src="/people/p6.svg" alt="" width={1200} height={2980} loading="lazy" />
+          <span className="l-walker-shadow" />
+        </span>
       </div>
 
       <footer className="l-wrap l-footer">
@@ -253,7 +265,7 @@ export default function Home() {
           <Link href="/listings/new" className="l-link">Sell</Link>
           <a href="https://github.com/Akshat14z/Arctic" className="l-link">Source code</a>
         </nav>
-        <p className="basis-full">Built for the Nexconn Build Challenge 2026. Demo accounts are marked Demo. People drawn from Open Peeps by Pablo Stanley (CC0).</p>
+        <p className="basis-full">Built for the Nexconn Build Challenge 2026. Demo accounts are marked Demo. People drawn from Open Peeps by Pablo Stanley (CC0). Demo watch photo by Lucas D. on Unsplash.</p>
       </footer>
     </div>
   );

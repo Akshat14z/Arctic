@@ -82,12 +82,12 @@ export function HomeView() {
           <article className="tile tile-hero min-h-56 justify-between md:col-span-2">
             <div>
               <h2 className="tile-title">Continue with {latest.otherUser.displayName}</h2>
-              <p lang={latest.listing.lang} className="meta truncate">
+              <p lang={latest.listing.lang} className="meta break-words">
                 {latest.listing.title}
               </p>
             </div>
             <p className="figure">{formatPrice(latest.listing.price, lang)}</p>
-            {latest.lastMessage && <p className="line-clamp-1 text-sm">{latest.lastMessage.text}</p>}
+            {latest.lastMessage && <p className="line-clamp-2 text-sm break-words">{latest.lastMessage.text}</p>}
             <Go href={`/chats/${encodeURIComponent(latest.channelId)}`} label={`Open the chat with ${latest.otherUser.displayName}`} />
           </article>
         ) : (
@@ -128,7 +128,7 @@ export function HomeView() {
                     </span>
                     <span className="flex min-w-0 flex-1 flex-col">
                       <span className="row-title">{c.otherUser.displayName}</span>
-                      <span className="meta truncate">{c.lastMessage?.text ?? c.listing.title}</span>
+                      <span className="meta line-clamp-2 break-words">{c.lastMessage?.text ?? c.listing.title}</span>
                     </span>
                     {c.lastMessage && (
                       <time dateTime={c.lastMessage.at} className="meta shrink-0">

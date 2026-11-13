@@ -20,7 +20,7 @@ function ChatWithSeller({ listingId }: { listingId: string }) {
 
   async function open() {
     if (!session) {
-      router.push(`/onboarding?next=${encodeURIComponent(`/listings/${listingId}`)}`);
+      router.push(`/signup?next=${encodeURIComponent(`/listings/${listingId}`)}`);
       return;
     }
     setBusy(true);
@@ -121,10 +121,19 @@ export function ListingDetail() {
   const textLang = original ? lang : listing.lang; // the server translates title + description for ?lang=
 
   return (
-    <article className="flex flex-col gap-3">
-      {listing.imageUrl && (
+    <article data-wide className="grid grid-cols-1 items-start gap-3 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] md:gap-5">
+      {listing.imageUrl ? (
         // eslint-disable-next-line @next/next/no-img-element -- arbitrary seller URLs
-        <img src={listing.imageUrl} alt={listing.title} className="aspect-[4/3] w-full rounded-[var(--radius-card)] object-cover" />
+        <img
+          src={listing.imageUrl}
+          alt={listing.title}
+          fetchPriority="high"
+          className="aspect-[4/3] w-full rounded-[var(--radius-card)] border border-border object-cover md:sticky md:top-4 md:row-span-3 md:aspect-[4/5]"
+        />
+      ) : (
+        <div aria-hidden className="grid aspect-[4/3] w-full place-items-center rounded-[var(--radius-card)] border border-border bg-surface-2 font-display text-7xl text-muted md:row-span-3 md:aspect-[4/5]">
+          {listing.title.trim().charAt(0).toUpperCase()}
+        </div>
       )}
 
       <section className="tile tile-hero gap-4">

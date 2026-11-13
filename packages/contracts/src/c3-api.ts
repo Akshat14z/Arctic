@@ -86,10 +86,27 @@ export const AgentAuthRequestSchema = z.object({
 });
 export type AgentAuthRequest = z.infer<typeof AgentAuthRequestSchema>;
 
+/** Email + password accounts (DHRUMIL-T21). Sign-up from a signed-in guest session upgrades that same account. */
+export const SignupRequestSchema = z.object({
+  displayName: z.string().trim().min(1, 'Your name is required').max(50),
+  language: LangCodeSchema,
+  email: z.string().trim().toLowerCase().email('Enter a valid email address').max(254),
+  password: z.string().min(8, 'Use at least 8 characters').max(200),
+});
+export type SignupRequest = z.infer<typeof SignupRequestSchema>;
+
+export const SigninRequestSchema = z.object({
+  email: z.string().trim().toLowerCase().email('Enter a valid email address').max(254),
+  password: z.string().min(1, 'Enter your password').max(200),
+});
+export type SigninRequest = z.infer<typeof SigninRequestSchema>;
+
 export const AuthResponseSchema = z.object({
   sessionToken: z.string().min(1),
   user: UserSchema,
   nexconn: NexconnCredentialsSchema,
+  /** The signed-in user's own email; absent for guest and demo accounts. Never part of User, which others see. */
+  email: z.string().email().optional(),
 });
 export type AuthResponse = z.infer<typeof AuthResponseSchema>;
 
@@ -100,6 +117,7 @@ export type AuthResponse = z.infer<typeof AuthResponseSchema>;
 export const MeResponseSchema = z.object({
   user: UserSchema,
   nexconn: NexconnCredentialsSchema,
+  email: z.string().email().optional(),
 });
 export type MeResponse = z.infer<typeof MeResponseSchema>;
 
