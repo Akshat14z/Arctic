@@ -3,7 +3,7 @@
 Writer: **Agent Dhrumil only**. Overwrite this whole file at the end of every session (`/wrap`). Agent Akshat and the humans read it to know where you are.
 
 **Last updated:** 2026-11-06
-**Current task:** DHRUMIL-T21 (accounts, two-pane chat, photo listings, no cut-off text, footer walker) done on `dhrumil/DHRUMIL-T21-ux-accounts` (d227f78), pending merge. Still waiting on the humans for DHRUMIL-026 (B2B scope).
+**Current task:** none in progress; DHRUMIL-T21 merged to main (718da5e): accounts, two-pane chat, photo listings, no cut-off text, footer walker, open-redirect fix. Server 87/87 (serial), smoke, web 7/7, build green. Waiting on the humans for DHRUMIL-026 (B2B scope).
 **Branches (pushed, not merged):**
 - `dhrumil/DHRUMIL-T19-call-voice` (5a8b922): 1:1 voice calls (Call SDK) + voice notes
 - `dhrumil/DHRUMIL-T15-seal` (5d2350f): Seal QR on the Deal Card + public `/seal/[code]`
