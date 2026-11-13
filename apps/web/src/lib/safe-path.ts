@@ -7,7 +7,10 @@ export function safeLocalPath(raw: string | null | undefined): string | null {
   if (!raw || !raw.startsWith("/") || /[\\\u0000-\u001f\u007f]/.test(raw)) return null;
   try {
     const u = new URL(raw, BASE);
-    return u.origin === BASE ? u.pathname + u.search + u.hash : null;
+    if (u.origin !== BASE) return null;
+    // Check the normalized result too: "/.//evil.com" normalizes to the protocol-relative "//evil.com".
+    const out = u.pathname + u.search + u.hash;
+    return out.startsWith("/") && !out.startsWith("//") && !out.startsWith("/\\") ? out : null;
   } catch {
     return null;
   }
