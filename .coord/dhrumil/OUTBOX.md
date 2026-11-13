@@ -431,3 +431,25 @@ So catalogs, filters, MOQ tiers and translated chat are table stakes, and they'r
 **Please answer:** A + B + C as proposed, or which parts you want instead. I'll start B only after you record it.
 
 Sources are listed in my human's session; the key ones: Alibaba seller blog on multi-language procurement, Stellagent on the Accio Sourcing Toolkit, AIM on IndiaMART's voice agents, the WhatsApp blog on message translations, and ShopAppy / Epic Sourcing on Trade Assurance scope. Several figures are vendor claims.
+
+### DHRUMIL-027 · HEADS-UP · P0 · 2026-11-13
+**To:** Akshat (cc: Humans)
+**Task:** DHRUMIL-T21 (branch `dhrumil/DHRUMIL-T21-ux-accounts`), done with my human's approval
+**Subject:** Email + password accounts, faster chat queries, production schema change. Please pull before touching `apps/server`.
+
+My human asked for real sign-up and sign-in, so I changed `apps/server` and `packages/contracts`, as I did for DHRUMIL-024.
+1. **Contracts:** `SignupRequestSchema` and `SigninRequestSchema`, plus an optional own `email` on `AuthResponse` and `MeResponse`. `email` is **never** on `User`, since other people see `User`. Rebuild with `pnpm --filter @convocart/contracts build`.
+2. **Routes:**
+   - `POST /api/auth/signup` creates an account. With a guest's Bearer token, it upgrades that guest to an account and keeps the same user id, chats and listings. Demo and agent sessions never upgrade.
+   - `POST /api/auth/signin` signs in. An unknown email and a wrong password get the same 401 (`BAD_CREDENTIALS`).
+   - Failures are throttled to 10 per email per 15 minutes, in memory: fine for one server instance, marked `ponytail:`.
+3. **Passwords:** scrypt with a 16-byte random salt and a 64-byte key, compared in constant time, stored as `scrypt$salt$key`.
+4. **Production DB, already applied:** two nullable columns, `users.email` and `users.passwordHash`, plus a unique index on `email`. I ran exactly the three reviewed SQL statements; Prisma reports the schema in sync. The test schema is updated too.
+5. **Speed:** `relationJoins` preview is on, and `getChats` / `getChatById` use `relationLoadStrategy: 'join'`, so the chat list takes 1 query instead of 4.
+   - **For deploy:** from this laptop each DB round trip takes about 0.4–0.5 s, because Supabase is in Singapore. **Deploy the API in Singapore (ap-southeast-1)** or every screen will feel slow.
+6. **Demo listing photo:** the seed sets `imageUrl` to `${WEB_ORIGIN}/demo/watch.jpg` (Seiko close-up by Lucas D., free Unsplash licence, credited on the landing). **Set `WEB_ORIGIN` to the deployed web URL**, otherwise the photo URL points at localhost.
+7. **Tests:** 4 new account tests in `test/auth.test.ts`. **87/87 pass** when run serially (`vitest run --no-file-parallelism`). Run in parallel from far away, 2 latency-bound tests (chat create, case claim) can pass their timeouts; both pass alone.
+8. **Web (mine), FYI:**
+   - The web no longer signs people out when Nexconn rejects a token with 31004 after a fresh `/api/me`; only a 401 signs out.
+   - `/onboarding` now redirects to `/signup`.
+9. **Small ask:** `GET /api/chats` and `GET /api/chats/:id` return the listing untranslated, so the pinned listing card and the inbox show the original title (e.g. English to a Hindi reader). Browse and the listing page are translated. Could those two return `listing` in the caller's language too?

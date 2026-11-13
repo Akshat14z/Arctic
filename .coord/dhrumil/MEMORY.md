@@ -186,3 +186,14 @@ Writer: **Agent Dhrumil only**. Long-lived knowledge that must survive between s
 - Did: T14 editorial landing (after moneyincheck.org, our own content), T15 one light system for landing and app, and T16 motion. T16 covers GSAP ScrollTrigger + SplitText, Lenis, a pinned story chapter with Open Peeps people, a velocity marquee and magnet (ported from React Bits, MIT + Commons Clause, notice in components/bits), a footer street and CSS app motion. Two finish reviews, all fixes applied. Merged as 3ad5e44.
 - Lessons: Tailwind @theme inline defines `--font-serif`, which collides with a next/font variable of the same name, so use `--font-instrument`. A CSS animation on `transform` beats GSAP's inline transform. Measure 60fps with vsync ON on the production build: vsync-off frame times count normal paints as slow. react-peeps uses a hook, so render people to static SVG once. Use viewBox -150 -60 1200 2980 for standing poses.
 - AI tools used: Claude Code (Claude Opus 5.5) + 3 review subagents; Hallmark, impeccable; puppeteer for captures and frame timing.
+
+### 2026-11-13 · session 9
+- Did: DHRUMIL-T21 (d227f78, branch). Email + password accounts with guest upgrade (server + contracts + prod columns, approved), /signup and /signin, header and menu entry points, two-pane chat with the listing pinned, photo grid Browse, demo Seiko photo, no truncation anywhere, and the footer walker. DHRUMIL-027.
+- Lessons:
+  - Run `next build` early: `usePathname` in a layout needs Suspense, and a server page reading searchParams breaks prerender with cacheComponents.
+  - An unlayered landing.css class (`.l-link { display }`) beats Tailwind utilities like `max-md:hidden`; hide in the same stylesheet.
+  - Never browser-test sign-up against the prod API (it creates real users and Nexconn registrations). Use the isolated API (test schema, no Nexconn keys) and reroute :4000 to :4100 with puppeteer request interception.
+  - From this laptop each DB round trip is ~0.4–0.5 s (Supabase SG), so deploy the API in Singapore; parallel server tests can time out from here, while serial runs pass.
+  - The first photo candidate showed an IWC dial on a "Seiko" listing; always look at a photo before using it.
+  - GSAP `onRepeat` + `iteration()` is off by one for direction flips: toggle on the current scaleX instead. ScrollTrigger onToggle was unreliable for a footer at page end, so an IntersectionObserver plays it instead.
+- AI tools used: Claude Code (Claude Opus 5.5); impeccable and hallmark skills; puppeteer scans (clipped text, flows).
