@@ -112,7 +112,7 @@ export function OfferModal({
             aria-label="Close dialog"
             className="grid size-9 place-items-center rounded-full bg-surface-2 text-muted transition-colors hover:bg-[var(--color-rule)] hover:text-text"
           >
-            ✕
+            <svg aria-hidden width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="m3.5 3.5 7 7m0-7-7 7" /></svg>
           </button>
         </div>
 
@@ -122,12 +122,12 @@ export function OfferModal({
             {/* Listing Reference */}
             <div className="flex items-center justify-between rounded-[var(--radius-field)] bg-surface-2 p-3">
               <div className="min-w-0 flex-1">
-                <span className="agate text-xs text-muted">Item / Listing</span>
-                <p className="truncate text-sm font-medium text-text">{listingTitle}</p>
+                <span className="meta text-xs">Item</span>
+                <p className="text-sm font-medium break-words">{listingTitle}</p>
               </div>
               {originalPrice && (
                 <div className="text-right">
-                  <span className="agate text-xs text-muted">Listed Price</span>
+                  <span className="meta text-xs">Listed at</span>
                   <p className="agate text-sm font-semibold">{formatPrice(originalPrice, lang)}</p>
                 </div>
               )}
@@ -136,7 +136,7 @@ export function OfferModal({
             {/* Mandatory Offer Price */}
             <label className="flex flex-col gap-1.5">
               <span className="label flex items-center justify-between">
-                <span>Final Offer Price (Mandatory) <span className="text-danger">*</span></span>
+                <span>Your price</span>
                 <span className="agate text-xs text-muted">Currency: {currency}</span>
               </span>
               <div className="relative flex items-center">
@@ -159,37 +159,39 @@ export function OfferModal({
                 />
               </div>
               <span className="hint text-xs">
-                Enter your exact proposed settlement amount. This price will be sealed upon mutual agreement.
+                If both of you agree, this exact amount goes on the Seal.
               </span>
             </label>
 
             {/* Delivery Method */}
             <div className="flex flex-col gap-1.5">
-              <span className="label">Handover / Delivery Method</span>
+              <span className="label">Handover</span>
               <div className="grid grid-cols-2 gap-2">
                 <button
                   type="button"
                   onClick={() => setDelivery("pickup")}
+                  aria-pressed={delivery === "pickup"}
                   className={`flex min-h-12 flex-col items-center justify-center rounded-[var(--radius-field)] border px-3 py-2 text-sm transition-all ${
                     delivery === "pickup"
                       ? "border-accent bg-accent/10 font-semibold text-accent"
                       : "border-border bg-surface text-muted hover:border-[var(--color-rule-2)]"
                   }`}
                 >
-                  <span>🤝 In-Person Pickup</span>
-                  <span className="text-[11px] font-normal text-muted">Verified by Seal QR code</span>
+                  <span>Pickup in person</span>
+                  <span className="text-xs font-normal text-muted">Scan the Seal at handover</span>
                 </button>
                 <button
                   type="button"
                   onClick={() => setDelivery("shipping")}
+                  aria-pressed={delivery === "shipping"}
                   className={`flex min-h-12 flex-col items-center justify-center rounded-[var(--radius-field)] border px-3 py-2 text-sm transition-all ${
                     delivery === "shipping"
                       ? "border-accent bg-accent/10 font-semibold text-accent"
                       : "border-border bg-surface text-muted hover:border-[var(--color-rule-2)]"
                   }`}
                 >
-                  <span>📦 Courier / Shipping</span>
-                  <span className="text-[11px] font-normal text-muted">Safe packaged dispatch</span>
+                  <span>Delivery</span>
+                  <span className="text-xs font-normal text-muted">Courier or post</span>
                 </button>
               </div>
             </div>
@@ -223,7 +225,7 @@ export function OfferModal({
                 disabled={!isPriceValid}
                 className="btn btn-primary px-6 font-semibold"
               >
-                Review Offer Summary →
+                Review offer
               </button>
             </div>
           </form>
@@ -235,7 +237,7 @@ export function OfferModal({
               <dl className="grid grid-cols-2 gap-3 text-sm">
                 <div>
                   <dt className="meta text-xs">Item</dt>
-                  <dd className="font-medium text-text truncate">{listingTitle}</dd>
+                  <dd className="font-medium break-words">{listingTitle}</dd>
                 </div>
                 <div>
                   <dt className="meta text-xs">Offered To</dt>
@@ -268,7 +270,7 @@ export function OfferModal({
               </dl>
             </div>
 
-            <div className="rounded-lg bg-amber-500/10 p-3 text-xs text-amber-900 dark:text-amber-200">
+            <div className="rounded-lg bg-amber-500/10 p-3 text-xs text-amber-900">
               <p className="font-medium">
                 Are you sure you want to send this offer?
               </p>

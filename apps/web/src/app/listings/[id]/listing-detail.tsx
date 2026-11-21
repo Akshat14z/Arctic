@@ -8,7 +8,7 @@ import { api, ApiError, friendlyMessage } from "@/lib/api/client";
 import { formatPrice, localeFor } from "@/lib/format";
 import { LANGUAGES, preferredLanguage } from "@/lib/languages";
 import { useSession } from "@/lib/session";
-import { DemoBadge } from "@/components/listing-card";
+import { DemoBadge, ListingImage } from "@/components/listing-card";
 import { ShareListing } from "@/components/share-listing";
 
 /** Opens (or reuses) the buyer's chat for this listing. Guests sign in first and come back here. */
@@ -48,7 +48,7 @@ function ChatWithSeller({ listingId }: { listingId: string }) {
         aria-busy={busy}
         className="btn btn-primary w-full py-3.5 text-base font-semibold shadow-md"
       >
-        {busy ? "Opening Negotiation Chat…" : "💬 Chat with Seller & Make Offer"}
+        {busy ? "Opening the chat…" : "Chat with the seller"}
       </button>
       {error && (
         <p role="alert" className="note note-error text-xs">
@@ -123,115 +123,68 @@ export function ListingDetail() {
   const textLang = original ? lang : listing.lang;
 
   return (
-    <article data-wide className="flex flex-col gap-6 py-2">
-      {/* Breadcrumb */}
-      <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-xs text-muted">
-        <Link href="/listings" className="hover:text-text transition-colors">Marketplace</Link>
-        <span>/</span>
-        <span className="text-text font-medium truncate max-w-xs">{listing.title}</span>
-      </nav>
+    <article data-wide className="flex flex-col gap-6">
+      <Link href="/listings" className="link inline-flex min-h-tap items-center gap-1 self-start text-sm">
+        <svg aria-hidden width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.5">
+          <path d="M8.5 3 4.5 7l4 4" />
+        </svg>
+        Browse
+      </Link>
 
-      {/* Main Showcase Grid */}
-      <div className="grid grid-cols-1 items-start gap-6 md:grid-cols-2">
-        {/* Left: Product Image */}
-        <div className="overflow-hidden rounded-2xl border border-border bg-surface-2 shadow-sm">
-          {listing.imageUrl ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={listing.imageUrl}
-              alt={listing.title}
-              fetchPriority="high"
-              className="aspect-[4/3] w-full object-cover transition-transform duration-300 hover:scale-[1.02]"
-            />
-          ) : (
-            <div aria-hidden className="grid aspect-[4/3] w-full place-items-center font-display text-8xl text-muted/40">
-              {listing.title.trim().charAt(0).toUpperCase()}
-            </div>
-          )}
+      <div className="grid grid-cols-1 items-start gap-8 md:grid-cols-2">
+        <div className="aspect-[4/3] overflow-hidden rounded-2xl border border-border bg-surface-2">
+          <ListingImage src={listing.imageUrl} title={listing.title} />
         </div>
 
-        {/* Right: Pricing, Actions, Description */}
-        <div className="flex flex-col gap-5">
-          <div className="rounded-2xl border border-border bg-surface p-6 shadow-sm flex flex-col gap-4">
-            <div className="flex items-center gap-2 flex-wrap">
-              {listing.isDemo && <DemoBadge />}
-              {original && (
-                <span className="agate rounded-md bg-surface-2 px-2 py-0.5 text-xs text-muted">
-                  Written in {original.native} · Translated to your language
-                </span>
-              )}
-            </div>
-
-            <h1 lang={textLang} className="text-2xl sm:text-3xl font-bold tracking-tight text-text leading-tight">
+        <div className="flex min-w-0 flex-col gap-6">
+          <div className="flex flex-col gap-3">
+            {(listing.isDemo || original) && (
+              <div className="flex flex-wrap items-center gap-2">
+                {listing.isDemo && <DemoBadge />}
+                {original && <span className="meta">Written in {original.native}, shown in your language</span>}
+              </div>
+            )}
+            <h1 lang={textLang} className="text-2xl font-semibold tracking-tight break-words sm:text-3xl">
               {listing.title}
             </h1>
+            <p className="agate text-3xl font-semibold">{formatPrice(listing.price, lang)}</p>
+          </div>
 
-            <div className="flex items-baseline justify-between border-y border-border/80 py-3">
-              <div>
-                <span className="meta text-xs block">Offered At</span>
-                <span className="agate text-3xl font-black text-text">
-                  {formatPrice(listing.price, lang)}
+          {mine ? (
+            <p className="note">This is your listing. Buyers&apos; messages show up in Chats.</p>
+          ) : (
+            <ChatWithSeller listingId={listing.id} />
+          )}
+
+          {listing.description && (
+            <section className="flex flex-col gap-2 border-t border-border pt-6">
+              <h2 className="text-base font-semibold">About this item</h2>
+              <p lang={textLang} className="max-w-[65ch] whitespace-pre-line break-words text-ink-2">
+                {listing.description}
+              </p>
+            </section>
+          )}
+
+          {listing.seller && (
+            <section className="flex flex-wrap items-center justify-between gap-3 border-t border-border pt-6">
+              <div className="flex min-w-0 items-center gap-3">
+                <span aria-hidden className="grid size-10 shrink-0 place-items-center rounded-full bg-surface-2 font-semibold">
+                  {listing.seller.displayName.trim().charAt(0).toUpperCase()}
                 </span>
-              </div>
-              <span className="agate text-xs text-muted">Fixed & Negotiable</span>
-            </div>
-
-            {mine ? (
-              <div className="rounded-xl bg-surface-2 p-3 text-center text-xs text-muted font-medium">
-                This is your listing. Check your chats to respond to buyer inquiries.
-              </div>
-            ) : (
-              <ChatWithSeller listingId={listing.id} />
-            )}
-          </div>
-
-          {/* Description Card */}
-          <div className="rounded-2xl border border-border bg-surface p-6 shadow-sm flex flex-col gap-3">
-            <h2 className="text-base font-semibold text-text">Item Details</h2>
-            <p lang={textLang} className="text-sm text-text leading-relaxed whitespace-pre-line">
-              {listing.description}
-            </p>
-
-            {listing.seller && (
-              <div className="mt-2 flex items-center justify-between border-t border-border pt-3 text-xs">
-                <div className="flex items-center gap-2.5">
-                  <span className="grid size-8 place-items-center rounded-full bg-accent text-white font-bold text-xs">
-                    {listing.seller.displayName.trim().charAt(0).toUpperCase()}
-                  </span>
-                  <div>
-                    <p className="font-semibold text-text">{listing.seller.displayName}</p>
-                    <p className="meta text-[11px]">Verified Seller</p>
-                  </div>
+                <div className="min-w-0">
+                  <p className="font-medium break-words">{listing.seller.displayName}</p>
+                  <p className="meta">Seller</p>
                 </div>
-                <time dateTime={listing.createdAt} className="agate text-muted">
-                  Listed {new Date(listing.createdAt).toLocaleDateString(localeFor(lang), { day: "numeric", month: "short", year: "numeric" })}
-                </time>
               </div>
-            )}
-          </div>
+              <time dateTime={listing.createdAt} className="meta">
+                Listed {new Date(listing.createdAt).toLocaleDateString(localeFor(lang), { day: "numeric", month: "short", year: "numeric" })}
+              </time>
+            </section>
+          )}
 
-          {/* Guarantee / Trust Features */}
-          <div className="rounded-2xl border border-border bg-surface-2 p-4 text-xs text-muted grid grid-cols-2 gap-3">
-            <div className="flex items-start gap-2">
-              <span className="text-base">🛡️</span>
-              <div>
-                <p className="font-semibold text-text">Handshake Seal</p>
-                <p className="text-[11px]">Mutual deal locking with tamper-proof QR code.</p>
-              </div>
-            </div>
-            <div className="flex items-start gap-2">
-              <span className="text-base">🌐</span>
-              <div>
-                <p className="font-semibold text-text">Auto-Translation</p>
-                <p className="text-[11px]">Chat across 8 languages with zero language barriers.</p>
-              </div>
-            </div>
-          </div>
-
-          {/* Share */}
-          <div className="rounded-2xl border border-border bg-surface p-4 shadow-sm">
+          <section className="border-t border-border pt-6">
             <ShareListing listing={listing} lang={lang} mine={mine} />
-          </div>
+          </section>
         </div>
       </div>
     </article>

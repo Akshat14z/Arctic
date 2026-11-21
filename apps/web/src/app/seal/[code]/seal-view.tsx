@@ -180,7 +180,7 @@ export function SealView() {
         the price and names can&apos;t be faked, even without internet. A screenshot of this page proves nothing; scan the code.
       </p>
 
-      <Link href="/" className="link self-start text-sm">
+      <Link href="/" className="link inline-flex min-h-tap items-center self-start text-sm">
         What is Handshake?
       </Link>
     </section>

@@ -96,13 +96,8 @@ export function SigninForm() {
         )}
 
         <button type="submit" disabled={busy} aria-busy={busy} className="btn btn-primary w-full py-3 font-semibold shadow-xs">
-          {busy ? "Signing in…" : "Sign in to Account"}
+          {busy ? "Signing in…" : "Sign in"}
         </button>
-
-        <div className="flex items-center justify-center gap-1.5 text-[11px] text-muted">
-          <span>🔒</span>
-          <span>Encrypted negotiation session · Token-based JWT auth</span>
-        </div>
       </form>
 
       <div className="flex flex-col items-center gap-2 text-center text-sm">
