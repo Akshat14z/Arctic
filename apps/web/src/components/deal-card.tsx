@@ -123,7 +123,7 @@ function SealBlock({ code }: { code: string }) {
       <div className="flex min-w-0 flex-col gap-1">
         <p className="font-semibold">Handshake Seal</p>
         <p>Both sides agreed to exactly this. Show the code at pickup: scanning it opens the verified deal.</p>
-        <Link href={`/seal/${encodeURIComponent(code)}`} className="link inline-flex min-h-tap flex-wrap items-center gap-x-1 break-all">
+        <Link href={`/seal/${encodeURIComponent(code)}${proof ? `#p=${proof}` : ""}`} className="link inline-flex min-h-tap flex-wrap items-center gap-x-1 break-all">
           Open the seal <span className="agate">{code}</span>
         </Link>
       </div>

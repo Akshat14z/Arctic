@@ -204,8 +204,8 @@ function ProofBanner({ check, mismatch }: { check: SealCheck | null; mismatch: b
     );
   return (
     <p role="alert" className="note note-error">
-      <strong>Don&apos;t trust this link.</strong> Its signature doesn&apos;t match these terms, so someone may have changed it. Ask the other person to
-      show the QR code from their Handshake chat.
+      <strong>Someone changed this link.</strong> The terms below come straight from Handshake and are the real ones. If you were shown a different
+      price or item, don&apos;t go ahead.
     </p>
   );
 }

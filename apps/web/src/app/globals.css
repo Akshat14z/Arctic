@@ -50,7 +50,8 @@
 }
 
 /* The landing page brings its own masthead. A judge-mode seat (/try/both) shows only the page. */
-html.seat :is([data-app-chrome], [data-bottom-tabs]) { display: none; }
+html.seat :is([data-app-chrome], [data-bottom-tabs], [data-seat-hide]) { display: none; }
+html:not(.seat) [data-seat-only] { display: none; }
 body:has([data-landing]) [data-app-chrome] { display: none; }
 /* One system: the app sits on the landing's grid paper, edge to edge (no device frame). */
 body:not(:has([data-landing])) {
