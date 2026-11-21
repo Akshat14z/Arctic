@@ -306,13 +306,46 @@ export async function getMe(userId: string): Promise<MeResponse> {
 }
 
 export async function updateMe(userId: string, input: UpdateMeRequest): Promise<MeResponse> {
-  const dataToUpdate: { displayName?: string; language?: string } = {};
+  const existingUser = await prisma.user.findUnique({
+    where: { id: userId },
+  });
+
+  if (!existingUser) {
+    throw new AppError('USER_NOT_FOUND', 'User record not found', 404, false);
+  }
+
+  const dataToUpdate: { displayName?: string; language?: string; email?: string; passwordHash?: string } = {};
 
   if (input.displayName !== undefined) {
     dataToUpdate.displayName = input.displayName.trim();
   }
   if (input.language !== undefined) {
     dataToUpdate.language = input.language;
+  }
+  if (input.email !== undefined) {
+    const cleanEmail = input.email.trim().toLowerCase();
+    if (cleanEmail !== existingUser.email) {
+      const conflict = await prisma.user.findFirst({
+        where: { email: cleanEmail, id: { not: userId } },
+      });
+      if (conflict) {
+        throw new AppError('EMAIL_TAKEN', 'An account with this email already exists', 409, false);
+      }
+      dataToUpdate.email = cleanEmail;
+    }
+  }
+
+  if (input.newPassword) {
+    if (existingUser.passwordHash) {
+      if (!input.currentPassword) {
+        throw new AppError('CURRENT_PASSWORD_REQUIRED', 'Please enter your current password to set a new one', 400, false);
+      }
+      const valid = await verifyPassword(input.currentPassword, existingUser.passwordHash);
+      if (!valid) {
+        throw new AppError('INVALID_CREDENTIALS', 'Current password does not match', 400, false);
+      }
+    }
+    dataToUpdate.passwordHash = await hashPassword(input.newPassword);
   }
 
   const user = await prisma.user.update({

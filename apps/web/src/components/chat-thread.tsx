@@ -3,10 +3,12 @@
 import { useEffect, useRef, useState } from "react";
 import {
   DealAgreeResponseSchema,
+  DealResponseSchema,
   ExtractDealResponseSchema,
   type AuthResponse,
   type Deal,
   type HandshakeExtraV1,
+  type Money,
 } from "@convocart/contracts";
 import { api, friendlyMessage } from "@/lib/api/client";
 import { ensureConnected, useConnectionState } from "@/lib/chat-connection";
@@ -15,6 +17,7 @@ import { parseExtra } from "@/lib/render";
 import { Composer } from "./composer";
 import { DealCard, dealSummary, type DealRole } from "./deal-card";
 import { MessageBubble } from "./message-bubble";
+import { OfferModal } from "./offer-modal";
 
 /** Adds messages, dropping duplicates (history reloads, our own echo), oldest first. */
 function merge(current: ChatMessage[], incoming: ChatMessage[]) {
@@ -29,6 +32,8 @@ type Props = {
   /** Our channel id, sent to /prepare so the server knows whose languages to translate into. */
   channelId: string;
   emptyText: string;
+  listingTitle?: string;
+  originalPrice?: Money;
   /** Set when sending isn't allowed (e.g. a resolved case); shown in place of the composer. */
   closedText?: string;
   /** Deal Cards: who I am in this deal, and both names. Omit `myRole` for read-only (agents). */
@@ -36,12 +41,22 @@ type Props = {
 };
 
 /** Messages, history, live updates and the composer for one Nexconn channel. */
-export function ChatThread({ session, channel, channelId, emptyText, closedText, deals }: Props) {
+export function ChatThread({
+  session,
+  channel,
+  channelId,
+  emptyText,
+  listingTitle = "Item in negotiation",
+  originalPrice,
+  closedText,
+  deals,
+}: Props) {
   const state = useConnectionState();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [attempt, setAttempt] = useState(0); // "Try again" re-runs the history load
-  const [proposing, setProposing] = useState(false);
+  const [showOfferModal, setShowOfferModal] = useState(false);
+  const [counterPrice, setCounterPrice] = useState<number | undefined>();
   const endRef = useRef<HTMLDivElement>(null);
   const lang = session.user.language;
 
@@ -69,7 +84,7 @@ export function ChatThread({ session, channel, channelId, emptyText, closedText,
   }, [channel.type, channel.id, state, attempt]);
 
   useEffect(() => {
-    endRef.current?.scrollIntoView({ block: "end" }); // braces: scroll methods may return a Promise, effects must not
+    endRef.current?.scrollIntoView({ block: "end" });
   }, [messages.length]);
 
   /** A deal travels as a C4 `deal_card` message; every new version (agreements) is a new message. */
@@ -80,32 +95,27 @@ export function ChatThread({ session, channel, channelId, emptyText, closedText,
     setMessages((list) => merge(list, [sent]));
   }
 
-  async function propose() {
-    setProposing(true);
-    setError(null);
-    try {
-      const { deal } = await api("/api/deals/extract", {
-        method: "POST",
-        body: { channelId },
-        token: session.sessionToken,
-        schema: ExtractDealResponseSchema,
-      });
-      if (deal) await sendDeal(deal);
-      else setError("We couldn't find deal terms in this chat yet. Agree on a price first.");
-    } catch (e) {
-      setError(friendlyMessage(e));
-    } finally {
-      setProposing(false);
-    }
-  }
-
-  async function agree(deal: Deal) {
+  async function handleAgree(deal: Deal) {
     const { deal: updated } = await api(`/api/deals/${encodeURIComponent(deal.id)}/agree`, {
       method: "POST",
       token: session.sessionToken,
       schema: DealAgreeResponseSchema,
     });
     await sendDeal(updated);
+  }
+
+  async function handleReject(deal: Deal) {
+    const { deal: updated } = await api(`/api/deals/${encodeURIComponent(deal.id)}/reject`, {
+      method: "POST",
+      token: session.sessionToken,
+      schema: DealResponseSchema,
+    });
+    await sendDeal(updated);
+  }
+
+  function handleCounter(deal: Deal) {
+    setCounterPrice(deal.price.amount);
+    setShowOfferModal(true);
   }
 
   // Only the newest message of each deal is shown, so agreements update one card instead of stacking.
@@ -120,6 +130,9 @@ export function ChatThread({ session, channel, channelId, emptyText, closedText,
     const d = parseExtra(m.extra);
     return d?.kind === "deal_card" && d.deal?.status === "agreed" && latestDealMessage.get(d.deal.id) === m.id;
   });
+
+  const recipientRole = deals?.myRole === "buyer" ? "seller" : "buyer";
+  const recipientName = deals ? deals.names[recipientRole] : "Trader";
 
   return (
     <>
@@ -139,14 +152,23 @@ export function ChatThread({ session, channel, channelId, emptyText, closedText,
 
       <div className="flex flex-1 flex-col gap-3 py-4" aria-live="polite">
         {messages.length === 0 && state === "connected" && !error && (
-          <p className="meta m-auto max-w-xs text-center">{emptyText}</p>
+          <p className="meta self-center py-12 text-center">{emptyText}</p>
         )}
         {messages.map((m) => {
           const d = parseExtra(m.extra);
           if (d?.kind === "deal_card" && d.deal) {
             if (latestDealMessage.get(d.deal.id) !== m.id) return null;
             return deals ? (
-              <DealCard key={m.id} deal={d.deal} lang={lang} myRole={deals.myRole} names={deals.names} onAgree={deals.myRole ? agree : undefined} />
+              <DealCard
+                key={m.id}
+                deal={d.deal}
+                lang={lang}
+                myRole={deals.myRole}
+                names={deals.names}
+                onAgree={deals.myRole ? handleAgree : undefined}
+                onReject={deals.myRole ? handleReject : undefined}
+                onCounter={deals.myRole ? handleCounter : undefined}
+              />
             ) : (
               <MessageBubble key={m.id} message={m} lang={lang} />
             );
@@ -161,28 +183,55 @@ export function ChatThread({ session, channel, channelId, emptyText, closedText,
           <p className="meta border-t border-border bg-bg pt-3 text-center">{closedText}</p>
         ) : (
           <>
-          {deals?.canPropose && deals.myRole && !hasAgreedDeal && (
-            <button
-              type="button"
-              onClick={propose}
-              disabled={proposing || state !== "connected"}
-              aria-busy={proposing}
-              className="btn btn-secondary w-full border-b-transparent"
-            >
-              {proposing ? "Writing up the deal…" : "Propose a deal from this chat"}
-            </button>
-          )}
-          <Composer
-            channel={channel}
-            channelId={channelId}
-            lang={lang}
-            token={session.sessionToken}
-            disabled={state !== "connected"}
-            onSent={(m) => setMessages((list) => merge(list, [m]))}
-          />
+            {deals?.canPropose && deals.myRole && !hasAgreedDeal && (
+              <div className="mb-2 flex items-center justify-between gap-2 rounded-xl border border-border bg-surface-2 px-3 py-2 shadow-xs">
+                <div className="flex items-center gap-2 text-xs">
+                  <span className="font-semibold text-text">Price Negotiation</span>
+                  <span className="meta hidden sm:inline">• Formal offer with sealed terms</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setCounterPrice(undefined);
+                    setShowOfferModal(true);
+                  }}
+                  disabled={state !== "connected"}
+                  className="btn btn-primary btn-sm text-xs font-semibold shadow-xs"
+                >
+                  🤝 Make an Offer
+                </button>
+              </div>
+            )}
+            <Composer
+              channel={channel}
+              channelId={channelId}
+              lang={lang}
+              token={session.sessionToken}
+              disabled={state !== "connected"}
+              onSent={(m) => setMessages((list) => merge(list, [m]))}
+            />
           </>
         )}
       </div>
+
+      {/* Structured Offer Creation Dialog */}
+      {deals?.myRole && (
+        <OfferModal
+          isOpen={showOfferModal}
+          onClose={() => setShowOfferModal(false)}
+          channelId={channelId}
+          token={session.sessionToken}
+          lang={lang}
+          listingTitle={listingTitle}
+          originalPrice={originalPrice}
+          recipientName={recipientName}
+          recipientRole={recipientRole}
+          initialPrice={counterPrice}
+          onOfferSent={async (newDeal) => {
+            await sendDeal(newDeal);
+          }}
+        />
+      )}
     </>
   );
 }

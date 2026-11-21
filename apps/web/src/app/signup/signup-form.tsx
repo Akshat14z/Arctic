@@ -92,7 +92,7 @@ export function SignupForm() {
   const show = (k: keyof typeof errors) => touched && errors[k];
 
   return (
-    <div className="mx-auto flex w-full max-w-lg flex-col gap-6 py-2">
+    <div className="mx-auto flex w-full max-w-lg flex-col gap-6 py-6 sm:py-2">
       <div className="flex flex-col gap-2">
         <h1 className="page-title">{isGuest ? "Save your account" : "Create your account"}</h1>
         <p className="text-muted">
@@ -158,9 +158,14 @@ export function SignupForm() {
           </p>
         )}
 
-        <button type="submit" disabled={!!busy} aria-busy={busy === "account"} className="btn btn-primary w-full">
+        <button type="submit" disabled={!!busy} aria-busy={busy === "account"} className="btn btn-primary w-full py-3 font-semibold shadow-xs">
           {busy === "account" ? "Creating your account…" : isGuest ? "Save my account" : "Create account"}
         </button>
+
+        <div className="flex items-center justify-center gap-1.5 text-[11px] text-muted">
+          <span>🛡️</span>
+          <span>No credit card required · Free instant translation & deal sealing</span>
+        </div>
 
         {!isGuest && (
           <>

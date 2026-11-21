@@ -2,10 +2,12 @@ import type { FastifyPluginAsync } from 'fastify';
 import {
   PrepareMessageRequestSchema,
   TranscribeAudioRequestSchema,
+  TranslateMessageRequestSchema,
 } from '@convocart/contracts';
 import { authenticate } from '../middleware/auth.js';
 import { prepareMessage } from '../services/message-prepare.service.js';
 import { transcribeAudio, getVoiceClip } from '../services/voice.service.js';
+import { translateText } from '../services/translation.service.js';
 
 export const messageRoutes: FastifyPluginAsync = async (app) => {
   /**
@@ -22,6 +24,24 @@ export const messageRoutes: FastifyPluginAsync = async (app) => {
       const parsedBody = PrepareMessageRequestSchema.parse(request.body);
       const result = await prepareMessage(request.user!.id, parsedBody);
       return reply.status(200).send(result);
+    }
+  );
+
+  /**
+   * POST /api/messages/translate
+   * On-demand translation of text to recipient language.
+   */
+  app.post(
+    '/api/messages/translate',
+    async (request, reply) => {
+      const parsed = TranslateMessageRequestSchema.parse(request.body);
+      const from = parsed.from || 'en';
+      const translatedText = await translateText(parsed.text, from, parsed.to);
+      return reply.status(200).send({
+        translatedText: translatedText ?? parsed.text,
+        from,
+        to: parsed.to,
+      });
     }
   );
 

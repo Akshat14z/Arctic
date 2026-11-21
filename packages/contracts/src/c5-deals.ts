@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { MoneySchema, LangCodeSchema } from './c1-conventions.js';
 
-export const DealStatusSchema = z.enum(['proposed', 'agreed', 'disputed']);
+export const DealStatusSchema = z.enum(['proposed', 'agreed', 'disputed', 'rejected']);
 export type DealStatus = z.infer<typeof DealStatusSchema>;
 
 export const DeliverySchema = z.object({
@@ -23,8 +23,10 @@ export const DealSchema = z.object({
     buyer: z.string().datetime().optional(),
     seller: z.string().datetime().optional(),
   }),
+  offeredBy: z.enum(['buyer', 'seller']).optional(),
+  offeredByName: z.string().optional(),
+  offerMessage: z.string().optional(),
   sealCode: z.string().optional(),
   status: DealStatusSchema,
 });
 export type Deal = z.infer<typeof DealSchema>;
-

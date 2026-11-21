@@ -73,7 +73,8 @@ function translateWithFallback(text: string, from: LangCode, to: LangCode): stri
     return COMMON_DICTIONARY[lower][to];
   }
 
-  return `[${LANG_LABELS[to]}] ${text}`;
+  // Graceful fallback: return the original text without bracket prefixes so formatting and meaning remain intact
+  return text;
 }
 
 const TRANSLATION_CACHE = new Map<string, string>();

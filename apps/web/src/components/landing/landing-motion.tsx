@@ -30,6 +30,7 @@ export function LandingMotion() {
 
     mm.add("(prefers-reduced-motion: no-preference)", () => {
       let streetIO: IntersectionObserver | undefined;
+      let walkerRO: ResizeObserver | undefined;
       root.classList.add("is-live");
 
       // Smooth scroll on one ticker with ScrollTrigger.
@@ -89,6 +90,9 @@ export function LandingMotion() {
             .to(walker, { x: far, duration: pace, ease: "none", repeat: -1, repeatRefresh: true, yoyo: true,
               onRepeat: () => gsap.set(figure, { scaleX: gsap.getProperty(figure, "scaleX") === 1 ? -1 : 1 }) }, 0)
             .to(figure, { y: -5, duration: 0.32, ease: "sine.inOut", yoyo: true, repeat: -1 }, 0);
+          // Refresh walker travel distance when the street resizes (e.g. font load, orientation change).
+          walkerRO = new ResizeObserver(() => ScrollTrigger.refresh());
+          walkerRO.observe(street);
         }
         // Play only while the street is on screen (an observer: reliable at the very bottom of the page).
         streetIO = new IntersectionObserver(([e]) => (e.isIntersecting ? sway.play() : sway.pause()));
@@ -97,6 +101,7 @@ export function LandingMotion() {
 
       return () => {
         streetIO?.disconnect();
+        walkerRO?.disconnect();
         root.classList.remove("is-live", "is-away");
         gsap.ticker.remove(tick);
         gsap.ticker.lagSmoothing(500, 33);

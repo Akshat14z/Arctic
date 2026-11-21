@@ -22,7 +22,7 @@ export function AppChrome({ children }: { children: React.ReactNode }) {
         </div>
       </header>
       {/* Pages opt into a wide layout (Home, the agent console) with a data-wide root element; the landing page with data-landing. */}
-      <main className="mx-auto flex w-full max-w-2xl flex-1 flex-col px-4 pt-4 pb-24 md:pb-8 has-[[data-wide]]:max-w-6xl has-[[data-landing]]:max-w-none has-[[data-landing]]:p-0">
+      <main className="mx-auto flex w-full max-w-2xl flex-1 flex-col px-4 pt-4 pb-[max(6rem,calc(4rem+env(safe-area-inset-bottom)))] md:pb-8 has-[[data-wide]]:max-w-6xl has-[[data-landing]]:max-w-none has-[[data-landing]]:p-0">
         {children}
       </main>
       <Suspense fallback={null}>

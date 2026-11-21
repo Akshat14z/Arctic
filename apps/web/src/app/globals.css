@@ -9,11 +9,12 @@
 @import "./tokens.css";
 @import "./base.css" layer(base);
 @import "./primitives.css" layer(components);
+@import "./landing-mobile.css";
 
 /* Page-level tokens on top of the brand tokens: next/font's generated families, Indic + Japanese fallbacks
    (Instrument Serif and Inter are Latin only), and the state tints the product needs. */
 :root {
-  --font-display: var(--font-instrument), "Noto Serif Devanagari", "Noto Serif JP", ui-serif, Georgia, serif;
+  --font-display: "Instrument Serif", var(--font-instrument), "Noto Serif Devanagari", "Noto Serif JP", ui-serif, Georgia, serif;
   --font-body: var(--font-inter), "Noto Sans", "Noto Sans Devanagari", "Noto Sans Tamil", "Noto Sans Telugu",
     "Noto Sans Kannada", "Noto Sans Bengali", "Hiragino Sans", "Noto Sans JP", ui-sans-serif, system-ui, sans-serif;
   --font-outlier: var(--font-body);

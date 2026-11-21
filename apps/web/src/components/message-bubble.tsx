@@ -12,10 +12,16 @@ import { useSpeech } from "@/lib/speak";
 export function MessageBubble({ message, lang }: { message: ChatMessage; lang: LangCode }) {
   const [showOriginal, setShowOriginal] = useState(false);
   const [audioGone, setAudioGone] = useState(false);
+  const [copied, setCopied] = useState(false);
   const extra = parseExtra(message.extra);
   const time = new Date(message.sentAt).toLocaleTimeString(localeFor(lang), { hour: "numeric", minute: "2-digit" });
+
+  const shown = pickDisplay(extra, message.text, lang, showOriginal);
+  const origName = extra && LANGUAGES.find((l) => l.code === extra.orig.lang)?.native;
+  const targetName = LANGUAGES.find((l) => l.code === lang)?.native ?? lang.toUpperCase();
+
   // Read aloud in the language actually shown (the reader's translation, or the original when toggled).
-  const speech = useSpeech(message.id, pickDisplay(extra, message.text, lang, showOriginal).lang ?? lang);
+  const speech = useSpeech(message.id, shown.lang ?? lang);
 
   if (extra?.kind === "system" && extra.system) {
     const scam = extra.system.event === "scam_warning";
@@ -29,17 +35,34 @@ export function MessageBubble({ message, lang }: { message: ChatMessage; lang: L
     );
   }
 
-  const shown = pickDisplay(extra, message.text, lang, showOriginal);
-  const origName = extra && LANGUAGES.find((l) => l.code === extra.orig.lang)?.native;
   // The sender was warned by Meaning Guard and sent it anyway: warn the reader too.
   const scam = !message.mine && extra?.guard?.issues.some((i) => i.kind === "scam_signal");
 
+  async function handleCopy() {
+    try {
+      await navigator.clipboard.writeText(shown.text);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {}
+  }
+
   return (
-    <div className={`flex max-w-[85%] flex-col gap-1 ${message.mine ? "items-end self-end" : "items-start self-start"}`}>
+    <div className={`flex max-w-[85%] flex-col gap-1.5 ${message.mine ? "items-end self-end" : "items-start self-start"}`}>
+      {/* Sender indicator for incoming */}
+      {!message.mine && message.from && (
+        <span className="agate px-1 text-[11px] font-semibold text-muted">
+          {message.from}
+        </span>
+      )}
+
+      {/* Bubble container */}
       <div
         lang={shown.lang}
-        className={message.mine ? "bubble bubble-mine" : "bubble"}
+        className={`group relative flex flex-col gap-1 break-words [overflow-wrap:anywhere] ${
+          message.mine ? "bubble bubble-mine shadow-xs" : "bubble shadow-xs"
+        }`}
       >
+        {/* Voice Note Audio Player */}
         {extra?.kind === "voice_note" && extra.audioUrl && (
           <span className="mb-1 flex flex-col gap-1">
             {audioGone ? (
@@ -56,33 +79,68 @@ export function MessageBubble({ message, lang }: { message: ChatMessage; lang: L
             )}
           </span>
         )}
-        {shown.text}
+
+        {/* Message Text */}
+        <p className="whitespace-pre-wrap leading-relaxed">{shown.text}</p>
+
+        {/* Translation Indicator Badge */}
+        {shown.translated && !showOriginal && (
+          <span className="mt-0.5 inline-flex items-center gap-1 text-[10px] opacity-75 font-medium">
+            <span>🌐 Translated to {targetName}</span>
+          </span>
+        )}
       </div>
+
+      {/* Scam Warning Alert */}
       {scam && (
-        <p role="alert" className="note note-error max-w-full">
-          <strong>Be careful.</strong> This asks to move the deal or payment off Handshake. Payments outside Handshake
-          aren&apos;t protected, and we can&apos;t help if something goes wrong.
+        <p role="alert" className="note note-error max-w-full text-xs">
+          <strong>Security Notice:</strong> This message asks to move off-platform. Off-platform deals lack Handshake Seal protection.
         </p>
       )}
-      <div className="meta flex flex-wrap items-center gap-x-3">
-        <time dateTime={new Date(message.sentAt).toISOString()} className="agate">{time}</time>
+
+      {/* Metadata & Actions row */}
+      <div className="meta flex flex-wrap items-center gap-x-2 text-xs">
+        <time dateTime={new Date(message.sentAt).toISOString()} className="agate">
+          {time}
+        </time>
+
+        {/* Copy Button */}
+        <button
+          type="button"
+          onClick={handleCopy}
+          aria-label="Copy message text"
+          className="text-muted hover:text-text transition-colors"
+          title="Copy text"
+        >
+          {copied ? "Copied" : "Copy"}
+        </button>
+
+        {/* Speech Read-Aloud */}
         {speech.available && shown.text.trim() && (
           <button
             type="button"
             onClick={() => speech.toggle(shown.text)}
             aria-pressed={speech.active}
             aria-label={speech.active ? "Stop reading aloud" : "Read aloud"}
-            className="inline-flex min-h-tap items-center gap-1 underline decoration-border underline-offset-2 transition-colors hover:text-text hover:decoration-text"
+            className="inline-flex items-center gap-1 text-muted hover:text-text transition-colors"
           >
-            <svg aria-hidden="true" viewBox="0 0 24 24" className="size-4" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-              {speech.active ? <path d="M7 7h10v10H7z" /> : <path d="M4 9v6h4l5 4V5L8 9H4zm12.5 0a4 4 0 0 1 0 6M19 6.5a8 8 0 0 1 0 11" />}
-            </svg>
-            {speech.active ? "Stop" : "Listen"}
+            {speech.active ? "■ Stop" : "🔊 Listen"}
           </button>
         )}
+
+        {/* Toggle Original / Translation */}
         {shown.canToggle && (
-          <button type="button" onClick={() => setShowOriginal((v) => !v)} className="min-h-tap underline decoration-border underline-offset-2 transition-colors hover:text-text hover:decoration-text" aria-pressed={showOriginal}>
-            {showOriginal ? "Show translation" : <>See original (<span lang={extra?.orig.lang}>{origName}</span>)</>}
+          <button
+            type="button"
+            onClick={() => setShowOriginal((v) => !v)}
+            className="font-medium underline decoration-border hover:decoration-text hover:text-text transition-colors"
+            aria-pressed={showOriginal}
+          >
+            {showOriginal ? (
+              `Show ${targetName} translation`
+            ) : (
+              <>See original ({origName ?? extra?.orig.lang})</>
+            )}
           </button>
         )}
       </div>

@@ -124,6 +124,9 @@ export type MeResponse = z.infer<typeof MeResponseSchema>;
 export const UpdateMeRequestSchema = z.object({
   displayName: z.string().min(1).max(50).optional(),
   language: LangCodeSchema.optional(),
+  email: z.string().email().optional(),
+  currentPassword: z.string().optional(),
+  newPassword: z.string().min(8, 'New password must be at least 8 characters').optional(),
 });
 export type UpdateMeRequest = z.infer<typeof UpdateMeRequestSchema>;
 
@@ -219,6 +222,34 @@ export const DealAgreeResponseSchema = z.object({
   deal: DealSchema,
 });
 export type DealAgreeResponse = z.infer<typeof DealAgreeResponseSchema>;
+
+export const CreateOfferRequestSchema = z.object({
+  channelId: z.string().min(1),
+  priceAmount: z.number().positive('Offer price must be greater than zero'),
+  currency: z.enum(['INR', 'USD', 'EUR', 'GBP', 'JPY']).default('INR'),
+  message: z.string().max(500).optional(),
+  deliveryMethod: z.enum(['pickup', 'shipping']).default('pickup'),
+});
+export type CreateOfferRequest = z.infer<typeof CreateOfferRequestSchema>;
+
+export const RejectDealResponseSchema = z.object({
+  deal: DealSchema,
+});
+export type RejectDealResponse = z.infer<typeof RejectDealResponseSchema>;
+
+export const TranslateMessageRequestSchema = z.object({
+  text: z.string().min(1),
+  from: LangCodeSchema.optional(),
+  to: LangCodeSchema,
+});
+export type TranslateMessageRequest = z.infer<typeof TranslateMessageRequestSchema>;
+
+export const TranslateMessageResponseSchema = z.object({
+  translatedText: z.string(),
+  from: LangCodeSchema,
+  to: LangCodeSchema,
+});
+export type TranslateMessageResponse = z.infer<typeof TranslateMessageResponseSchema>;
 
 export const DealResponseSchema = z.object({
   deal: DealSchema,

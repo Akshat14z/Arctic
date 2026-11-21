@@ -132,7 +132,7 @@ export function Composer({ channel, channelId, lang, token, disabled, onSent }: 
   }
 
   return (
-    <div className="flex flex-col gap-1 border-t border-border bg-bg pt-3">
+    <div className="flex flex-col gap-1 border-t border-border bg-bg pt-3 pb-[env(safe-area-inset-bottom,0px)]">
       {held && (
         <GuardSheet
           voice={held.extra.kind === "voice_note"}

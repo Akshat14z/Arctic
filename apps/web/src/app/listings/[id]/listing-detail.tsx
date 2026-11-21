@@ -46,12 +46,12 @@ function ChatWithSeller({ listingId }: { listingId: string }) {
         onClick={open}
         disabled={busy}
         aria-busy={busy}
-        className="btn btn-primary w-full sm:w-auto sm:self-start"
+        className="btn btn-primary w-full py-3.5 text-base font-semibold shadow-md"
       >
-        {busy ? "Opening chat…" : "Chat with seller"}
+        {busy ? "Opening Negotiation Chat…" : "💬 Chat with Seller & Make Offer"}
       </button>
       {error && (
-        <p role="alert" className="note note-error">
+        <p role="alert" className="note note-error text-xs">
           {error}
         </p>
       )}
@@ -62,7 +62,6 @@ function ChatWithSeller({ listingId }: { listingId: string }) {
 export function ListingDetail() {
   const { id } = useParams<{ id: string }>();
   const session = useSession();
-  // Guests (often arriving from a WhatsApp link) read in their browser's language until they pick one.
   const [guestLang, setGuestLang] = useState<LangCode | null>(null);
   useEffect(() => setGuestLang(preferredLanguage(navigator.languages)), []);
   const lang = session?.user.language ?? guestLang ?? "en";
@@ -72,7 +71,7 @@ export function ListingDetail() {
 
   const hydrated = session !== undefined && (session !== null || guestLang !== null);
   useEffect(() => {
-    if (!hydrated) return; // wait for the session so we fetch once, in the right language
+    if (!hydrated) return;
     let live = true;
     setError(null);
     api(`/api/listings/${encodeURIComponent(id)}?lang=${lang}`, { schema: ListingDetailResponseSchema }).then(
@@ -86,12 +85,12 @@ export function ListingDetail() {
 
   if (error) {
     return (
-      <section className="flex flex-1 flex-col items-start justify-center gap-4">
-        <h1 className="page-title">{error.notFound ? "Listing not found" : "Couldn't load this listing"}</h1>
-        <p className="text-muted">{error.text}</p>
+      <section className="flex flex-1 flex-col items-center justify-center gap-4 py-16 text-center">
+        <h1 className="page-title text-2xl font-bold">{error.notFound ? "Listing not found" : "Couldn't load this listing"}</h1>
+        <p className="meta max-w-md">{error.text}</p>
         {error.notFound ? (
           <Link href="/listings" className="btn btn-primary">
-            Browse listings
+            Back to Marketplace
           </Link>
         ) : (
           <button
@@ -108,76 +107,133 @@ export function ListingDetail() {
 
   if (!listing)
     return (
-      <div aria-busy className="flex flex-col gap-4">
-        <div className="skeleton aspect-[4/3] w-full" />
-        <div className="skeleton h-8 w-3/4" />
-        <div className="skeleton h-6 w-1/3" />
-        <div className="skeleton h-20 w-full" />
+      <div aria-busy className="grid grid-cols-1 md:grid-cols-2 gap-6 py-6">
+        <div className="skeleton aspect-[4/3] w-full rounded-2xl" />
+        <div className="flex flex-col gap-4">
+          <div className="skeleton h-10 w-3/4 rounded-xl" />
+          <div className="skeleton h-8 w-1/3 rounded-xl" />
+          <div className="skeleton h-32 w-full rounded-xl" />
+          <div className="skeleton h-12 w-full rounded-xl mt-4" />
+        </div>
       </div>
     );
 
   const mine = session?.user.id === listing.sellerId;
   const original = listing.lang !== lang ? LANGUAGES.find((l) => l.code === listing.lang) : undefined;
-  const textLang = original ? lang : listing.lang; // the server translates title + description for ?lang=
+  const textLang = original ? lang : listing.lang;
 
   return (
-    <article data-wide className="grid grid-cols-1 items-start gap-3 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] md:gap-5">
-      {listing.imageUrl ? (
-        // eslint-disable-next-line @next/next/no-img-element -- arbitrary seller URLs
-        <img
-          src={listing.imageUrl}
-          alt={listing.title}
-          fetchPriority="high"
-          className="aspect-[4/3] w-full rounded-[var(--radius-card)] border border-border object-cover md:sticky md:top-4 md:row-span-3 md:aspect-[4/5]"
-        />
-      ) : (
-        <div aria-hidden className="grid aspect-[4/3] w-full place-items-center rounded-[var(--radius-card)] border border-border bg-surface-2 font-display text-7xl text-muted md:row-span-3 md:aspect-[4/5]">
-          {listing.title.trim().charAt(0).toUpperCase()}
-        </div>
-      )}
+    <article data-wide className="flex flex-col gap-6 py-2">
+      {/* Breadcrumb */}
+      <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-xs text-muted">
+        <Link href="/listings" className="hover:text-text transition-colors">Marketplace</Link>
+        <span>/</span>
+        <span className="text-text font-medium truncate max-w-xs">{listing.title}</span>
+      </nav>
 
-      <section className="tile tile-hero gap-4">
-        <div className="flex flex-col gap-1">
-          <h1 lang={textLang} className="page-title text-balance">
-            {listing.title}
-          </h1>
-          <p className="meta flex flex-wrap items-center gap-2">
-            {listing.isDemo && <DemoBadge />}
-            {original && (
-              <span>
-                Written in <span lang={original.code}>{original.native}</span>, shown in your language
-              </span>
+      {/* Main Showcase Grid */}
+      <div className="grid grid-cols-1 items-start gap-6 md:grid-cols-2">
+        {/* Left: Product Image */}
+        <div className="overflow-hidden rounded-2xl border border-border bg-surface-2 shadow-sm">
+          {listing.imageUrl ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={listing.imageUrl}
+              alt={listing.title}
+              fetchPriority="high"
+              className="aspect-[4/3] w-full object-cover transition-transform duration-300 hover:scale-[1.02]"
+            />
+          ) : (
+            <div aria-hidden className="grid aspect-[4/3] w-full place-items-center font-display text-8xl text-muted/40">
+              {listing.title.trim().charAt(0).toUpperCase()}
+            </div>
+          )}
+        </div>
+
+        {/* Right: Pricing, Actions, Description */}
+        <div className="flex flex-col gap-5">
+          <div className="rounded-2xl border border-border bg-surface p-6 shadow-sm flex flex-col gap-4">
+            <div className="flex items-center gap-2 flex-wrap">
+              {listing.isDemo && <DemoBadge />}
+              {original && (
+                <span className="agate rounded-md bg-surface-2 px-2 py-0.5 text-xs text-muted">
+                  Written in {original.native} · Translated to your language
+                </span>
+              )}
+            </div>
+
+            <h1 lang={textLang} className="text-2xl sm:text-3xl font-bold tracking-tight text-text leading-tight">
+              {listing.title}
+            </h1>
+
+            <div className="flex items-baseline justify-between border-y border-border/80 py-3">
+              <div>
+                <span className="meta text-xs block">Offered At</span>
+                <span className="agate text-3xl font-black text-text">
+                  {formatPrice(listing.price, lang)}
+                </span>
+              </div>
+              <span className="agate text-xs text-muted">Fixed & Negotiable</span>
+            </div>
+
+            {mine ? (
+              <div className="rounded-xl bg-surface-2 p-3 text-center text-xs text-muted font-medium">
+                This is your listing. Check your chats to respond to buyer inquiries.
+              </div>
+            ) : (
+              <ChatWithSeller listingId={listing.id} />
             )}
-          </p>
-        </div>
-        <p className="figure">{formatPrice(listing.price, lang)}</p>
-        {mine ? <p className="meta">This is your listing.</p> : <ChatWithSeller listingId={listing.id} />}
-      </section>
-
-      <section className="tile">
-        <h2 className="tile-title">About this item</h2>
-        <p lang={textLang} className="max-w-prose whitespace-pre-line text-pretty">
-          {listing.description}
-        </p>
-        {listing.seller && (
-          <div className="row mt-1 border-t border-border">
-            <span className="row-icon" aria-hidden>
-              {listing.seller.displayName.trim().charAt(0).toUpperCase()}
-            </span>
-            <span className="flex min-w-0 flex-1 flex-col">
-              <span className="row-title">{listing.seller.displayName}</span>
-              <span className="meta">Seller</span>
-            </span>
-            <time dateTime={listing.createdAt} className="meta shrink-0">
-              Listed {new Date(listing.createdAt).toLocaleDateString(localeFor(lang), { day: "numeric", month: "short" })}
-            </time>
           </div>
-        )}
-      </section>
 
-      <section className="tile">
-        <ShareListing listing={listing} lang={lang} mine={mine} />
-      </section>
+          {/* Description Card */}
+          <div className="rounded-2xl border border-border bg-surface p-6 shadow-sm flex flex-col gap-3">
+            <h2 className="text-base font-semibold text-text">Item Details</h2>
+            <p lang={textLang} className="text-sm text-text leading-relaxed whitespace-pre-line">
+              {listing.description}
+            </p>
+
+            {listing.seller && (
+              <div className="mt-2 flex items-center justify-between border-t border-border pt-3 text-xs">
+                <div className="flex items-center gap-2.5">
+                  <span className="grid size-8 place-items-center rounded-full bg-accent text-white font-bold text-xs">
+                    {listing.seller.displayName.trim().charAt(0).toUpperCase()}
+                  </span>
+                  <div>
+                    <p className="font-semibold text-text">{listing.seller.displayName}</p>
+                    <p className="meta text-[11px]">Verified Seller</p>
+                  </div>
+                </div>
+                <time dateTime={listing.createdAt} className="agate text-muted">
+                  Listed {new Date(listing.createdAt).toLocaleDateString(localeFor(lang), { day: "numeric", month: "short", year: "numeric" })}
+                </time>
+              </div>
+            )}
+          </div>
+
+          {/* Guarantee / Trust Features */}
+          <div className="rounded-2xl border border-border bg-surface-2 p-4 text-xs text-muted grid grid-cols-2 gap-3">
+            <div className="flex items-start gap-2">
+              <span className="text-base">🛡️</span>
+              <div>
+                <p className="font-semibold text-text">Handshake Seal</p>
+                <p className="text-[11px]">Mutual deal locking with tamper-proof QR code.</p>
+              </div>
+            </div>
+            <div className="flex items-start gap-2">
+              <span className="text-base">🌐</span>
+              <div>
+                <p className="font-semibold text-text">Auto-Translation</p>
+                <p className="text-[11px]">Chat across 8 languages with zero language barriers.</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Share */}
+          <div className="rounded-2xl border border-border bg-surface p-4 shadow-sm">
+            <ShareListing listing={listing} lang={lang} mine={mine} />
+          </div>
+        </div>
+      </div>
     </article>
   );
 }

@@ -123,8 +123,12 @@ export function AccountMenu() {
   const isAgent = user.role === "agent";
   const isGuest = !isAgent && !user.isDemo && !email;
   const links = isAgent
-    ? [{ href: "/agent", label: "Dispatch" }]
+    ? [
+        { href: "/agent", label: "Dispatch" },
+        { href: "/profile", label: "Profile & Settings" },
+      ]
     : [
+        { href: "/profile", label: "My Profile & Settings" },
         { href: "/home", label: "Home" },
         { href: "/chats", label: "My chats" },
         { href: "/listings?mine=1", label: "My listings" },
@@ -138,7 +142,7 @@ export function AccountMenu() {
       >
         {user.displayName.trim().charAt(0).toUpperCase()}
       </summary>
-      <div className="absolute right-0 z-[var(--z-dropdown)] mt-2 flex w-72 max-w-[calc(100vw-2rem)] flex-col gap-3 rounded-[20px] border border-border bg-surface p-4 shadow-[0_18px_40px_-18px_var(--color-shadow)]">
+      <div className="absolute right-0 z-[var(--z-dropdown)] mt-2 flex w-72 max-w-[calc(100vw-1rem)] max-h-[min(28rem,80dvh)] overflow-y-auto flex-col gap-3 rounded-[20px] border border-border bg-surface p-4 shadow-[0_18px_40px_-18px_var(--color-shadow)]">
         <div className="flex flex-col gap-0.5">
           <p className="font-medium break-words">{user.displayName}</p>
           <p className="meta break-all">{email ?? (user.isDemo ? "Demo account" : isAgent ? "Support agent" : "Guest account, on this device only")}</p>

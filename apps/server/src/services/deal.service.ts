@@ -317,3 +317,138 @@ export async function getSealByCode(
     ...(proof ? { proof } : {}),
   };
 }
+
+/**
+ * Creates an explicit structured offer with mandatory price validation and optional message.
+ */
+export async function createOffer(
+  channelId: string,
+  userId: string,
+  input: {
+    priceAmount: number;
+    currency?: Money['currency'];
+    message?: string;
+    deliveryMethod?: 'pickup' | 'shipping';
+  }
+): Promise<Deal> {
+  const chat = await prisma.chat.findUnique({
+    where: { channelId },
+    include: {
+      listing: {
+        include: {
+          translations: true,
+        },
+      },
+      buyer: true,
+      seller: true,
+    },
+  });
+
+  if (!chat) {
+    throw new AppError('CHAT_NOT_FOUND', 'Chat conversation not found', 404);
+  }
+
+  const isBuyer = chat.buyerId === userId;
+  const isSeller = chat.sellerId === userId;
+
+  if (!isBuyer && !isSeller) {
+    throw new AppError('FORBIDDEN', 'Only participants in this conversation can create an offer', 403);
+  }
+
+  const userRole: 'buyer' | 'seller' = isBuyer ? 'buyer' : 'seller';
+  const user = isBuyer ? chat.buyer : chat.seller;
+  const currency = (input.currency || chat.listing.priceCurrency || 'INR') as Money['currency'];
+  const deliveryMethod = input.deliveryMethod || 'pickup';
+
+  // Multilingual item map
+  const itemMap: Partial<Record<LangCode, string>> = {};
+  const listingLang = chat.listing.lang as LangCode;
+  itemMap[listingLang] = chat.listing.title;
+
+  for (const tr of chat.listing.translations) {
+    itemMap[tr.lang as LangCode] = tr.title;
+  }
+
+  for (const lang of ALL_LANGUAGES) {
+    if (!itemMap[lang]) {
+      try {
+        itemMap[lang] = (await translateText(chat.listing.title, listingLang, lang)) ?? chat.listing.title;
+      } catch {
+        itemMap[lang] = chat.listing.title;
+      }
+    }
+  }
+
+  const dealId = `d_${randomBytes(6).toString('hex')}`;
+  const now = new Date();
+  const dealData: Deal = {
+    id: dealId,
+    listingId: chat.listingId,
+    channelId: chat.channelId,
+    item: itemMap as Record<LangCode, string>,
+    price: {
+      amount: input.priceAmount,
+      currency,
+    },
+    quantity: 1,
+    delivery: { method: deliveryMethod },
+    conditions: buildDefaultConditions(deliveryMethod),
+    agreedBy: {
+      [userRole]: now.toISOString(),
+    },
+    offeredBy: userRole,
+    offeredByName: user.displayName,
+    offerMessage: input.message?.trim() || undefined,
+    status: 'proposed',
+  };
+
+  await prisma.deal.create({
+    data: {
+      id: dealId,
+      channelId: chat.channelId,
+      listingId: chat.listingId,
+      payload: dealData as unknown as Prisma.InputJsonValue,
+      status: 'proposed',
+      agreedBuyerAt: isBuyer ? now : null,
+      agreedSellerAt: isSeller ? now : null,
+    },
+  });
+
+  return dealData;
+}
+
+/**
+ * Rejects / declines a proposed deal.
+ */
+export async function rejectDeal(dealId: string, userId: string): Promise<Deal> {
+  const dealRecord = await prisma.deal.findUnique({
+    where: { id: dealId },
+    include: {
+      chat: true,
+    },
+  });
+
+  if (!dealRecord) {
+    throw new AppError('DEAL_NOT_FOUND', 'Deal not found', 404);
+  }
+
+  if (dealRecord.chat.buyerId !== userId && dealRecord.chat.sellerId !== userId) {
+    throw new AppError('FORBIDDEN', 'Only participants in this deal can decline it', 403);
+  }
+
+  const existingPayload = dealRecord.payload as unknown as Deal;
+  const updatedPayload: Deal = {
+    ...existingPayload,
+    status: 'rejected',
+  };
+
+  await prisma.deal.update({
+    where: { id: dealId },
+    data: {
+      status: 'rejected',
+      payload: updatedPayload as unknown as Prisma.InputJsonValue,
+    },
+  });
+
+  return updatedPayload;
+}

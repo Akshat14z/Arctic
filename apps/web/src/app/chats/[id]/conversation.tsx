@@ -112,6 +112,8 @@ export function Conversation() {
         session={session}
         channel={channel}
         channelId={chat.channelId}
+        listingTitle={chat.listing.title}
+        originalPrice={chat.listing.price}
         emptyText={`Say hello. ${other.displayName} reads your messages in their own language.`}
         deals={{
           myRole: chat.buyerId === me ? "buyer" : "seller",

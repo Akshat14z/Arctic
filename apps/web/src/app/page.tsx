@@ -219,6 +219,85 @@ export default function Home() {
         />
       </div>
 
+      {/* Featured Marketplace Showcase */}
+      <section className="l-wrap py-12 flex flex-col gap-6">
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-border pb-4">
+          <div>
+            <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-text">Live Cross-Border Marketplace</h2>
+            <p className="meta text-xs sm:text-sm">Real-time translated listings and instant deal locking with Handshake Seal.</p>
+          </div>
+          <Link href="/listings" className="l-btn l-btn-sm self-start sm:self-auto">
+            Explore All Listings →
+          </Link>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+          {[
+            {
+              id: "demo-watch",
+              title: "Vintage Seiko Automatic Watch (1978)",
+              price: "₹15,000",
+              seller: "Kenji Sato",
+              lang: "Japanese",
+              tag: "Verified Deal",
+            },
+            {
+              id: "demo-camera",
+              title: "Sony Alpha A7 III Full-Frame Camera",
+              price: "₹84,000",
+              seller: "Arjun Verma",
+              lang: "Hindi",
+              tag: "Tech & Optical",
+            },
+            {
+              id: "demo-shawl",
+              title: "Handspun Kashmiri Pashmina Shawl",
+              price: "₹11,500",
+              seller: "Priya Sharma",
+              lang: "Hindi",
+              tag: "Handcrafted",
+            },
+            {
+              id: "demo-knife",
+              title: "Kyocera Damascus Santoku Chef Knife",
+              price: "₹6,800",
+              seller: "Takumi Mori",
+              lang: "Japanese",
+              tag: "Artisan Steel",
+            },
+          ].map((item) => (
+            <Link
+              key={item.id}
+              href="/listings"
+              className="group relative flex flex-col justify-between overflow-hidden rounded-2xl border border-border bg-surface p-3.5 transition-all duration-200 hover:-translate-y-1 hover:border-accent/50 hover:shadow-lg no-underline text-text"
+            >
+              <div>
+                <div className="relative aspect-[4/3] w-full overflow-hidden rounded-xl bg-surface-2 border border-border/80">
+                  <span className="absolute top-2 left-2 z-10 rounded-md bg-black/75 px-2 py-0.5 text-[10px] font-semibold text-white backdrop-blur-xs">
+                    {item.tag}
+                  </span>
+                  <div className="grid size-full place-items-center bg-gradient-to-br from-surface-2 to-[var(--color-rule)] font-display text-4xl text-muted/60">
+                    {item.title.charAt(0)}
+                  </div>
+                </div>
+
+                <div className="mt-3 flex flex-col gap-1">
+                  <h3 className="line-clamp-1 text-sm font-semibold text-text group-hover:text-accent transition-colors">
+                    {item.title}
+                  </h3>
+                  <p className="agate text-base font-bold text-text">{item.price}</p>
+                </div>
+              </div>
+
+              <div className="mt-3 flex items-center justify-between border-t border-border/60 pt-2 text-xs text-muted">
+                <span>{item.seller} ({item.lang})</span>
+                <span className="font-semibold text-accent group-hover:underline">Chat & Offer →</span>
+              </div>
+            </Link>
+          ))}
+        </div>
+      </section>
+
       {/* Support */}
       <section className="l-wrap l-agent">
         <div className="l-agent-head">

@@ -1,0 +1,41 @@
+/* ── Landing page mobile overrides ── */
+
+/* Narrow phones: tighter grid squares */
+@media (max-width: 24.375rem) {
+  [data-landing] { background-size: 48px 48px; }
+}
+
+/* Hero: clip drift words that overflow on small screens */
+@media (max-width: 47.99rem) {
+  .l-hero { overflow-x: clip; }
+}
+
+/* Spec section: always single-column; two-column only on large screens (already set in landing.css but guard explicitly) */
+.l-spec { grid-template-columns: minmax(0, 1fr); }
+@media (min-width: 64rem) { .l-spec { grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); } }
+
+/* Fan section: clamp the min-height so it doesn't crush small phones */
+.l-fan { position: relative; min-height: clamp(18rem, 55vw, 34rem); }
+
+/* Nav CTA: smaller on very narrow phones */
+@media (max-width: 29.99rem) {
+  .l-btn:not(.l-btn-sm) { min-height: 2.75rem; padding: 0 var(--space-md); font-size: var(--text-sm); }
+}
+
+/* Story section: reduce font size and vertical padding on phones */
+@media (max-width: 47.99rem) {
+  .l-story { padding-block: var(--space-2xl); font-size: clamp(1.5rem, 7vw, 2rem); }
+}
+
+/* Agent section: stack on narrow screens */
+@media (max-width: 47.99rem) {
+  .l-agent { flex-direction: column; gap: var(--space-lg); }
+  .l-agent-shot img { border-radius: 16px; }
+}
+
+/* Footer: stack on phones */
+@media (max-width: 47.99rem) {
+  .l-footer { flex-direction: column; gap: var(--space-lg); }
+  .l-footer nav { flex-wrap: wrap; gap: var(--space-sm); }
+}
+

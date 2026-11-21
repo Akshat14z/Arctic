@@ -63,7 +63,7 @@
 .bubble { padding: var(--space-xs) var(--space-md); border: var(--rule-hair) solid var(--color-rule); border-radius: var(--radius-lg, 20px); background: var(--color-paper-2); color: var(--color-ink); white-space: pre-wrap; overflow-wrap: anywhere; }
 .bubble-mine { background: var(--color-accent); border-color: var(--color-accent); color: var(--color-accent-ink); }
 
-.skeleton { background: var(--color-paper-2); border-radius: var(--radius-field); }
+.skeleton { background: var(--color-paper-2); border-radius: var(--radius-field); min-width: 0; }
 @media (prefers-reduced-motion: no-preference) { .skeleton { animation: skeleton-pulse 1.4s var(--ease-in-out) infinite alternate; } }
 @keyframes skeleton-pulse { from { opacity: 1; } to { opacity: 0.55; } }
 
@@ -83,7 +83,7 @@
 
 /* Segmented filter (All / Buying / Selling): a pill track, the active pill white. */
 .seg { display: inline-flex; gap: var(--space-2xs); padding: var(--space-2xs); border-radius: var(--radius-pill); background: var(--color-paper-3); }
-.seg > button, .seg > a { min-height: 2.75rem; padding: 0 var(--space-md); border-radius: var(--radius-pill); font: 500 var(--text-sm)/1 var(--font-body); color: var(--color-muted); background: transparent; border: 0; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; transition: background-color var(--dur-micro) var(--ease-out), color var(--dur-micro) var(--ease-out); }
+.seg > button, .seg > a { min-height: 2.75rem; min-width: 2.75rem; padding: 0 var(--space-md); border-radius: var(--radius-pill); font: 500 var(--text-sm)/1 var(--font-body); color: var(--color-muted); background: transparent; border: 0; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; transition: background-color var(--dur-micro) var(--ease-out), color var(--dur-micro) var(--ease-out); }
 .seg > :hover { color: var(--color-ink); }
 .seg > [aria-pressed="true"], .seg > [aria-current="page"] { background: var(--color-accent); color: var(--color-accent-ink); }
 

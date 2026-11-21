@@ -74,12 +74,12 @@ export function HomeView() {
         </div>
       )}
 
-      <div data-stagger className="grid grid-cols-1 gap-3 md:grid-cols-3">
+      <div data-stagger className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3">
         {/* Hero: pick up where you left off, or find something */}
         {loading ? (
-          <div className="skeleton h-56 md:col-span-2" />
+          <div className="skeleton h-56 sm:col-span-2" />
         ) : latest ? (
-          <article className="tile tile-hero min-h-56 justify-between md:col-span-2">
+          <article className="tile tile-hero min-h-56 justify-between sm:col-span-2">
             <div>
               <h2 className="tile-title">Continue with {latest.otherUser.displayName}</h2>
               <p lang={latest.listing.lang} className="meta break-words">
@@ -91,7 +91,7 @@ export function HomeView() {
             <Go href={`/chats/${encodeURIComponent(latest.channelId)}`} label={`Open the chat with ${latest.otherUser.displayName}`} />
           </article>
         ) : (
-          <article className="tile tile-hero min-h-56 justify-between md:col-span-2">
+          <article className="tile tile-hero min-h-56 justify-between sm:col-span-2">
             <div>
               <h2 className="tile-title">Find something to buy</h2>
               <p className="meta">Chat with any seller. You read every message in {native}.</p>
@@ -113,7 +113,7 @@ export function HomeView() {
         </article>
 
         {/* Chats */}
-        <article className="tile md:col-span-2">
+        <article className="tile sm:col-span-2">
           <h2 className="tile-title">Chats</h2>
           <Go href="/chats" label="All chats" />
           {loading ? (

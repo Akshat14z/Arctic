@@ -471,3 +471,319 @@ You can now safely switch all frontend calls (Listings, Chats, Messages Prepare,
    - `pnpm -r run typecheck` passes with 0 errors.
    - `pnpm -r run build` completes cleanly without warnings or errors.
    - Chrome console runs completely free of errors or unhandled warnings.
+
+
+---
+
+## Entry: 2026-11-21 — UI Polish, Mobile Responsiveness, Lenis/GSAP Smooth Scroll & Auth Hardening
+
+**From:** Akshat (coordinator)  
+**Priority legend:** P0 = must ship / P1 = high / P2 = nice-to-have  
+**Status key:** `[ ]` = open · `[x]` = done
+
+> **Context:** The existing UI/theme is **good and must NOT be redesigned**. All changes extend the existing design system (tokens.css, base.css, primitives.css, landing.css, globals.css). Do NOT introduce new UI libraries. Do NOT change fonts, colours, or layout structure. The app uses Next.js 16 App Router + Tailwind v4 + plain CSS. The landing page is `page.tsx` (data-landing). The app shell is `app-chrome.tsx`. Auth is a custom JWT flow (no Supabase), using `src/lib/session.ts` (localStorage) + `/api/auth/*` Fastify routes + Prisma/Postgres. **No Supabase** is in the stack — the user asked about it because they were uncertain; the existing custom auth is correct and must stay.
+
+> **Audit findings — existing assets already in place:**
+> - `lenis@1.3.27`, `gsap@3.15.1`, `@gsap/react@2.1.2` are **already installed** in `apps/web/package.json`.
+> - `LandingMotion` component (`src/components/landing/landing-motion.tsx`) already wires Lenis + GSAP ScrollTrigger + SplitText on the landing page. ✅
+> - Bottom tab bar (`BottomTabs` in `nav-links.tsx`) already renders on mobile below `md`. ✅
+> - `prefers-reduced-motion` guard is already respected throughout. ✅
+> - Sign-in (`/signin`) and sign-up (`/signup`) pages already exist and talk to `/api/auth/signin` / `/api/auth/signup` / `/api/auth/guest`. ✅
+> - `useRequireSession` redirects unauthenticated users to `/signin?next=...`. ✅
+
+> **What is broken / missing (found during audit):**
+> 1. Several fonts render clipped — caused by `overflow-x: clip` on `html, body` and missing `min-width: 0` guards inside flex children.
+> 2. The landing page grid background and hero drift words overflow on narrow phones (< 390 px).
+> 3. The home bento grid (`md:grid-cols-3`) has no `sm` column count — snaps directly from 1 to 3.
+> 4. The listings grid (`ListingsBrowser`) has no defined column count at mobile sizes; can render as one giant card.
+> 5. The account dropdown (`AccountMenu`) can overflow the viewport on narrow screens.
+> 6. The chats layout (`chats/layout.tsx`) may not handle the bottom-tabs safe-area padding on iOS Safari.
+> 7. `BottomTabs` is hidden inside a conversation — but on very small phones the composer can overlap the viewport without `env(safe-area-inset-bottom)`.
+> 8. The landing page `l-spec` two-column grid does not collapse to single-column below `64rem` on screens narrower than `640px`.
+> 9. The `l-fan` section min-height (`34rem`) is too tall on 375 px phones and clips the fan images.
+> 10. Auth pages (`/signin`, `/signup`) use `max-w-md` / `max-w-lg` but have no horizontal padding guard on 320 px screens.
+> 11. The `l-street` walker animation uses `street.clientWidth` which returns 0 on first render if the section is `overflow: hidden` — need a `ResizeObserver` refresh.
+> 12. The story chapter ScrollTrigger pin assumes `min-height: 40rem` but the chapter `end: "+=2600"` is not `invalidateOnRefresh` aligned with viewport changes.
+
+---
+
+### [x] UI-10 (P1) FIX FONT CLIPPING & OVERFLOW GLOBALLY
+
+**Files:** `src/app/base.css`, `src/app/globals.css`
+
+**Changes:**
+1. In `base.css`, change `html, body { overflow-x: clip; }` to:
+   ```css
+   html { overflow-x: clip; }
+   body { overflow-x: clip; }
+   ```
+   Add `min-width: 0;` to every flex child that holds text — specifically `.row-title`, `.tile > *`, `.bubble` — if not already present. Check `primitives.css` for any `flex` containers missing `min-width: 0` on direct children that hold headings.
+
+2. In `base.css`, ensure `h1, h2, h3` already have `overflow-wrap: break-word; min-width: 0;` (they do — just verify they are not inside a parent with `overflow: hidden` that also clips the ascender/descender).
+
+3. In `globals.css` `:root` override, verify `--font-display` resolves to the `--font-instrument` CSS variable emitted by `next/font`. If `var(--font-instrument)` is undefined at paint time (before the `<html>` class is set by Next.js), add `"Instrument Serif"` as the first literal fallback:
+   ```css
+   --font-display: "Instrument Serif", var(--font-instrument), "Noto Serif Devanagari", ...
+   ```
+
+**Acceptance:**
+- `h1` on `/signin`, `/home`, `/listings` renders without clipping at 320 px, 375 px, 414 px viewports.
+- No horizontal scrollbar at any viewport.
+
+---
+
+### [x] UI-11 (P1) MOBILE GRID — HOME BENTO
+
+**File:** `src/app/home/home-view.tsx`
+
+**Change:** The `data-stagger` bento grid currently jumps from `grid-cols-1` to `md:grid-cols-3` with no intermediate step. Add `sm:grid-cols-2` so the two-column layout kicks in at 640 px before jumping to three:
+
+```diff
+- <div data-stagger className="grid grid-cols-1 gap-3 md:grid-cols-3">
++ <div data-stagger className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3">
+```
+
+The hero tile (`md:col-span-2`) should stay full-width on mobile and span 2 at sm:
+```diff
+- <article className="tile tile-hero min-h-56 justify-between md:col-span-2">
++ <article className="tile tile-hero min-h-56 justify-between sm:col-span-2">
+```
+
+**Acceptance:** At 390 px the home bento shows a single column; at 640–768 px it shows two columns with the hero spanning both; above 768 px it shows three columns.
+
+---
+
+### [x] UI-12 (P1) MOBILE GRID — LISTINGS BROWSER
+
+**File:** `src/app/listings/listings-browser.tsx`
+
+**Change:** Find the product grid (the div that wraps `items.map(...)` → `<ListingCard>`). It likely has `grid-cols-2 md:grid-cols-3` or similar. Ensure:
+```
+grid-cols-2 sm:grid-cols-3 lg:grid-cols-4
+```
+Add `gap-3 sm:gap-4` so cards have breathing room on small screens.
+
+Also in `src/components/listing-card.tsx`: if the card has a fixed height, change to `min-h-*` so text does not clip. Add `overflow-wrap: anywhere` to the listing title element.
+
+**Acceptance:** At 375 px the grid shows 2 columns; at 640 px it shows 3; at 1024 px it shows 4. No text overflow clipping on listing titles.
+
+---
+
+### [x] UI-13 (P1) ACCOUNT DROPDOWN MOBILE FIX
+
+**File:** `src/components/nav-links.tsx` → `AccountMenu`
+
+**Change:** The dropdown `<div>` currently has `w-72 max-w-[calc(100vw-2rem)]`. On narrow screens (320 px) the `2rem` margin may not be enough because the button is `shrink-0` at the right edge. Fix by also adding `right-0` and removing any left positioning, and ensure the parent `<details>` is `relative`:
+
+```diff
+- <div className="absolute right-0 z-[var(--z-dropdown)] mt-2 flex w-72 max-w-[calc(100vw-2rem)] flex-col ...">
++ <div className="absolute right-0 z-[var(--z-dropdown)] mt-2 flex w-72 max-w-[calc(100vw-1rem)] flex-col ...">
+```
+
+Also cap max-height so it does not overflow the viewport vertically:
+```
+max-h-[min(28rem,80dvh)] overflow-y-auto
+```
+
+**Acceptance:** Dropdown is fully visible and scrollable at 320 px × 568 px (iPhone SE).
+
+---
+
+### [x] UI-14 (P0) SIGN-IN & SIGN-UP — HORIZONTAL PADDING ON SMALL PHONES
+
+**Files:** `src/app/signin/signin-form.tsx`, `src/app/signup/signup-form.tsx`, `src/app/signin/page.tsx`, `src/app/signup/page.tsx`
+
+**Change:** Both forms use `mx-auto w-full max-w-md` / `max-w-lg` but the page wrapper (`app-chrome.tsx` → `main`) already adds `px-4`. Verify the page files (`signin/page.tsx`, `signup/page.tsx`) wrap their form with at least `py-8 sm:py-16` so the form has vertical breathing room on mobile and the keyboard does not cover the submit button.
+
+In `signin-form.tsx` and `signup-form.tsx`, add `px-4 sm:px-0` to the outer `<div>` if `px-4` is not provided by the parent:
+```diff
+- <div className="mx-auto flex w-full max-w-md flex-col gap-6 py-2">
++ <div className="mx-auto flex w-full max-w-md flex-col gap-6 py-6 sm:py-2">
+```
+
+The "Continue as a guest" button should be `w-full` on mobile (already is — just verify).
+
+Also add `autocomplete="email"` / `autocomplete="current-password"` / `autocomplete="new-password"` where missing (check the signup form's password field wrapper).
+
+**Acceptance:**
+- Sign-in and sign-up forms are fully visible and usable on a 375 × 667 (iPhone 8) screen.
+- No form fields hidden behind the virtual keyboard (the page scrolls).
+- Password toggle button (from `PasswordField`) is reachable by thumb.
+
+---
+
+### [x] UI-15 (P1) LANDING PAGE PHONE FIXES
+
+**File:** `src/app/landing.css`
+
+**Changes:**
+
+1. **Grid background on narrow phones:** At `< 390px` the `96px` grid squares can feel too coarse. Add:
+   ```css
+   @media (max-width: 24.375rem) {
+     [data-landing] { background-size: 48px 48px; }
+   }
+   ```
+
+2. **Hero drift words:** The `.l-drift span:nth-child(n+2)` is already hidden on phones — but the first drift word can still overflow. Add `overflow: hidden` on the `.l-hero` container only for narrow screens:
+   ```css
+   @media (max-width: 47.99rem) {
+     .l-hero { overflow-x: clip; }
+   }
+   ```
+
+3. **Spec section single-column:** The `@media (min-width: 64rem)` already makes it two-column, but on 320–640 px with no explicit rule the grid might still be two-column from some inherited class. Explicitly set:
+   ```css
+   .l-spec { grid-template-columns: minmax(0, 1fr); }
+   @media (min-width: 64rem) { .l-spec { grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); } }
+   ```
+
+4. **Fan section height:** `.l-fan { min-height: 34rem }` is too tall at 375 px. Change to:
+   ```css
+   .l-fan { position: relative; min-height: clamp(18rem, 55vw, 34rem); }
+   ```
+
+5. **Nav on mobile:** The `.l-nav` has `justify-content: space-between` with the logo + `.l-link-wide` (hidden on phones) + `.l-btn`. On very narrow phones the two remaining items can be cramped. Add `gap: var(--space-sm)` and ensure the CTA button uses `l-btn-sm` on phones:
+   ```css
+   @media (max-width: 29.99rem) {
+     .l-btn:not(.l-btn-sm) { min-height: 2.75rem; padding: 0 var(--space-md); font-size: var(--text-sm); }
+   }
+   ```
+
+6. **Story section padding:** `.l-story` currently has `padding-block: var(--space-3xl)` (96px top/bottom). On phones reduce it:
+   ```css
+   @media (max-width: 47.99rem) {
+     .l-story { padding-block: var(--space-2xl); font-size: clamp(1.5rem, 7vw, 2rem); }
+   }
+   ```
+
+7. **Walker animation ResizeObserver:** In `landing-motion.tsx`, the `far()` function is `() => street.clientWidth - walker.offsetWidth`. If this evaluates to 0 (the section hasn't painted), the walker stays at 0. Wrap the walker GSAP call in a `ScrollTrigger.refresh()` and add a `ResizeObserver`:
+   ```ts
+   const ro = new ResizeObserver(() => ScrollTrigger.refresh());
+   ro.observe(street);
+   // in cleanup:
+   ro.disconnect();
+   ```
+
+**Acceptance:** Landing page renders correctly at 320 px, 375 px, 390 px, 428 px, 768 px, 1024 px, 1440 px. Walker starts moving on first scroll. No horizontal scrollbar.
+
+---
+
+### [x] UI-16 (P1) SAFE AREA & COMPOSER PADDING — CHAT PAGES
+
+**Files:** `src/app/chats/layout.tsx`, `src/components/composer.tsx`
+
+**Problem:** On iOS Safari with a home indicator bar, the bottom of the composer can be hidden behind the system bar. The `BottomTabs` already uses `pb-[env(safe-area-inset-bottom)]` — but the composer (inside a conversation) needs the same treatment.
+
+**Change:** In `composer.tsx` (or its parent wrapper in `chats/[id]/conversation.tsx`), add `pb-[env(safe-area-inset-bottom)]` to the fixed/sticky bottom bar that holds the input + send button. If the composer is `position: sticky; bottom: 0`, add:
+```css
+/* in globals.css or inline */
+.composer-bar { padding-bottom: env(safe-area-inset-bottom, 0px); }
+```
+Or as a Tailwind class: `pb-[env(safe-area-inset-bottom)]`.
+
+Also in `app-chrome.tsx`, the `<main>` has `pb-24 md:pb-8`. On iOS the 24 (96px) should be enough — but add `pb-[max(6rem,calc(4rem+env(safe-area-inset-bottom)))]` on mobile:
+```diff
+- className="... pb-24 md:pb-8 ..."
++ className="... pb-[max(6rem,calc(4rem+env(safe-area-inset-bottom)))] md:pb-8 ..."
+```
+
+**Acceptance:** On a simulated iPhone 14 Pro (393 × 852, home indicator), the message composer input is fully visible and tappable. The send button is not behind the home indicator.
+
+---
+
+### [x] UI-17 (P2) LENIS SMOOTH SCROLL — CONFIRM INTEGRATION
+
+**Files:** `src/components/landing/landing-motion.tsx` (already exists and correct)
+
+**Status:** Lenis 1.3.27 is already installed and instantiated in `LandingMotion`. **No new install needed.**
+
+**Verify only:** Confirm that `LandingMotion` is imported and rendered inside the landing page (`src/app/page.tsx`). If it is missing, add:
+```tsx
+import { LandingMotion } from "@/components/landing/landing-motion";
+// ... inside the JSX of the [data-landing] div:
+<LandingMotion />
+```
+
+Verify GSAP plugins are registered (they are: `ScrollTrigger`, `SplitText`, `useGSAP`). No action needed if already present.
+
+**Acceptance:** On the landing page, scrolling is smooth (eased) on desktop. Title lines rise in on load. The walker walks. `prefers-reduced-motion: reduce` disables all of this — the page still looks correct with no broken layout.
+
+---
+
+### [x] UI-18 (P0) AUTH — CONFIRM NO SUPABASE, CUSTOM JWT IS CORRECT
+
+**Status: Informational — no code changes required.**
+
+The auth system uses a custom JWT flow:
+- `POST /api/auth/signup` → Prisma writes user + hashed password → returns `AuthResponse` (sessionToken, nexconnToken, user).
+- `POST /api/auth/signin` → verifies password with `scrypt` + timing-safe compare → returns same shape.
+- `POST /api/auth/guest` → creates anonymous user with generated ID.
+- Client stores `AuthResponse` in `localStorage` (key `handshake.session`) via `src/lib/session.ts`.
+- `useRequireSession` redirects to `/signin?next=...` if `session === null`.
+- `useSession()` returns `undefined` during SSR hydration, `null` when signed out, `AuthResponse` when signed in.
+
+**This is correct. No Supabase integration exists or is needed.** The user asked about Supabase — clarify to them: auth is custom, works, and does not need changes.
+
+**One hardening fix:** In `signin-form.tsx`, after `saveSession(res)`, the redirect is `router.replace(nextPath(...))`. Ensure `nextPath()` does not redirect to an external URL (open redirect). In `src/lib/next-path.ts`, verify the `next` param is validated to start with `/`. If not, add:
+```ts
+const safe = (p: string) => (p.startsWith("/") && !p.startsWith("//") ? p : "/home");
+```
+
+**Acceptance:** Signing up with a new email creates an account and redirects to `/home`. Signing in with correct credentials redirects to the `?next=` path (or `/home`). Wrong password shows "Incorrect email or password." Invalid `?next=` values redirect to `/home`.
+
+---
+
+### [x] UI-19 (P1) POLISH — SKELETON LOADERS & LOADING STATES
+
+**Files:** `src/app/primitives.css`, affected pages
+
+**Changes:**
+1. The `.skeleton` class already has a pulse animation in `primitives.css`. Verify it also has `border-radius: var(--radius-field)` so skeletons are not sharp rectangles.
+
+2. In `src/app/home/home-view.tsx`, the `loadingMine` case renders nothing for the "My listings" tile. Add a skeleton:
+   ```diff
+   - {loadingMine ? null : ...}
+   + {loadingMine ? <div className="skeleton h-40" /> : ...}
+   ```
+
+3. In `src/app/listings/listings-browser.tsx`, the initial load (before `page`) renders nothing. Add a skeleton grid:
+   ```tsx
+   {!page && !error && (
+     <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
+       {Array.from({ length: 8 }).map((_, i) => (
+         <div key={i} className="skeleton aspect-[3/4] rounded-[var(--radius-card)]" />
+       ))}
+     </div>
+   )}
+   ```
+
+**Acceptance:** All loading states show a pulsing skeleton, never a blank white area.
+
+---
+
+### [x] UI-20 (P2) POLISH — BUTTON & INTERACTIVE ELEMENT MINIMUM TAP SIZE
+
+**Files:** `src/app/primitives.css`
+
+**Change:** Verify every interactive element meets 44 × 44 px minimum. Check:
+- `.btn` — should have `min-height: 2.75rem` (44 px). Add if missing.
+- `.seg a` (the pill tab links) — should have `min-height: 2.75rem`. Add if missing.
+- `input[type="checkbox"]`, `input[type="radio"]` — add `min-width: 1.25rem; min-height: 1.25rem;` if not set.
+
+**Acceptance:** No tappable element is smaller than 44 × 44 px at any viewport.
+
+---
+
+### IMPLEMENTATION ORDER
+
+1. UI-10 (font clipping) — do first, it unblocks visual verification of everything else.
+2. UI-18 (auth confirm) — read-only, just verify and report.
+3. UI-14 (auth form mobile padding).
+4. UI-11, UI-12, UI-13 (home / listings / dropdown mobile grids).
+5. UI-15 (landing mobile fixes + walker ResizeObserver).
+6. UI-16 (safe area / composer).
+7. UI-17 (Lenis confirm).
+8. UI-19, UI-20 (polish).
+
+After all changes: run `pnpm -r run typecheck` and confirm 0 errors. No test suites to run.
