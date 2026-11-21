@@ -5,14 +5,23 @@ import { AuthResponseSchema, type AuthResponse } from "@convocart/contracts";
 
 // The signed-in session survives refresh in localStorage (ARCHITECTURE §3). Storage can be blocked or
 // corrupt, so every read is validated and every access is guarded.
-const KEY = "handshake.session";
+const BASE_KEY = "handshake.session";
+/**
+ * Judge mode (/try/both) runs two people side by side in two frames named "hs-seat-<role>". Each frame keeps its
+ * own session under its own key, so the two sign-ins never overwrite each other. Everywhere else: one key.
+ */
+export function seatName(): string | null {
+  if (typeof window === "undefined") return null;
+  return /^hs-seat-[a-z]+$/.test(window.name) ? window.name.slice(8) : null;
+}
+const key = () => (seatName() ? `${BASE_KEY}.${seatName()}` : BASE_KEY);
 const listeners = new Set<() => void>();
 let cache: { raw: string | null; value: AuthResponse | null } = { raw: null, value: null };
 
 function read(): AuthResponse | null {
   let raw: string | null = null;
   try {
-    raw = localStorage.getItem(KEY);
+    raw = localStorage.getItem(key());
   } catch {}
   if (raw !== cache.raw) {
     let value: AuthResponse | null = null;
@@ -23,7 +32,7 @@ function read(): AuthResponse | null {
       if (value && (value.sessionToken.startsWith("mock_") || value.nexconn.token === "mock-nexconn-token")) {
         value = null;
         try {
-          localStorage.removeItem(KEY);
+          localStorage.removeItem(key());
         } catch {}
       }
     } catch {}
@@ -34,8 +43,8 @@ function read(): AuthResponse | null {
 
 function write(value: AuthResponse | null) {
   try {
-    if (value) localStorage.setItem(KEY, JSON.stringify(value));
-    else localStorage.removeItem(KEY);
+    if (value) localStorage.setItem(key(), JSON.stringify(value));
+    else localStorage.removeItem(key());
   } catch {}
   listeners.forEach((l) => l());
 }

@@ -3,12 +3,13 @@
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import { SealDetailResponseSchema, type LangCode, type SealDetailResponse } from "@convocart/contracts";
+import { SealDetailResponseSchema, type LangCode, type Money, type SealDetailResponse } from "@convocart/contracts";
 import { api, ApiError, friendlyMessage } from "@/lib/api/client";
 import { formatPrice, localeFor } from "@/lib/format";
 import { LANGUAGES, preferredLanguage } from "@/lib/languages";
 import { useSession } from "@/lib/session";
 import { SealQr, useSealUrl } from "@/components/seal-qr";
+import { checkSealToken, proofFromHash, type SealCheck } from "@/lib/seal-proof";
 
 const pick = <T,>(r: Partial<Record<LangCode, T>>, lang: LangCode) => r[lang] ?? r.en ?? Object.values(r)[0];
 
@@ -20,7 +21,14 @@ export function SealView() {
   const [error, setError] = useState<{ text: string; notFound: boolean } | null>(null);
   const [attempt, setAttempt] = useState(0);
   const [copied, setCopied] = useState(false);
-  const url = useSealUrl(code);
+  const [check, setCheck] = useState<SealCheck | null>(null);
+  const url = useSealUrl(code, seal?.proof);
+
+  // The signed summary in the link's #p= fragment, checked on this device with Handshake's public key.
+  useEffect(() => {
+    const proof = proofFromHash(window.location.hash);
+    if (proof) void checkSealToken(proof).then(setCheck);
+  }, []);
 
   // The reader's language: their Handshake language if signed in, else the browser's. They can switch below.
   useEffect(() => {
@@ -39,6 +47,9 @@ export function SealView() {
       live = false;
     };
   }, [code, lang, attempt]);
+
+  // A definite "no such seal" from our server wins over the signature; the offline view is only for an unreachable server.
+  if (error && !error.notFound && check?.status === "valid" && check.payload.c === code) return <OfflineSeal check={check} />;
 
   if (error) {
     return (
@@ -65,8 +76,12 @@ export function SealView() {
   const conditions = pick(deal.conditions, lang) ?? [];
   const demo = deal.listingId.startsWith("demo_");
 
+  // The signed summary must match the live record: same code and price.
+  const mismatch = check?.status === "valid" && (check.payload.c !== code || check.payload.p !== deal.price.amount || check.payload.cur !== deal.price.currency);
+
   return (
     <section className="flex flex-col gap-6">
+      <ProofBanner check={check} mismatch={!!mismatch} />
       <header className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <h1 className="page-title flex items-center gap-2">
           <svg aria-hidden="true" viewBox="0 0 20 20" className="size-6 shrink-0 text-success" fill="none" stroke="currentColor" strokeWidth="2.5">
@@ -161,13 +176,73 @@ export function SealView() {
       </div>
 
       <p className="meta max-w-prose">
-        Only trust a seal shown on this site. Handshake looks up the code on our server, so a screenshot proves nothing by itself. Scan the QR
-        code or open the link yourself.
+        The QR code carries Handshake&apos;s digital signature of these terms. Scanning it checks the signature on your own phone, so
+        the price and names can&apos;t be faked, even without internet. A screenshot of this page proves nothing; scan the code.
       </p>
 
       <Link href="/" className="link self-start text-sm">
         What is Handshake?
       </Link>
+    </section>
+  );
+}
+
+/** What the on-device signature check found. Nothing to show when the link carried no proof. */
+function ProofBanner({ check, mismatch }: { check: SealCheck | null; mismatch: boolean }) {
+  if (!check) return null;
+  if (check.status === "valid" && !mismatch)
+    return (
+      <p role="status" className="note note-success">
+        <strong>Signed by Handshake.</strong> Checked on this device: these terms haven&apos;t been changed since both people agreed.
+      </p>
+    );
+  if (check.status === "unsupported")
+    return (
+      <p role="status" className="note">
+        This browser can&apos;t check the signature itself. Handshake&apos;s server confirmed the seal below.
+      </p>
+    );
+  return (
+    <p role="alert" className="note note-error">
+      <strong>Someone changed this link.</strong> The terms below come straight from Handshake and are the real ones. If you were shown a different
+      price or item, don&apos;t go ahead.
+    </p>
+  );
+}
+
+/** Handshake's server can't be reached, but the link's signature holds: show the signed core terms. */
+function OfflineSeal({ check }: { check: Extract<SealCheck, { status: "valid" }> }) {
+  const p = check.payload;
+  const when = (iso?: string) => (iso ? new Date(iso).toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" }) : null);
+  return (
+    <section className="flex flex-col gap-6">
+      <ProofBanner check={check} mismatch={false} />
+      <h1 className="page-title">Verified Handshake Seal</h1>
+      <p className="meta">Handshake&apos;s server can&apos;t be reached right now, so these are the signed core terms carried in the link.</p>
+      <article aria-label="Agreed deal" className="tile gap-1">
+        <h2 className="section-title break-words">{p.i}</h2>
+        <p className="agate text-4xl leading-tight">
+          {formatPrice({ amount: p.p, currency: p.cur as Money["currency"] }, "en")}
+          {p.q > 1 && <span className="text-base text-muted"> × {p.q}</span>}
+        </p>
+        {p.d && <p className="meta">{p.d === "pickup" ? "Pickup" : "Shipping"}</p>}
+        <dl className="mt-3 border-t border-border text-sm">
+          <Row term="Buyer">
+            {p.b}
+            {p.ba && <span className="meta block">agreed <span className="agate">{when(p.ba)}</span></span>}
+          </Row>
+          <Row term="Seller">
+            {p.s}
+            {p.sa && <span className="meta block">agreed <span className="agate">{when(p.sa)}</span></span>}
+          </Row>
+          <Row term="Sealed">
+            <span className="agate">{when(p.t)}</span>
+          </Row>
+          <Row term="Code">
+            <span className="agate break-all">{p.c}</span>
+          </Row>
+        </dl>
+      </article>
     </section>
   );
 }

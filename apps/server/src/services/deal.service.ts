@@ -1,4 +1,5 @@
 import { randomBytes } from 'crypto';
+import { sealPayload, signSeal } from './seal-proof.js';
 import type { Prisma } from '@prisma/client';
 import type {
   Deal,
@@ -305,14 +306,14 @@ export async function getSealByCode(
       : dealRecord.updatedAt
   ).toISOString();
 
+  const names = { buyer: dealRecord.chat.buyer.displayName, seller: dealRecord.chat.seller.displayName };
+  const proof = signSeal(sealPayload({ ...deal, sealCode }, names, sealedAt));
+
   return {
     deal,
     sealedAt,
-    buyer: {
-      displayName: dealRecord.chat.buyer.displayName,
-    },
-    seller: {
-      displayName: dealRecord.chat.seller.displayName,
-    },
+    buyer: { displayName: names.buyer },
+    seller: { displayName: names.seller },
+    ...(proof ? { proof } : {}),
   };
 }
