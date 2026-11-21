@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { safeLocalPath } from "@/lib/safe-path";
 import { AuthResponseSchema } from "@convocart/contracts";
@@ -57,6 +58,15 @@ export function TrySandbox() {
         </p>
       </div>
       <hr className="rule-double" />
+
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <p className="text-sm">
+          <span className="font-medium">Fastest way to see it:</span> both people in one window, typing to each other live.
+        </p>
+        <Link href="/try/both" className="btn btn-primary shrink-0">
+          Watch both sides at once
+        </Link>
+      </div>
 
       <ul className="flex flex-col border-y border-border">
         {ROLES.map((r) => (

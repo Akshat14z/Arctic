@@ -235,8 +235,17 @@ export const SealDetailResponseSchema = z.object({
   sealedAt: z.string().datetime(),
   buyer: z.object({ displayName: z.string() }),
   seller: z.object({ displayName: z.string() }),
+  /** Self-proving seal (DHRUMIL-T22): base64url(payload).base64url(Ed25519 signature); absent if signing is off. */
+  proof: z.string().optional(),
 });
 export type SealDetailResponse = z.infer<typeof SealDetailResponseSchema>;
+
+export const SealKeyResponseSchema = z.object({
+  /** Handshake's seal-signing public key: raw Ed25519, base64url. null when signing is off. */
+  publicKey: z.string().nullable(),
+  alg: z.literal('Ed25519'),
+});
+export type SealKeyResponse = z.infer<typeof SealKeyResponseSchema>;
 
 /* -------------------------------------------------------------------------- */
 /* Case & Escalation Schemas                                                  */

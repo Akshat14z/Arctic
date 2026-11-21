@@ -22,8 +22,8 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     // suppressHydrationWarning: the pre-paint script below adds the "js" class to <html> before React hydrates.
     <html lang="en" className={`${inter.variable} ${serif.variable} h-full antialiased`} suppressHydrationWarning>
       <head>
-        {/* Before paint: with script and motion allowed, the landing hides its hero until GSAP takes it over (landing.css). */}
-        <script dangerouslySetInnerHTML={{ __html: "if(matchMedia('(prefers-reduced-motion: no-preference)').matches)document.documentElement.classList.add('js')" }} />
+        {/* Before paint: with script and motion allowed, the landing hides its hero until GSAP takes it over (landing.css). A judge-mode seat frame (/try/both) drops the app chrome. */}
+        <script dangerouslySetInnerHTML={{ __html: "if(matchMedia('(prefers-reduced-motion: no-preference)').matches)document.documentElement.classList.add('js');if(/^hs-seat-/.test(window.name))document.documentElement.classList.add('seat')" }} />
       </head>
       <body className="flex min-h-full flex-col font-sans">
         <HtmlLang />

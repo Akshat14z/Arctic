@@ -7,12 +7,15 @@ import { LANGUAGES } from "@/lib/languages";
 import { localeFor } from "@/lib/format";
 import { parseExtra, pickDisplay } from "@/lib/render";
 import { apiUrl } from "@/lib/api/client";
+import { useSpeech } from "@/lib/speak";
 
 export function MessageBubble({ message, lang }: { message: ChatMessage; lang: LangCode }) {
   const [showOriginal, setShowOriginal] = useState(false);
   const [audioGone, setAudioGone] = useState(false);
   const extra = parseExtra(message.extra);
   const time = new Date(message.sentAt).toLocaleTimeString(localeFor(lang), { hour: "numeric", minute: "2-digit" });
+  // Read aloud in the language actually shown (the reader's translation, or the original when toggled).
+  const speech = useSpeech(message.id, pickDisplay(extra, message.text, lang, showOriginal).lang ?? lang);
 
   if (extra?.kind === "system" && extra.system) {
     const scam = extra.system.event === "scam_warning";
@@ -63,6 +66,20 @@ export function MessageBubble({ message, lang }: { message: ChatMessage; lang: L
       )}
       <div className="meta flex flex-wrap items-center gap-x-3">
         <time dateTime={new Date(message.sentAt).toISOString()} className="agate">{time}</time>
+        {speech.available && shown.text.trim() && (
+          <button
+            type="button"
+            onClick={() => speech.toggle(shown.text)}
+            aria-pressed={speech.active}
+            aria-label={speech.active ? "Stop reading aloud" : "Read aloud"}
+            className="inline-flex min-h-tap items-center gap-1 underline decoration-border underline-offset-2 transition-colors hover:text-text hover:decoration-text"
+          >
+            <svg aria-hidden="true" viewBox="0 0 24 24" className="size-4" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+              {speech.active ? <path d="M7 7h10v10H7z" /> : <path d="M4 9v6h4l5 4V5L8 9H4zm12.5 0a4 4 0 0 1 0 6M19 6.5a8 8 0 0 1 0 11" />}
+            </svg>
+            {speech.active ? "Stop" : "Listen"}
+          </button>
+        )}
         {shown.canToggle && (
           <button type="button" onClick={() => setShowOriginal((v) => !v)} className="min-h-tap underline decoration-border underline-offset-2 transition-colors hover:text-text hover:decoration-text" aria-pressed={showOriginal}>
             {showOriginal ? "Show translation" : <>See original (<span lang={extra?.orig.lang}>{origName}</span>)</>}

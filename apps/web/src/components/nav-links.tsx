@@ -57,7 +57,7 @@ export function BottomTabs() {
   const session = useSession();
   if (!session || /^\/(chats|cases|agent\/cases)\/./.test(path)) return null;
   return (
-    <nav aria-label="Main" className="fixed inset-x-0 bottom-0 z-[var(--z-sticky-nav)] border-t border-border bg-bg/95 pb-[env(safe-area-inset-bottom)] backdrop-blur md:hidden">
+    <nav data-bottom-tabs aria-label="Main" className="fixed inset-x-0 bottom-0 z-[var(--z-sticky-nav)] border-t border-border bg-bg/95 pb-[env(safe-area-inset-bottom)] backdrop-blur md:hidden">
       <ul className="mx-auto flex max-w-md">
         {tabs.map((t) => {
           const here = isHere(path, t.href);

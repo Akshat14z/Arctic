@@ -111,3 +111,45 @@ describe('Translation meaning check', () => {
     expect(rupeeAmounts('No amounts here')).toEqual([]);
   });
 });
+
+describe('Self-proving seal (DHRUMIL-T22)', () => {
+  it('signs a compact payload that verifies with the published key, and detects tampering', async () => {
+    const { createPublicKey, verify } = await import('crypto');
+    const { sealPayload, signSeal, sealPublicKey, resetSealKeyForTesting } = await import('../src/services/seal-proof.js');
+    resetSealKeyForTesting();
+    const deal = {
+      id: 'd1', listingId: 'l1', channelId: 'c1', sealCode: 's_abc',
+      item: { en: 'Vintage Seiko', ja: 'セイコー' }, price: { amount: 15000, currency: 'INR' as const }, quantity: 1,
+      delivery: { method: 'pickup' as const }, conditions: {}, agreedBy: { buyer: '2026-11-07T16:04:00.000Z', seller: '2026-11-07T16:04:30.000Z' },
+      status: 'agreed' as const,
+    };
+    const token = signSeal(sealPayload(deal as never, { buyer: 'Priya', seller: 'Kenji' }, '2026-11-07T16:04:30.000Z'))!;
+    expect(token).toMatch(/^[\w-]+\.[\w-]+$/);
+    const [body, sig] = token.split('.');
+    const payload = JSON.parse(Buffer.from(body, 'base64url').toString('utf8'));
+    expect(payload).toMatchObject({ v: 1, c: 's_abc', i: 'Vintage Seiko', p: 15000, cur: 'INR', d: 'pickup', b: 'Priya', s: 'Kenji' });
+    const pub = createPublicKey({ key: { kty: 'OKP', crv: 'Ed25519', x: sealPublicKey()! }, format: 'jwk' });
+    expect(verify(null, Buffer.from(body, 'base64url'), pub, Buffer.from(sig, 'base64url'))).toBe(true);
+    // change the price: the signature no longer matches
+    const forged = Buffer.from(JSON.stringify({ ...payload, p: 1500 })).toString('base64url');
+    expect(verify(null, Buffer.from(forged, 'base64url'), pub, Buffer.from(sig, 'base64url'))).toBe(false);
+  });
+
+  it('signs nothing in production without SEAL_SIGNING_SEED', async () => {
+    const { signSeal, sealPublicKey, resetSealKeyForTesting } = await import('../src/services/seal-proof.js');
+    const { resetConfigForTesting } = await import('../src/config.js');
+    const prev = process.env.NODE_ENV;
+    process.env.NODE_ENV = 'production';
+    delete process.env.SEAL_SIGNING_SEED;
+    resetConfigForTesting();
+    resetSealKeyForTesting();
+    try {
+      expect(sealPublicKey()).toBeNull();
+      expect(signSeal({ v: 1, c: 's', i: 'x', p: 1, cur: 'INR', q: 1, b: 'a', s: 'b', t: '2026-11-07T00:00:00.000Z' })).toBeNull();
+    } finally {
+      process.env.NODE_ENV = prev;
+      resetConfigForTesting();
+      resetSealKeyForTesting();
+    }
+  });
+});

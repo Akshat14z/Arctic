@@ -1,10 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { Deal, LangCode } from "@convocart/contracts";
 import Link from "next/link";
 import { formatPrice, localeFor } from "@/lib/format";
 import { SealQr, useSealUrl } from "./seal-qr";
+import { SealDetailResponseSchema } from "@convocart/contracts";
+import { api } from "@/lib/api/client";
 
 export type DealRole = "buyer" | "seller";
 
@@ -113,10 +115,11 @@ export function DealCard({ deal, lang, myRole, names, onAgree }: Props) {
 
 /** Handshake Seal (DHRUMIL-T15, D-023): show the QR at pickup; scanning it opens the verified deal. */
 function SealBlock({ code }: { code: string }) {
-  const url = useSealUrl(code);
+  const proof = useSealProof(code);
+  const url = useSealUrl(code, proof);
   return (
     <div className="note note-success mt-4 flex items-start gap-3">
-      <SealQr url={url} size={96} />
+      <SealQr url={url} size={128} />
       <div className="flex min-w-0 flex-col gap-1">
         <p className="font-semibold">Handshake Seal</p>
         <p>Both sides agreed to exactly this. Show the code at pickup: scanning it opens the verified deal.</p>
@@ -126,4 +129,20 @@ function SealBlock({ code }: { code: string }) {
       </div>
     </div>
   );
+}
+
+/** The seal's signed proof, for its QR (public endpoint). Without it the QR still links to the seal page. */
+function useSealProof(code: string): string | undefined {
+  const [proof, setProof] = useState<string>();
+  useEffect(() => {
+    let live = true;
+    api(`/api/seals/${encodeURIComponent(code)}`, { schema: SealDetailResponseSchema }).then(
+      (s) => live && setProof(s.proof),
+      () => {},
+    );
+    return () => {
+      live = false;
+    };
+  }, [code]);
+  return proof;
 }
