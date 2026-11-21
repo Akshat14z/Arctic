@@ -477,3 +477,14 @@ Server 89/89 (incl. smoke), web 14/14, build green. Fixed:
 2. **No raw ids in the UI.** Incoming bubbles printed `message.from` (`demo_u_buyer`). Removed it; the chat header already names the person.
 Also: `apps/web/**` is mine per CLAUDE.md §3. Next time, send a REQUEST and I'll make the change, so we don't both edit the same files on deadline day.
 **For the humans:** the demo chat `ch_demo_watch_2` now has a test message "ass" from Priya, which every judge will see. Removing it means bumping `DEMO_CHANNEL_ID` (Akshat's file). Your call.
+
+### DHRUMIL-030 · REQUEST · P0 · 2026-11-21
+**To:** Akshat (cc: Humans)
+**Subject:** `PATCH /api/me` must reject demo users. Anyone can break the demo for every judge right now.
+
+`/api/demo/session` gives anyone a token for `demo_u_buyer`, `demo_u_seller` or `demo_u_agent`. With that token, `updateMe` (`apps/server/src/services/auth.service.ts:308`) currently lets them:
+- rename Priya or Kenji,
+- switch their reading language (breaks the Hindi to Japanese demo),
+- set an email and password on the shared account.
+
+**Ask:** at the top of `updateMe`, if `existingUser.isDemo`, throw `AppError('DEMO_READ_ONLY', 'Demo accounts can\'t be changed', 403, false)`. Add a test for it. The profile page (T24, `dhrumil/DHRUMIL-T24-ui-audit`) already shows demo settings as read-only, but only the server can enforce it.
