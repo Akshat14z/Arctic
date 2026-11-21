@@ -1,7 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createHash, createPrivateKey, createPublicKey, sign } from "node:crypto";
-import { checkSealToken, proofFromHash, SEAL_PUBLIC_KEY } from "./seal-proof.ts";
+import { checkSealToken, DEV_SEAL_PUBLIC_KEY, proofFromHash } from "./seal-proof.ts";
 
 // The same published development key the server uses (apps/server/src/services/seal-proof.ts).
 const seed = createHash("sha256").update("handshake-dev-seal-key-v1").digest();
@@ -13,7 +13,7 @@ const token = (payload: object) => {
 const payload = { v: 1, c: "s_abc", i: "Vintage Seiko", p: 15000, cur: "INR", q: 1, d: "pickup", b: "Priya", s: "Kenji", t: "2026-11-07T16:04:30.000Z" };
 
 test("the built-in dev key matches the server's dev seed", () => {
-  assert.equal((createPublicKey(priv).export({ format: "jwk" }) as { x: string }).x, SEAL_PUBLIC_KEY);
+  assert.equal((createPublicKey(priv).export({ format: "jwk" }) as { x: string }).x, DEV_SEAL_PUBLIC_KEY);
 });
 
 test("a genuine seal checks out on this device", async () => {
@@ -28,6 +28,10 @@ test("a changed price or a broken token fails", async () => {
   assert.equal((await checkSealToken(forged)).status, "invalid");
   assert.equal((await checkSealToken("nonsense")).status, "invalid");
   assert.equal((await checkSealToken("e30.e30")).status, "invalid");
+});
+
+test("with no public key (production without the env var) nothing is trusted", async () => {
+  assert.equal((await checkSealToken(token(payload), "")).status, "unsupported");
 });
 
 test("reads the proof from the URL fragment only when it looks like a token", () => {

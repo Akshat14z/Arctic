@@ -48,7 +48,8 @@ export function SealView() {
     };
   }, [code, lang, attempt]);
 
-  if (error && check?.status === "valid" && check.payload.c === code) return <OfflineSeal check={check} />;
+  // A definite "no such seal" from our server wins over the signature; the offline view is only for an unreachable server.
+  if (error && !error.notFound && check?.status === "valid" && check.payload.c === code) return <OfflineSeal check={check} />;
 
   if (error) {
     return (

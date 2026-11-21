@@ -43,7 +43,7 @@ The web checks Seal signatures with the public key that matches `SEAL_SIGNING_SE
 curl https://<api-host>/api/seals/key
 ```
 
-Copy `publicKey` into the web's `NEXT_PUBLIC_SEAL_PUBLIC_KEY`. Without it, the web uses the dev key and every production Seal shows "Don't trust this link".
+Copy `publicKey` into the web's `NEXT_PUBLIC_SEAL_PUBLIC_KEY`. Without it, a production build trusts no signature (it never falls back to the dev key), so Seals are checked only by asking the server.
 
 ## 4. Web (Vercel)
 
