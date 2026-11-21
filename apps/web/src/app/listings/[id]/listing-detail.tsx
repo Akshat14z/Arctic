@@ -5,7 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { ChatCreateResponseSchema, ListingDetailResponseSchema, type LangCode, type Listing } from "@convocart/contracts";
 import { api, ApiError, friendlyMessage } from "@/lib/api/client";
-import { formatPrice, localeFor } from "@/lib/format";
+import { formatPrice } from "@/lib/format";
 import { LANGUAGES, preferredLanguage } from "@/lib/languages";
 import { useSession } from "@/lib/session";
 import { DemoBadge, ListingImage } from "@/components/listing-card";
@@ -177,7 +177,7 @@ export function ListingDetail() {
                 </div>
               </div>
               <time dateTime={listing.createdAt} className="meta">
-                Listed {new Date(listing.createdAt).toLocaleDateString(localeFor(lang), { day: "numeric", month: "short", year: "numeric" })}
+                Listed {new Date(listing.createdAt).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}
               </time>
             </section>
           )}

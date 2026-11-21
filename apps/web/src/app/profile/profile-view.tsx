@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { MeResponseSchema, type AuthResponse as Session, type LangCode } from "@convocart/contracts";
 import { api, friendlyMessage } from "@/lib/api/client";
-import { clearSession, saveSession } from "@/lib/session";
+import { saveSession, signOut } from "@/lib/session";
 import { useRequireSession } from "@/lib/use-require-session";
 import { LANGUAGES } from "@/lib/languages";
 
@@ -32,7 +32,7 @@ function Settings({ session }: { session: Session }) {
             <p className="meta break-words">{session.email ?? kind}</p>
           </div>
         </div>
-        <button type="button" onClick={() => clearSession()} className="btn btn-secondary">
+        <button type="button" onClick={signOut} className="btn btn-secondary">
           Sign out
         </button>
       </header>

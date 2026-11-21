@@ -65,7 +65,7 @@ export function LandingMotion() {
       ScrollTrigger.create({ trigger: q(".l-hero")[0], start: "top top", end: "bottom top", onToggle: (self) => root.classList.toggle("is-away", !self.isActive) });
 
       // Footer street: step up onto the rule, then sway from the feet.
-      const people = q(".l-street > img");
+      const people = q(".l-street > .l-peep");
       if (people.length) {
         gsap.from(people, {
           yPercent: 100,

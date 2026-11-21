@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef } from "react";
 import { LANGUAGES } from "@/lib/languages";
-import { clearSession, useSession } from "@/lib/session";
+import { signOut, useSession } from "@/lib/session";
 import { Icon, type IconName } from "./icons";
 
 type Tab = { href: string; label: string; icon: IconName };
@@ -12,7 +12,7 @@ const PEOPLE: Tab[] = [
   { href: "/home", label: "Home", icon: "home" },
   { href: "/listings", label: "Browse", icon: "browse" },
   { href: "/chats", label: "Chats", icon: "chats" },
-  { href: "/listings/new", label: "Sell", icon: "sell" },
+  { href: "/selling", label: "Selling", icon: "sell" },
 ];
 const VISITOR: Tab[] = [
   { href: "/listings", label: "Browse", icon: "browse" },
@@ -25,6 +25,7 @@ const AGENT: Tab[] = [
 
 function isHere(path: string, href: string) {
   if (href === "/listings") return path === "/listings" || (path.startsWith("/listings/") && path !== "/listings/new");
+  if (href === "/selling") return path === "/selling" || path === "/listings/new";
   return path === href || path.startsWith(`${href}/`);
 }
 
@@ -131,7 +132,7 @@ export function AccountMenu() {
         { href: "/profile", label: "My Profile & Settings" },
         { href: "/home", label: "Home" },
         { href: "/chats", label: "My chats" },
-        { href: "/listings?mine=1", label: "My listings" },
+        { href: "/selling", label: "Selling" },
       ];
 
   return (
@@ -169,7 +170,7 @@ export function AccountMenu() {
             Switch demo account
           </Link>
         )}
-        <button type="button" onClick={clearSession} className="btn btn-quiet self-start px-0">
+        <button type="button" onClick={signOut} className="btn btn-quiet self-start px-0">
           Sign out
         </button>
       </div>

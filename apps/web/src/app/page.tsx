@@ -24,13 +24,12 @@ function Ink({ children }: { children: string }) {
 
 // Lines from the seeded demo chat (Priya writes Hindi, Kenji writes Japanese), placed around the title.
 const DRIFT: { text: string; lang?: string; at: string }[] = [
+  // Only in the band beside the title: the lower corners belong to the two screenshots.
   { text: "पक्का", lang: "hi", at: "left-[6%] top-[8%]" },
   { text: "₹15,000", at: "right-[9%] top-[6%]" },
-  { text: "決まり", lang: "ja", at: "left-[14%] bottom-[22%]" },
-  { text: "See original", at: "right-[3%] bottom-[12%]" },
   { text: "कल शाम", lang: "hi", at: "left-[38%] top-[2%]" },
-  { text: "明日の夕方", lang: "ja", at: "right-[8%] bottom-[4%]" },
-  { text: "₹14,000", at: "left-[2%] top-[62%]" },
+  { text: "決まり", lang: "ja", at: "left-[3%] top-[30%]" },
+  { text: "明日の夕方", lang: "ja", at: "right-[3%] top-[30%]" },
 ];
 
 // The pinned chapter: what happens, one step per screen of scroll.
@@ -43,6 +42,17 @@ const STEPS: [string, string][] = [
 
 // The street at the foot of the page.
 const STREET = ["p1", "p2", "p3", "p4", "p5", "p6", "p7", "p8"];
+// What the street says, one bubble at a time (landing.css .l-bubble). Real phrases from the demo deal.
+const SAYS: ({ text: string; lang?: string } | null)[] = [
+  { text: "नमस्ते", lang: "hi" },
+  { text: "こんにちは", lang: "ja" },
+  { text: "₹15,000?" },
+  { text: "पक्का!", lang: "hi" },
+  { text: "決まり!", lang: "ja" },
+  { text: "வணக்கம்", lang: "ta" },
+  { text: "See original" },
+  { text: "ধন্যবাদ", lang: "bn" },
+];
 
 const SPEC: [string, string][] = [
   ["Translation", "Every message, in 8 languages, with the original one tap away"],
@@ -102,12 +112,12 @@ export default function Home() {
           <div className="l-cutouts">
             <figure className="l-cutout l-cutout-a">
               {/* eslint-disable-next-line @next/next/no-img-element -- static product captures, sized explicitly */}
-              <img src="/screens/chat-buyer.png" alt="Priya's screen: her question about the watch and Kenji's reply, both in Hindi" width={780} height={432} fetchPriority="high" />
+              <img src="/screens/chat-buyer.png" alt="Priya's screen: her question about the watch and Kenji's reply, both in Hindi" width={808} height={436} fetchPriority="high" />
               <figcaption>Priya reads Hindi</figcaption>
             </figure>
             <figure className="l-cutout l-cutout-b">
               {/* eslint-disable-next-line @next/next/no-img-element -- static product captures, sized explicitly */}
-              <img src="/screens/chat-seller.png" alt="Kenji's screen: the same question and reply, both in Japanese" width={780} height={426} fetchPriority="high" />
+              <img src="/screens/chat-seller.png" alt="Kenji's screen: the same question and reply, both in Japanese" width={808} height={436} fetchPriority="high" />
               <figcaption>Kenji reads Japanese</figcaption>
             </figure>
           </div>
@@ -177,7 +187,7 @@ export default function Home() {
           </figure>
           <figure className="l-fan-2">
             {/* eslint-disable-next-line @next/next/no-img-element -- static product captures, sized explicitly */}
-            <img src="/screens/seal.png" alt="A sealed Deal Card: the agreed terms, both agree times and the Seal's QR code" width={716} height={934} loading="lazy" />
+            <img src="/screens/seal.png" alt="A sealed Deal Card: the agreed terms, both agree times and the Seal's QR code" width={716} height={1048} loading="lazy" />
           </figure>
         </div>
         <div>
@@ -227,7 +237,7 @@ export default function Home() {
         </div>
         <div className="l-agent-shot">
           {/* eslint-disable-next-line @next/next/no-img-element -- static product capture, sized explicitly */}
-          <img src="/screens/agent.png" alt="The agent console: each message in the original and in English, beside the case summary and the frozen deal" width={2512} height={1490} loading="lazy" />
+          <img src="/screens/agent.png" alt="The agent console: each message in the original and in English, beside the case summary and the frozen deal" width={2512} height={1598} loading="lazy" />
         </div>
       </section>
 
@@ -243,9 +253,16 @@ export default function Home() {
 
       {/* The street: everyone who might trade here, standing on the footer rule */}
       <div className="l-wrap l-street" aria-hidden>
-        {STREET.map((n) => (
-          // eslint-disable-next-line @next/next/no-img-element -- static Open Peeps SVG
-          <img key={n} src={`/people/${n}.svg`} alt="" width={1200} height={2980} loading="lazy" />
+        {STREET.map((n, i) => (
+          <span key={n} className="l-peep">
+            {/* eslint-disable-next-line @next/next/no-img-element -- static Open Peeps SVG */}
+            <img src={`/people/${n}.svg`} alt="" width={1200} height={2980} loading="lazy" />
+            {SAYS[i] && (
+              <span className="l-bubble" lang={SAYS[i]!.lang} style={{ animationDelay: `${i * 1.5}s` }}>
+                {SAYS[i]!.text}
+              </span>
+            )}
+          </span>
         ))}
         {/* The walker: strolls the length of the street, turns, and walks back (landing-motion). Still under reduced motion. */}
         <span className="l-walker">

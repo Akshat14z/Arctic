@@ -147,7 +147,7 @@ export function HomeView() {
         {/* Your listings, or the way to start one */}
         <article className="tile">
           <h2 className="tile-title">Your listings</h2>
-          <Go href="/listings/new" label="Sell something" />
+          <Go href="/selling" label="Open your seller dashboard" />
           {loadingMine ? (
             <div className="skeleton h-24" />
           ) : mine && mine.length > 0 ? (

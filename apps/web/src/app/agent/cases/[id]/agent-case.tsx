@@ -101,8 +101,8 @@ function Transcript({ detail, lang }: { detail: CaseDetailResponse; lang: LangCo
           </div>
           <ol className="flex flex-col">
             {transcript.map((t) => (
-              <li key={t.at + t.from} className={`${cols} border-b border-border py-3 last:border-b-0`}>
-                <p className="flex flex-col text-sm">
+              <li key={t.at + t.from} className={`${cols} border-b border-border py-4 last:border-b-0`}>
+                <p className="flex flex-col gap-0.5 text-sm leading-normal">
                   <span className="font-medium">{nameOf(t.from)}</span>
                   <span className="agate text-muted">{time(t.at)}</span>
                   <span className="text-muted">
