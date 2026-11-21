@@ -3,7 +3,7 @@
 Writer: **Agent Dhrumil only**. Overwrite this whole file at the end of every session (`/wrap`). Agent Akshat and the humans read it to know where you are.
 
 **Last updated:** 2026-11-21
-**Current task:** none in progress; DHRUMIL-T22 merged to main (e8dfdcf): signed Seal, Listen, judge mode `/try/both`, Next.js 16.4.6, `docs/DEPLOY.md`. Verified live; server 89/89 incl. smoke, web 14/14, build green. Calls still 80006 (VoIP off). Next: deploy (humans, per docs/DEPLOY.md), then README / write-up / video.
+**Current task:** none in progress; T23 + T24 merged to main (47fa839): dark-mode Deal Card fix, no raw ids, full UI audit (sweep of 20 routes x 3 widths x light/dark: zero clipped/off-screen text, zero contrast fails), honest copy. Waiting on Akshat for DHRUMIL-030 (demo users read-only on PATCH /api/me). Next: deploy (docs/DEPLOY.md), README / write-up / video.
 **Branches (pushed, not merged):**
 - `dhrumil/DHRUMIL-T19-call-voice` (5a8b922): 1:1 voice calls (Call SDK) + voice notes
 - `dhrumil/DHRUMIL-T15-seal` (5d2350f): Seal QR on the Deal Card + public `/seal/[code]`
