@@ -76,12 +76,6 @@ export function MessageBubble({ message, lang }: { message: ChatMessage; lang: L
         {/* Message Text */}
         <p className="whitespace-pre-wrap leading-relaxed">{shown.text}</p>
 
-        {/* Translation Indicator Badge */}
-        {shown.translated && !showOriginal && (
-          <span className="mt-0.5 inline-flex items-center gap-1 text-[10px] opacity-75 font-medium">
-            <span>🌐 Translated to {targetName}</span>
-          </span>
-        )}
       </div>
 
       {/* Scam Warning Alert */}
@@ -92,7 +86,7 @@ export function MessageBubble({ message, lang }: { message: ChatMessage; lang: L
       )}
 
       {/* Metadata & Actions row */}
-      <div className="meta flex flex-wrap items-center gap-x-2 text-xs">
+      <div className="meta flex flex-wrap items-center gap-x-3 gap-y-1 text-xs">
         <time dateTime={new Date(message.sentAt).toISOString()} className="agate">
           {time}
         </time>
@@ -101,9 +95,7 @@ export function MessageBubble({ message, lang }: { message: ChatMessage; lang: L
         <button
           type="button"
           onClick={handleCopy}
-          aria-label="Copy message text"
-          className="text-muted hover:text-text transition-colors"
-          title="Copy text"
+          className="hit text-muted transition-colors hover:text-text"
         >
           {copied ? "Copied" : "Copy"}
         </button>
@@ -114,10 +106,12 @@ export function MessageBubble({ message, lang }: { message: ChatMessage; lang: L
             type="button"
             onClick={() => speech.toggle(shown.text)}
             aria-pressed={speech.active}
-            aria-label={speech.active ? "Stop reading aloud" : "Read aloud"}
-            className="inline-flex items-center gap-1 text-muted hover:text-text transition-colors"
+            className="hit inline-flex items-center gap-1 text-muted transition-colors hover:text-text"
           >
-            {speech.active ? "■ Stop" : "🔊 Listen"}
+            <svg aria-hidden width="12" height="12" viewBox="0 0 12 12" fill="currentColor">
+              {speech.active ? <rect x="2.5" y="2.5" width="7" height="7" rx="1" /> : <path d="M1.5 4.5h2l3-2.5v8l-3-2.5h-2zM8.5 3.5a3.5 3.5 0 0 1 0 5" stroke="currentColor" strokeWidth="1.2" fill="none" />}
+            </svg>
+            {speech.active ? "Stop" : "Listen"}
           </button>
         )}
 
@@ -126,7 +120,7 @@ export function MessageBubble({ message, lang }: { message: ChatMessage; lang: L
           <button
             type="button"
             onClick={() => setShowOriginal((v) => !v)}
-            className="font-medium underline decoration-border hover:decoration-text hover:text-text transition-colors"
+            className="hit font-medium underline decoration-border transition-colors hover:text-text hover:decoration-text"
             aria-pressed={showOriginal}
           >
             {showOriginal ? (

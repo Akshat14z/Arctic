@@ -184,11 +184,8 @@ export function ChatThread({
         ) : (
           <>
             {deals?.canPropose && deals.myRole && !hasAgreedDeal && (
-              <div className="mb-2 flex items-center justify-between gap-2 rounded-xl border border-border bg-surface-2 px-3 py-2 shadow-xs">
-                <div className="flex items-center gap-2 text-xs">
-                  <span className="font-semibold text-text">Price Negotiation</span>
-                  <span className="meta hidden sm:inline">• Formal offer with sealed terms</span>
-                </div>
+              <div className="mb-2 flex flex-wrap items-center justify-between gap-x-3 gap-y-1 border-t border-border pt-2">
+                <p className="meta">Agreed on a price? Put it in writing.</p>
                 <button
                   type="button"
                   onClick={() => {
@@ -196,9 +193,9 @@ export function ChatThread({
                     setShowOfferModal(true);
                   }}
                   disabled={state !== "connected"}
-                  className="btn btn-primary btn-sm text-xs font-semibold shadow-xs"
+                  className="btn btn-secondary"
                 >
-                  🤝 Make an Offer
+                  Make an offer
                 </button>
               </div>
             )}

@@ -114,3 +114,7 @@ a.row:hover .row-title { text-decoration: underline; text-underline-offset: 3px;
 .btn { transition-property: background-color, color, border-color, transform; }
 @keyframes app-in { from { opacity: 0; transform: translateY(6px); } }
 @keyframes app-rise { from { opacity: 0; transform: translateY(10px); } }
+
+/* Small inline actions (Copy, Listen, See original): the visible text stays compact, the touch target is 44px tall. */
+.hit { position: relative; }
+.hit::after { content: ""; position: absolute; inset: -14px -5px; }

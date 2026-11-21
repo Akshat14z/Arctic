@@ -162,10 +162,7 @@ export function SignupForm() {
           {busy === "account" ? "Creating your account…" : isGuest ? "Save my account" : "Create account"}
         </button>
 
-        <div className="flex items-center justify-center gap-1.5 text-[11px] text-muted">
-          <span>🛡️</span>
-          <span>No credit card required · Free instant translation & deal sealing</span>
-        </div>
+        <p className="meta text-center">Free. No card needed.</p>
 
         {!isGuest && (
           <>

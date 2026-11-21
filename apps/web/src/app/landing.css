@@ -22,7 +22,7 @@ body:has([data-landing]) { background: var(--l-paper); padding: 0; }
 
 /* Nav */
 .l-nav { display: flex; align-items: center; justify-content: space-between; gap: var(--space-md); padding-block: var(--space-md); }
-.l-mark { font-family: var(--font-serif-stack); font-size: 1.6rem; line-height: 1; color: var(--l-ink); text-decoration: none; }
+.l-mark { font-family: var(--font-serif-stack); font-size: 1.6rem; line-height: 1; color: var(--l-ink); text-decoration: none; display: inline-flex; align-items: center; min-height: 2.75rem; }
 .l-link { white-space: nowrap; color: var(--l-ink); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 4px; font-weight: 500; min-height: 2.75rem; display: inline-flex; align-items: center; }
 .l-link:hover { text-decoration-thickness: 2px; }
 /* Tailwind's max-md:hidden loses to .l-link (unlayered), so the phone hide lives here. */
