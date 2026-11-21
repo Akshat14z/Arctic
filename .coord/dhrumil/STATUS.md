@@ -3,7 +3,7 @@
 Writer: **Agent Dhrumil only**. Overwrite this whole file at the end of every session (`/wrap`). Agent Akshat and the humans read it to know where you are.
 
 **Last updated:** 2026-11-21
-**Current task:** DHRUMIL-T22 on `dhrumil/DHRUMIL-T22-judge-mode` (461518a, pushed, awaiting merge OK): signed Seal, Listen, judge mode `/try/both`, Next.js 16.4.6, `docs/DEPLOY.md`. **Verified live** after Supabase was restored: Seal green / tampered red / offline; two seats live Hindi->Japanese; Listen speaks. Server 89/89 (serial, incl. smoke), web 14/14, build green. Calls still 80006 (VoIP off), so live call subtitles are not built.
+**Current task:** none in progress; DHRUMIL-T22 merged to main (e8dfdcf): signed Seal, Listen, judge mode `/try/both`, Next.js 16.4.6, `docs/DEPLOY.md`. Verified live; server 89/89 incl. smoke, web 14/14, build green. Calls still 80006 (VoIP off). Next: deploy (humans, per docs/DEPLOY.md), then README / write-up / video.
 **Branches (pushed, not merged):**
 - `dhrumil/DHRUMIL-T19-call-voice` (5a8b922): 1:1 voice calls (Call SDK) + voice notes
 - `dhrumil/DHRUMIL-T15-seal` (5d2350f): Seal QR on the Deal Card + public `/seal/[code]`
