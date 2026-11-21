@@ -268,7 +268,7 @@ export function OfferModal({
               </dl>
             </div>
 
-            <div className="rounded-lg bg-amber-500/10 p-3 text-xs text-amber-900 dark:text-amber-200">
+            <div className="rounded-lg bg-amber-500/10 p-3 text-xs text-amber-900">
               <p className="font-medium">
                 Are you sure you want to send this offer?
               </p>

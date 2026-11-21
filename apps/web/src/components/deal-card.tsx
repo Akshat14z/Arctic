@@ -118,15 +118,15 @@ export function DealCard({ deal, lang, myRole, names, onAgree, onReject, onCount
         {/* Status Pill */}
         <div>
           {agreed ? (
-            <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/15 px-3 py-1 text-xs font-semibold text-emerald-700 dark:text-emerald-300">
+            <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/15 px-3 py-1 text-xs font-semibold text-emerald-700">
               ✓ Agreed & Sealed
             </span>
           ) : rejected ? (
-            <span className="inline-flex items-center gap-1 rounded-full bg-red-500/15 px-3 py-1 text-xs font-semibold text-red-700 dark:text-red-300">
+            <span className="inline-flex items-center gap-1 rounded-full bg-red-500/15 px-3 py-1 text-xs font-semibold text-red-700">
               ✕ Offer Declined
             </span>
           ) : (
-            <span className="inline-flex items-center gap-1 rounded-full bg-amber-500/15 px-3 py-1 text-xs font-semibold text-amber-800 dark:text-amber-200">
+            <span className="inline-flex items-center gap-1 rounded-full bg-amber-500/15 px-3 py-1 text-xs font-semibold text-amber-800">
               ⏳ Pending Confirmation
             </span>
           )}
@@ -192,7 +192,7 @@ export function DealCard({ deal, lang, myRole, names, onAgree, onReject, onCount
               <span className="text-text">
                 {names[r]} {r === myRole && <span className="text-muted">(you)</span>}
               </span>
-              <span className={`agate font-medium ${deal.agreedBy[r] ? "text-emerald-600 dark:text-emerald-400" : "text-muted"}`}>
+              <span className={`agate font-medium ${deal.agreedBy[r] ? "text-emerald-600" : "text-muted"}`}>
                 {deal.agreedBy[r] ? `✓ Accepted ${when(deal.agreedBy[r]!)}` : "Awaiting response"}
               </span>
             </li>
@@ -264,13 +264,13 @@ function SealBlock({ code }: { code: string }) {
     <div className="note note-success mt-3 flex items-start gap-3 rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-3">
       <SealQr url={url} size={108} />
       <div className="flex min-w-0 flex-1 flex-col gap-1 text-xs">
-        <p className="font-semibold text-sm text-emerald-900 dark:text-emerald-100">Handshake Seal Active</p>
-        <p className="text-emerald-800 dark:text-emerald-200">
+        <p className="font-semibold text-sm text-emerald-900">Handshake Seal Active</p>
+        <p className="text-emerald-800">
           Both sides agreed to these terms. Present this code at pickup or delivery to inspect and confirm handover.
         </p>
         <Link
           href={`/seal/${encodeURIComponent(code)}${proof ? `#p=${proof}` : ""}`}
-          className="link font-semibold underline text-emerald-700 dark:text-emerald-300 mt-1 inline-flex items-center gap-1"
+          className="link font-semibold underline text-emerald-700 mt-1 inline-flex items-center gap-1"
         >
           Verify Certificate: <span className="agate font-mono font-bold">{code}</span> ↗
         </Link>

@@ -48,13 +48,6 @@ export function MessageBubble({ message, lang }: { message: ChatMessage; lang: L
 
   return (
     <div className={`flex max-w-[85%] flex-col gap-1.5 ${message.mine ? "items-end self-end" : "items-start self-start"}`}>
-      {/* Sender indicator for incoming */}
-      {!message.mine && message.from && (
-        <span className="agate px-1 text-[11px] font-semibold text-muted">
-          {message.from}
-        </span>
-      )}
-
       {/* Bubble container */}
       <div
         lang={shown.lang}
