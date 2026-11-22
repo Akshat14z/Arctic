@@ -4,16 +4,13 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Suspense, useState } from "react";
 import { AccountMenu, NavTabs } from "./nav-links";
+import { useT } from "@/lib/use-t";
 
-const ANNOUNCEMENTS = [
-  "Seller storefronts are live",
-  "Follow trusted sellers and catch their newest listings",
-  "Save listings to track price changes",
-  "Every chat reads in your language",
-];
+const ANNOUNCEMENTS = ["ann.1", "ann.2", "ann.3", "ann.4"] as const;
 
 export function AppHeader() {
   const path = usePathname();
+  const t = useT();
   const [announcementsPaused, setAnnouncementsPaused] = useState(false);
   if (path === "/") return null;
 
@@ -34,7 +31,7 @@ export function AppHeader() {
         <div className="announcement-track">
           {[0, 1].map((copy) => (
             <div key={copy} className="announcement-set" aria-hidden={copy === 1}>
-              {ANNOUNCEMENTS.map((item) => <span key={item}>{item}<i aria-hidden>●</i></span>)}
+              {ANNOUNCEMENTS.map((item) => <span key={item}>{t(item)}<i aria-hidden>●</i></span>)}
             </div>
           ))}
         </div>

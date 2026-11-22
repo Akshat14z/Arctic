@@ -5,8 +5,10 @@ import { useRouter } from "next/navigation";
 import { FollowStatusResponseSchema, type FollowStatusResponse } from "@convocart/contracts";
 import { api, friendlyMessage } from "@/lib/api/client";
 import { useSession } from "@/lib/session";
+import { useT } from "@/lib/use-t";
 
 export function FollowButton({ sellerId, compact = false, onStatus }: { sellerId: string; compact?: boolean; onStatus?: (status: FollowStatusResponse) => void }) {
+  const t = useT();
   const session = useSession();
   const router = useRouter();
   const [status, setStatus] = useState<FollowStatusResponse | null>(null);
@@ -70,7 +72,7 @@ export function FollowButton({ sellerId, compact = false, onStatus }: { sellerId
   return (
     <div className="flex min-w-0 flex-col gap-1">
       <button type="button" onClick={toggle} disabled={busy} aria-busy={busy} aria-pressed={following} className={`${following ? "btn btn-secondary" : "btn btn-primary"} ${compact ? "px-4 text-sm" : ""}`}>
-        {following ? "Following" : "Follow"}
+        {following ? t("follow.following") : t("follow.follow")}
       </button>
       {error && <span role="alert" className="max-w-48 text-sm text-danger">{error}</span>}
     </div>
