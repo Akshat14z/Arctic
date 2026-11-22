@@ -1,6 +1,6 @@
 export const metadata = {
   title: "Both sides at once",
-  description: "Watch Priya (Hindi) and Kenji (Japanese) in the same Handshake chat, side by side. Demo accounts, no sign-up.",
+  description: "Watch Priya (Hindi) and Kenji (Japanese) in the same CommonGrounds chat, side by side. Demo accounts, no sign-up.",
 };
 
 const CHAT = "/chats/ch_demo_watch_5";

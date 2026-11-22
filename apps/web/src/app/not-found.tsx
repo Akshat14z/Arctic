@@ -9,7 +9,7 @@ export default function NotFound() {
         href="/"
         className="btn btn-primary"
       >
-        Go to Handshake
+        Go to CommonGrounds
       </Link>
     </section>
   );

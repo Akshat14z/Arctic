@@ -7,6 +7,8 @@ const PATHS = {
   dispatch: "M4 13a8 8 0 0 1 16 0v4a2 2 0 0 1-2 2h-1v-6h3M4 13v4a2 2 0 0 0 2 2h1v-6H4",
   go: "M8 16 16 8M9 8h7v7",
   back: "M15 5l-7 7 7 7",
+  follow: "M12 20s-7-4.35-7-10a4 4 0 0 1 7-2.65A4 4 0 0 1 19 10c0 5.65-7 10-7 10z",
+  bell: "M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4",
 } as const;
 
 export type IconName = keyof typeof PATHS;

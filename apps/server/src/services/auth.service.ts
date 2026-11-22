@@ -36,6 +36,10 @@ interface DbUserLike {
   role: string;
   isDemo: boolean;
   agentLanguages: string[];
+  avatarUrl?: string | null;
+  bio?: string | null;
+  businessDescription?: string | null;
+  isVerified?: boolean;
 }
 
 export function formatUser(dbUser: DbUserLike): User {
@@ -45,6 +49,12 @@ export function formatUser(dbUser: DbUserLike): User {
     language: dbUser.language as LangCode,
     role: dbUser.role as 'user' | 'agent',
     isDemo: dbUser.isDemo,
+    ...(dbUser.avatarUrl ? { avatarUrl: dbUser.avatarUrl } : {}),
+    ...(dbUser.bio ? { bio: dbUser.bio } : {}),
+    ...(dbUser.businessDescription
+      ? { businessDescription: dbUser.businessDescription }
+      : {}),
+    ...(dbUser.isVerified !== undefined ? { isVerified: dbUser.isVerified } : {}),
     agentLanguages:
       dbUser.agentLanguages && dbUser.agentLanguages.length > 0
         ? (dbUser.agentLanguages as LangCode[])
@@ -319,7 +329,15 @@ export async function updateMe(userId: string, input: UpdateMeRequest): Promise<
     throw new AppError('DEMO_READ_ONLY', "Demo accounts can't be changed", 403, false);
   }
 
-  const dataToUpdate: { displayName?: string; language?: string; email?: string; passwordHash?: string } = {};
+  const dataToUpdate: {
+    displayName?: string;
+    language?: string;
+    email?: string;
+    passwordHash?: string;
+    avatarUrl?: string | null;
+    bio?: string | null;
+    businessDescription?: string | null;
+  } = {};
 
   if (input.displayName !== undefined) {
     dataToUpdate.displayName = input.displayName.trim();
@@ -352,6 +370,9 @@ export async function updateMe(userId: string, input: UpdateMeRequest): Promise<
     }
     dataToUpdate.passwordHash = await hashPassword(input.newPassword);
   }
+  if (input.avatarUrl !== undefined) dataToUpdate.avatarUrl = input.avatarUrl;
+  if (input.bio !== undefined) dataToUpdate.bio = input.bio;
+  if (input.businessDescription !== undefined) dataToUpdate.businessDescription = input.businessDescription;
 
   const user = await prisma.user.update({
     where: { id: userId },

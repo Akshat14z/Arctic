@@ -16,7 +16,7 @@ export async function generateMetadata({ params }: PageProps<"/listings/[id]">):
     if (!parsed.success) return { title: "Listing" };
     const { listing } = parsed.data;
     const title = `${listing.title} · ${formatPrice(listing.price, listing.lang)}`;
-    const description = "Chat with the seller on Handshake. Each of you reads in your own language.";
+    const description = "Chat with the seller on CommonGrounds. Each of you reads in your own language.";
     return {
       title,
       description,

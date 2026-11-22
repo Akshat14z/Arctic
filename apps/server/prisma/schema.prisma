@@ -20,6 +20,10 @@ model User {
   role           String    @default("user") // "user" | "agent"
   isDemo         Boolean   @default(false)
   agentLanguages String[]  @default([])
+  avatarUrl      String?
+  bio            String?
+  businessDescription String?
+  isVerified     Boolean   @default(false)
   email          String?   @unique // lower-cased; set when someone creates an account (DHRUMIL-T21)
   passwordHash   String?   // scrypt$<salt hex>$<key hex>
   createdAt      DateTime  @default(now())
@@ -32,6 +36,10 @@ model User {
   casesAsBuyer   Case[]    @relation("BuyerCases")
   casesAsSeller  Case[]    @relation("SellerCases")
   casesAsAgent   Case[]    @relation("AgentCases")
+  followers      SellerFollow[] @relation("FollowedSeller")
+  following      SellerFollow[] @relation("Follower")
+  notifications  Notification[] @relation("NotificationRecipient")
+  watchlist      WatchlistItem[]
 
   @@index([role])
   @@index([isDemo])
@@ -60,6 +68,8 @@ model Listing {
   priceAmount   Float
   priceCurrency String               @default("INR")
   imageUrl      String?
+  category      String?
+  isActive      Boolean              @default(true)
   isDemo        Boolean              @default(false)
   createdAt     DateTime             @default(now())
   updatedAt     DateTime             @updatedAt
@@ -67,11 +77,62 @@ model Listing {
   translations  ListingTranslation[]
   chats         Chat[]
   deals         Deal[]
+  watchedBy     WatchlistItem[]
 
   @@index([sellerId])
   @@index([createdAt])
   @@index([isDemo])
   @@map("listings")
+}
+
+model SellerFollow {
+  followerId        String
+  followingId       String
+  follower          User     @relation("Follower", fields: [followerId], references: [id], onDelete: Cascade)
+  following         User     @relation("FollowedSeller", fields: [followingId], references: [id], onDelete: Cascade)
+  notifyNewListings Boolean  @default(true)
+  notifyPriceChanges Boolean @default(true)
+  notificationFrequency String @default("instant")
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@id([followerId, followingId])
+  @@index([followingId, createdAt])
+  @@index([followerId, createdAt])
+  @@map("seller_follows")
+}
+
+model WatchlistItem {
+  userId             String
+  listingId          String
+  user               User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  listing            Listing  @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  notifyPriceChanges Boolean  @default(true)
+  createdAt          DateTime @default(now())
+
+  @@id([userId, listingId])
+  @@index([userId, createdAt])
+  @@index([listingId])
+  @@map("watchlist_items")
+}
+
+model Notification {
+  id          String    @id @default(cuid())
+  recipientId String
+  recipient   User      @relation("NotificationRecipient", fields: [recipientId], references: [id], onDelete: Cascade)
+  type        String
+  sellerId    String
+  listingId   String
+  title       String
+  body        String
+  frequency   String    @default("instant")
+  dedupeKey   String    @unique
+  readAt      DateTime?
+  createdAt   DateTime  @default(now())
+
+  @@index([recipientId, createdAt])
+  @@index([recipientId, readAt])
+  @@map("notifications")
 }
 
 model ListingTranslation {

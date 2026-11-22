@@ -2,7 +2,7 @@
   "name": "@convocart/server",
   "version": "0.1.0",
   "private": true,
-  "description": "Fastify Backend for ConvoCart / Handshake",
+  "description": "Fastify backend for CommonGrounds (CG)",
   "type": "module",
   "main": "./dist/index.js",
   "scripts": {

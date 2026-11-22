@@ -72,6 +72,7 @@ export function SignupForm() {
       });
       saveSession(res);
       router.replace(nextPath());
+      window.setTimeout(() => router.refresh(), 0);
     } catch (err) {
       setError(friendlyMessage(err));
       setBusy(null);
@@ -91,6 +92,7 @@ export function SignupForm() {
       });
       saveSession(res);
       router.replace(nextPath());
+      window.setTimeout(() => router.refresh(), 0);
     } catch (err) {
       setError(friendlyMessage(err));
       setBusy(null);
@@ -100,8 +102,9 @@ export function SignupForm() {
   const show = (k: keyof typeof errors) => touched && errors[k];
 
   return (
-    <div className="mx-auto flex w-full max-w-lg flex-col gap-6 py-6 sm:py-2">
-      <div className="flex flex-col gap-2">
+    <div className="auth-shell signup-shell">
+      <div className="flex flex-col gap-2 text-center">
+        <p className="eyebrow">CommonGrounds</p>
         <h1 className="page-title">
           {isGuest ? "Save your account" : "Create your account"}
         </h1>
@@ -112,7 +115,7 @@ export function SignupForm() {
         </p>
       </div>
 
-      <form onSubmit={createAccount} noValidate className="tile gap-5">
+      <form onSubmit={createAccount} noValidate className="tile signup-grid gap-5">
         <label className="flex flex-col gap-2">
           <span className="label">Your name</span>
           <input
@@ -133,7 +136,9 @@ export function SignupForm() {
           </span>
         </label>
 
-        <LanguagePicker value={language} onChange={setLanguage} />
+        <div className="signup-field">
+          <LanguagePicker value={language} onChange={setLanguage} />
+        </div>
 
         {/* New visitors: a guest needs only a name and a language, so that path comes first (Golden Path: in within seconds). */}
         {!isGuest && (
@@ -143,15 +148,15 @@ export function SignupForm() {
               onClick={continueAsGuest}
               disabled={!!busy}
               aria-busy={busy === "guest"}
-              className="btn btn-primary w-full"
+              className="btn btn-primary signup-span w-full"
             >
               {busy === "guest" ? "Starting…" : "Start now as a guest"}
             </button>
-            <p className="hint -mt-2 text-center">
+            <p className="hint signup-span -mt-2 text-center">
               Stays on this device. Add an email any time.
             </p>
             <div
-              className="flex items-center gap-3 text-sm text-muted"
+              className="signup-span flex items-center gap-3 text-sm text-muted"
               aria-hidden
             >
               <span className="h-px flex-1 bg-border" />
@@ -202,7 +207,7 @@ export function SignupForm() {
         </div>
 
         {error && (
-          <p role="alert" className="note note-error">
+          <p role="alert" className="note note-error signup-span">
             {error}
           </p>
         )}
@@ -211,7 +216,7 @@ export function SignupForm() {
           type="submit"
           disabled={!!busy}
           aria-busy={busy === "account"}
-          className={`btn w-full ${isGuest ? "btn-primary" : "btn-secondary"}`}
+          className={`btn signup-span w-full ${isGuest ? "btn-primary" : "btn-secondary"}`}
         >
           {busy === "account"
             ? "Creating your account…"
@@ -220,7 +225,7 @@ export function SignupForm() {
               : "Create account"}
         </button>
 
-        <p className="meta text-center">Free. No card needed.</p>
+        <p className="meta signup-span text-center">Free. No card needed.</p>
       </form>
 
       <p className="text-center text-sm">

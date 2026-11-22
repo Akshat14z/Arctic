@@ -10,11 +10,11 @@ const serif = Instrument_Serif({ variable: "--font-instrument", subsets: ["latin
 const inter = Inter({ variable: "--font-inter", subsets: ["latin"], weight: ["400", "500", "600"], display: "swap" });
 
 export const metadata: Metadata = {
-  title: { default: "Handshake: same deal, in both languages", template: "%s · Handshake" },
+  title: { default: "CommonGrounds: commerce built on conversation", template: "%s · CommonGrounds" },
   description: "Marketplace chat that translates every message and spells out every amount, so both sides agree to the same deal.",
 };
 
-export const viewport: Viewport = { themeColor: "oklch(96.4% 0.006 250)" };
+export const viewport: Viewport = { themeColor: "oklch(97% 0.012 80)" };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
@@ -23,7 +23,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     <html lang="en" className={`${inter.variable} ${serif.variable} h-full antialiased`} suppressHydrationWarning>
       <head>
         {/* Before paint: with script and motion allowed, the landing hides its hero until GSAP takes it over (landing.css). A judge-mode seat frame (/try/both) drops the app chrome. */}
-        <script dangerouslySetInnerHTML={{ __html: "if(matchMedia('(prefers-reduced-motion: no-preference)').matches)document.documentElement.classList.add('js');if(/^hs-seat-/.test(window.name))document.documentElement.classList.add('seat')" }} />
+        <script dangerouslySetInnerHTML={{ __html: "try{var t=localStorage.getItem('cg.theme')||(matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');document.documentElement.dataset.theme=t}catch(e){}if(matchMedia('(prefers-reduced-motion: no-preference)').matches)document.documentElement.classList.add('js');if(/^hs-seat-/.test(window.name))document.documentElement.classList.add('seat')" }} />
       </head>
       <body className="flex min-h-full flex-col font-sans">
         <HtmlLang />

@@ -165,3 +165,19 @@ Akshat receives Nexconn's `message:send` webhook for: transcript storage, scam d
 | 4 | Server-side group creation supported via `groupChannelManagementApi.createGroupChannel({ channelId, name, owner, userIds })` | Akshat | `node_modules/@nexconn/server-sdk/dist/api.d.ts` |
 | 5 | Server client requires `setPrimaryBackupDomains(primary, backup)` before sending requests | Akshat | `node_modules/@nexconn/server-sdk/dist/configuration.d.ts` |
 | 6 | `extra` size limit: 8 KB sends fine; 16 KB fails with error code 20115. Text + `extra` budget is ~8 KB. | Dhrumil | DHRUMIL-006 spike probe |
+
+## C7 — Social commerce and seller follows
+
+Implemented in `packages/contracts/src/c7-social-commerce.ts`.
+
+- `POST /api/sellers/:id/follow` — authenticated, idempotently follows a seller; self-follow is rejected.
+- `DELETE /api/sellers/:id/follow` — authenticated, idempotently unfollows a seller.
+- `GET /api/sellers/:id/follow-status` — authenticated relationship, counts, and notification preferences.
+- `GET /api/sellers/:id/followers` and `/following` — public cursor-paginated relationship lists.
+- `PATCH /api/sellers/:id/follow-preferences` — authenticated per-seller new-listing/price-change settings.
+- `GET /api/sellers/:id` — public-safe seller storefront and active listing page.
+- `GET /api/following/feed` — authenticated chronological, cursor-paginated active listings from followed sellers.
+- `GET /api/notifications` and `PATCH /api/notifications/:id/read` — persistent in-app notification inbox.
+- `GET /api/watchlist`, `GET /api/watchlist/:listingId/status`, and `POST`/`DELETE /api/watchlist/:listingId` — persistent Smart Watchlist, distinct from following.
+
+`SellerFollow` uses `(followerId, followingId)` as its database primary key. Notification dedupe keys are source-neutral so a later Watchlist notifier can reuse them without creating a second event. Push and email delivery are not part of this contract.

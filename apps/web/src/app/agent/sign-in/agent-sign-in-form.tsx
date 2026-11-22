@@ -41,7 +41,9 @@ export function AgentSignInForm() {
         body: { displayName: name.trim(), language, agentLanguages: helps, code },
         schema: AuthResponseSchema,
       });
-      saveSession(res); // the effect above redirects
+      saveSession(res);
+      router.replace(nextPath());
+      window.setTimeout(() => router.refresh(), 0);
     } catch (err) {
       setError(friendlyMessage(err));
       setBusy(false);
@@ -51,7 +53,7 @@ export function AgentSignInForm() {
   return (
     <form onSubmit={submit} noValidate className="flex flex-col gap-8">
       <div className="flex flex-col gap-2">
-        <h1 className="page-title">Handshake support</h1>
+        <h1 className="page-title">CommonGrounds support</h1>
         <p className="text-muted">Sign in to the dispatch console.</p>
         {session && session.user.role !== "agent" && (
           <p className="note">You&apos;re signed in as {session.user.displayName}. Signing in here switches you to a support account.</p>

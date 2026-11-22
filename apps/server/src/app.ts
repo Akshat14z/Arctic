@@ -14,6 +14,7 @@ import { webhookRoutes } from './routes/webhooks.js';
 import { dealRoutes } from './routes/deals.js';
 import { sealRoutes } from './routes/seals.js';
 import { demoRoutes } from './routes/demo.js';
+import { socialCommerceRoutes } from './routes/social-commerce.js';
 
 export async function buildApp(): Promise<FastifyInstance> {
   const config = getConfig();
@@ -64,6 +65,7 @@ export async function buildApp(): Promise<FastifyInstance> {
   await app.register(dealRoutes);
   await app.register(sealRoutes);
   await app.register(demoRoutes);
+  await app.register(socialCommerceRoutes);
 
   return app;
 }

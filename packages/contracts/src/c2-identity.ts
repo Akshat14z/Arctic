@@ -18,6 +18,10 @@ export const UserSchema = z.object({
   isDemo: z.boolean().default(false),
   agentLanguages: z.array(LangCodeSchema).optional(),
   keptDeals: KeptDealsSchema.optional(),
+  avatarUrl: z.string().url().optional(),
+  bio: z.string().optional(),
+  businessDescription: z.string().optional(),
+  isVerified: z.boolean().optional(),
 });
 export type User = z.infer<typeof UserSchema>;
 

@@ -12,6 +12,8 @@ import { DemoBadge, ListingImage } from "@/components/listing-card";
 import { ShareListing } from "@/components/share-listing";
 import { translator } from "@/lib/i18n";
 import { useT } from "@/lib/use-t";
+import { FollowButton } from "@/components/follow-button";
+import { WatchlistButton } from "@/components/watchlist-button";
 
 /** Opens (or reuses) the buyer's chat for this listing. Guests sign in first and come back here. */
 function ChatWithSeller({ listingId }: { listingId: string }) {
@@ -157,7 +159,7 @@ export function ListingDetail() {
           {mine ? (
             <p className="note">{t("listing.mine")}</p>
           ) : (
-            <ChatWithSeller listingId={listing.id} />
+            <div className="flex flex-col gap-2"><ChatWithSeller listingId={listing.id} /><WatchlistButton listingId={listing.id} /></div>
           )}
 
           {listing.description && (
@@ -171,7 +173,7 @@ export function ListingDetail() {
 
           {listing.seller && (
             <section className="flex flex-wrap items-center justify-between gap-3 border-t border-border pt-6">
-              <div className="flex min-w-0 items-center gap-3">
+              <Link href={`/sellers/${listing.seller.id}`} className="flex min-w-0 items-center gap-3 text-text no-underline hover:underline">
                 <span aria-hidden className="grid size-10 shrink-0 place-items-center rounded-full bg-surface-2 font-semibold">
                   {listing.seller.displayName.trim().charAt(0).toUpperCase()}
                 </span>
@@ -179,10 +181,13 @@ export function ListingDetail() {
                   <p className="font-medium break-words">{listing.seller.displayName}</p>
                   <p className="meta">{t("listing.seller")}</p>
                 </div>
+              </Link>
+              <div className="flex flex-wrap items-center gap-3">
+                {!mine && <FollowButton sellerId={listing.seller.id} compact />}
+                <time dateTime={listing.createdAt} className="meta">
+                  {t("listing.listed", { date: new Date(listing.createdAt).toLocaleDateString(lang === "en" ? "en-IN" : lang, { day: "numeric", month: "short", year: "numeric" }) })}
+                </time>
               </div>
-              <time dateTime={listing.createdAt} className="meta">
-                {t("listing.listed", { date: new Date(listing.createdAt).toLocaleDateString(lang === "en" ? "en-IN" : lang, { day: "numeric", month: "short", year: "numeric" }) })}
-              </time>
             </section>
           )}
 

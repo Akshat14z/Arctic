@@ -59,7 +59,7 @@ const SPEC: [string, string][] = [
   ["Translation", "Every message, in 8 languages, with the original one tap away"],
   ["Meaning Guard", "Amounts like “2 lakh” checked before you send"],
   ["Deal Card", "The terms, agreed by both sides in their own language"],
-  ["Handshake Seal", "A QR code anyone can scan to see the same deal"],
+  ["CommonGrounds Seal", "A QR code anyone can scan to see the same deal"],
   ["Get help", "A human agent who reads what each side wrote"],
 ];
 
@@ -71,7 +71,7 @@ export default function Home() {
       <div className="l-wrap">
         <header className="l-nav">
           <Link href="/" className="l-mark">
-            Handshake
+            CommonGrounds
           </Link>
           <nav aria-label="Main" className="flex items-center gap-x-5 gap-y-1">
             <Link href="/listings" className="l-link l-link-wide">
@@ -148,15 +148,10 @@ export default function Home() {
             <img data-who="priya" className="l-person l-person-priya" src="/people/priya.svg" alt="" width={1200} height={2980} />
             {/* eslint-disable-next-line @next/next/no-img-element -- static Open Peeps SVG */}
             <img data-who="kenji" className="l-person l-person-kenji" src="/people/kenji.svg" alt="" width={1200} height={2980} />
-            {/* eslint-disable-next-line @next/next/no-img-element -- static Open Peeps SVG */}
-            <img data-who="sarah" className="l-person l-person-sarah" src="/people/sarah.svg" alt="" width={1450} height={2980} />
-
             <p data-say="1a" className="l-say l-say-left l-say-mine" lang="hi">क्या आप ₹14,000 में देंगे?</p>
             <p data-say="2b" className="l-say l-say-left l-say-low" lang="hi">₹15,000 अंतिम मूल्य है।</p>
             <p data-say="1b" className="l-say l-say-right" lang="ja">₹14,000でいかがですか？</p>
             <p data-say="2a" className="l-say l-say-right l-say-low l-say-mine" lang="ja">₹15,000が最終価格です。</p>
-            <p data-say="4" className="l-say l-say-sarah">I can read both sides.</p>
-
             <div data-fly="1" className="l-fly"><span>₹14,000</span></div>
             <div data-fly="2" className="l-fly l-fly-back"><span>₹15,000</span></div>
 
@@ -259,7 +254,7 @@ export default function Home() {
       </div>
 
       {/* The street: everyone who might trade here, standing on the footer rule */}
-      <div className="l-wrap l-street" aria-hidden>
+      <div className="l-street" aria-hidden>
         {STREET.map((n, i) => (
           <span key={n} className="l-peep">
             {/* eslint-disable-next-line @next/next/no-img-element -- static Open Peeps SVG */}
@@ -279,18 +274,6 @@ export default function Home() {
         </span>
       </div>
 
-      <footer className="l-wrap l-footer">
-        <Link href="/" className="l-mark">
-          Handshake
-        </Link>
-        <nav aria-label="Footer">
-          <Link href="/try" className="l-link">Try the demo</Link>
-          <Link href="/listings" className="l-link">Browse</Link>
-          <Link href="/listings/new" className="l-link">Sell</Link>
-          <a href="https://github.com/Akshat14z/Arctic" className="l-link">Source code</a>
-        </nav>
-        <p className="basis-full">Built for the Nexconn Build Challenge 2026. Demo accounts are marked Demo. People drawn from Open Peeps by Pablo Stanley (CC0). Demo listing photos on Unsplash by Lucas D., Ethan Hoover, Charlie Schroeder, Cooker King, Thorium, Mohit Tomar, Beau Carpenter and Goashape Studio.</p>
-      </footer>
     </div>
   );
 }

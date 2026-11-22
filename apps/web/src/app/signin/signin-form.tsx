@@ -42,6 +42,7 @@ export function SigninForm() {
       const res = await api("/api/auth/signin", { method: "POST", body: { email: email.trim(), password }, schema: AuthResponseSchema });
       saveSession(res);
       router.replace(nextPath(res.user.role === "agent" ? "/agent" : "/home"));
+      window.setTimeout(() => router.refresh(), 0);
     } catch (err) {
       setError(friendlyMessage(err));
       setBusy(false);
@@ -49,8 +50,9 @@ export function SigninForm() {
   }
 
   return (
-    <div className="mx-auto flex w-full max-w-md flex-col gap-6 py-6 sm:py-2">
-      <div className="flex flex-col gap-2">
+    <div className="auth-shell">
+      <div className="flex flex-col gap-2 text-center">
+        <p className="eyebrow">CommonGrounds</p>
         <h1 className="page-title">Welcome back</h1>
         <p className="text-muted">Sign in to pick up your chats where you left them.</p>
       </div>
@@ -102,7 +104,7 @@ export function SigninForm() {
 
       <div className="flex flex-col items-center gap-2 text-center text-sm">
         <p>
-          New to Handshake?{" "}
+          New to CommonGrounds?{" "}
           <Link href={signupHref} className="link">
             Create an account
           </Link>

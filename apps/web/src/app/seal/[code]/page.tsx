@@ -1,7 +1,7 @@
 import { Suspense } from "react";
 import { SealSkeleton, SealView } from "./seal-view";
 
-export const metadata = { title: "Handshake Seal" };
+export const metadata = { title: "CommonGrounds Seal" };
 
 // Public (D-023): anyone with the link or the QR can check the deal, no sign-in.
 export default function SealPage() {

@@ -23,6 +23,7 @@ export function NewListingForm() {
   const [amount, setAmount] = useState("");
   const [currency, setCurrency] = useState<Money["currency"] | null>(null);
   const [imageUrl, setImageUrl] = useState("");
+  const [category, setCategory] = useState("");
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [busy, setBusy] = useState(false);
   const [failure, setFailure] = useState<string | null>(null);
@@ -42,6 +43,7 @@ export function NewListingForm() {
       description: description.trim(),
       price: { amount: price, currency: cur },
       ...(imageUrl.trim() && { imageUrl: imageUrl.trim() }),
+      ...(category && { category }),
     };
     const parsed = ListingCreateRequestSchema.safeParse(body);
     if (!parsed.success) {
@@ -147,6 +149,14 @@ export function NewListingForm() {
         )}
         {error("price")}
       </fieldset>
+
+      <label className="flex flex-col gap-2">
+        <span className="label">Category</span>
+        <select value={category} onChange={(e) => setCategory(e.target.value)} className="field">
+          <option value="">Choose a category</option>
+          {['Electronics', 'Fashion', 'Home', 'Books', 'Sports', 'Collectibles', 'Other'].map((value) => <option key={value}>{value}</option>)}
+        </select>
+      </label>
 
       <label className="flex flex-col gap-2">
         <span className="label">

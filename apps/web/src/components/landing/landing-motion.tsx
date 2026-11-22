@@ -6,7 +6,7 @@
    the compositor at 60fps.
    - Lenis smooth scroll, synced to ScrollTrigger.
    - Hero: the title rises line by line (GSAP SplitText, after React Bits' SplitText), the screens settle.
-   - Story chapter: pinned while Priya and Kenji trade messages, the deal is sealed, and Sarah arrives.
+   - Story chapter: pinned while Priya and Kenji trade messages and seal the deal.
    - Footer: the street of people steps up onto the rule and sways.
    - Magnet on the primary buttons (after React Bits' Magnet), fine pointers only. */
 
@@ -119,7 +119,7 @@ export function LandingMotion() {
         const s = (sel: string) => chapter.querySelectorAll(sel);
         const tl = gsap.timeline({
           defaults: { ease: "power3.out", duration: 1 },
-          scrollTrigger: { trigger: chapter, start: "top top", end: "+=2600", pin: chapter.querySelector(".l-chapter-pin"), scrub: 0.6, anticipatePin: 1, invalidateOnRefresh: true },
+          scrollTrigger: { trigger: chapter, start: "top top", end: "+=4400", pin: chapter.querySelector(".l-chapter-pin"), scrub: 1.15, anticipatePin: 1, invalidateOnRefresh: true },
         });
         const step = (n: number) => s(`.l-step[data-step="${n}"]`);
         // An amount crossing from one person to the other, along the whole track (measured on refresh).
@@ -131,12 +131,12 @@ export function LandingMotion() {
           const far = () => track.offsetWidth - chip.offsetWidth;
           gsap.set(chip, { autoAlpha: 0 });
           return t
-            .fromTo(chip, { x: () => (n === 1 ? 0 : far()) }, { x: () => (n === 1 ? far() : 0), duration: 0.8, ease: "power2.inOut" })
-            .to(chip, { autoAlpha: 1, duration: 0.15 }, 0)
-            .to(chip, { autoAlpha: 0, duration: 0.15 }, 0.65);
+            .fromTo(chip, { x: () => (n === 1 ? 0 : far()) }, { x: () => (n === 1 ? far() : 0), duration: 1.35, ease: "power1.inOut" })
+            .to(chip, { autoAlpha: 1, duration: 0.25 }, 0)
+            .to(chip, { autoAlpha: 0, duration: 0.25 }, 1.1);
         };
         gsap.set(s(".l-step"), { autoAlpha: 0, y: 24 });
-        gsap.set(s("[data-say], [data-deal], [data-seal], [data-who='sarah']"), { autoAlpha: 0 });
+        gsap.set(s("[data-say], [data-deal], [data-seal]"), { autoAlpha: 0 });
 
         tl.to(step(1), { autoAlpha: 1, y: 0 })
           .fromTo(s("[data-say='1a']"), { y: 16, scale: 0.92 }, { autoAlpha: 1, y: 0, scale: 1 }, "<0.2")
@@ -151,14 +151,13 @@ export function LandingMotion() {
           .fromTo(s("[data-say='2b']"), { y: 16, scale: 0.92 }, { autoAlpha: 1, y: 0, scale: 1 }, "-=0.2")
           .to(step(2), { autoAlpha: 0, y: -24 }, "+=0.4")
           .to(step(3), { autoAlpha: 1, y: 0 }, "<0.2")
-          .to(s("[data-say]:not([data-say='4'])"), { autoAlpha: 0.35 }, "<")
+          .to(s("[data-say]"), { autoAlpha: 0.35 }, "<")
           .fromTo(s("[data-deal]"), { y: 60, scale: 0.94 }, { autoAlpha: 1, y: 0, scale: 1 }, "<0.1")
           .fromTo(s("[data-seal]"), { scale: 2.2, rotate: -40 }, { autoAlpha: 1, scale: 1, rotate: -12, ease: "back.out(2)", duration: 0.6 })
           .to(step(3), { autoAlpha: 0, y: -24 }, "+=0.4")
           .to(step(4), { autoAlpha: 1, y: 0 }, "<0.2")
-          .fromTo(s("[data-who='sarah']"), { xPercent: 60 }, { autoAlpha: 1, xPercent: 0, duration: 1.2 }, "<")
-          .fromTo(s("[data-say='4']"), { y: 16, scale: 0.92 }, { autoAlpha: 1, y: 0, scale: 1 }, "-=0.3")
-          .to({}, { duration: 0.6 }); // hold the last frame before the pin releases
+          .to(s("[data-deal], [data-seal]"), { autoAlpha: 1, duration: 0.8 }, "<")
+          .to({}, { duration: 1.2 }); // hold the last frame before the pin releases
       }
       return () => chapter?.classList.remove("is-pinned");
     });

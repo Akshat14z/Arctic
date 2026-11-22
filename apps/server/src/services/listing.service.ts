@@ -11,6 +11,20 @@ import type {
 import { prisma } from '../db/prisma.js';
 import { formatUser } from './auth.service.js';
 import { AppError } from '../errors.js';
+import { notifyNewListing, notifyPriceChange } from './notification.service.js';
+
+const LISTING_CACHE_TTL_MS = 5_000;
+const LISTING_CACHE_MAX_ENTRIES = 200;
+const listingCache = new Map<string, { expiresAt: number; value: ListingListResponse }>();
+const listingRequests = new Map<string, Promise<ListingListResponse>>();
+
+function listingCacheKey(query: ListingListQuery): string {
+  return JSON.stringify({ q: query.q?.trim() || '', lang: query.lang || '', cursor: query.cursor || '' });
+}
+
+function clearListingCache(): void {
+  listingCache.clear();
+}
 
 export function generateListingId(prefix = 'l'): string {
   const randomPart = randomBytes(6).toString('hex');
@@ -26,6 +40,8 @@ interface DbListingWithRelations {
   priceAmount: number;
   priceCurrency: string;
   imageUrl: string | null;
+  category: string | null;
+  isActive: boolean;
   isDemo: boolean;
   createdAt: Date;
   updatedAt: Date;
@@ -76,6 +92,8 @@ export function formatListing(
       currency: dbListing.priceCurrency as any,
     },
     imageUrl: dbListing.imageUrl || undefined,
+    category: dbListing.category || undefined,
+    isActive: dbListing.isActive,
     isDemo: dbListing.isDemo,
     createdAt: dbListing.createdAt.toISOString(),
   };
@@ -105,6 +123,7 @@ export async function createListing(
       priceAmount: input.price.amount,
       priceCurrency: input.price.currency || 'INR',
       imageUrl: input.imageUrl || null,
+      category: input.category || null,
       isDemo: seller.isDemo,
     },
     include: {
@@ -113,10 +132,37 @@ export async function createListing(
     },
   });
 
+  clearListingCache();
+
+  await notifyNewListing({ sellerId: seller.id, listingId: created.id, listingTitle: created.title });
+
   return formatListing(created);
 }
 
 export async function getListings(
+  query: ListingListQuery
+): Promise<ListingListResponse> {
+  const cacheKey = listingCacheKey(query);
+  const cached = listingCache.get(cacheKey);
+  if (cached && cached.expiresAt > Date.now()) return cached.value;
+  listingCache.delete(cacheKey);
+
+  const pending = listingRequests.get(cacheKey);
+  if (pending) return pending;
+
+  const request = queryListings(query).then((value) => {
+    if (listingCache.size >= LISTING_CACHE_MAX_ENTRIES) {
+      const oldest = listingCache.keys().next().value;
+      if (oldest) listingCache.delete(oldest);
+    }
+    listingCache.set(cacheKey, { expiresAt: Date.now() + LISTING_CACHE_TTL_MS, value });
+    return value;
+  }).finally(() => listingRequests.delete(cacheKey));
+  listingRequests.set(cacheKey, request);
+  return request;
+}
+
+async function queryListings(
   query: ListingListQuery
 ): Promise<ListingListResponse> {
   const pageSize = 20;
@@ -213,6 +259,12 @@ export async function updateListing(
   if (input.imageUrl !== undefined) {
     dataToUpdate.imageUrl = input.imageUrl;
   }
+  if (input.category !== undefined) {
+    dataToUpdate.category = input.category;
+  }
+  if (input.isActive !== undefined) {
+    dataToUpdate.isActive = input.isActive;
+  }
 
   const updated = await prisma.listing.update({
     where: { id },
@@ -222,6 +274,18 @@ export async function updateListing(
       translations: true,
     },
   });
+
+  clearListingCache();
+
+  if (input.price && (input.price.amount !== existing.priceAmount || input.price.currency !== existing.priceCurrency)) {
+    await notifyPriceChange({
+      sellerId: existing.sellerId,
+      listingId: updated.id,
+      listingTitle: updated.title,
+      priceAmount: updated.priceAmount,
+      priceCurrency: updated.priceCurrency,
+    });
+  }
 
   return formatListing(updated);
 }
@@ -250,6 +314,7 @@ export async function deleteListing(
   await prisma.listing.delete({
     where: { id },
   });
+  clearListingCache();
 
   return {
     success: true,

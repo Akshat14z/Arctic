@@ -51,14 +51,246 @@
 }
 
 /* The landing page brings its own masthead. A judge-mode seat (/try/both) shows only the page. */
-html.seat :is([data-app-chrome], [data-bottom-tabs], [data-seat-hide]) { display: none; }
+html.seat :is([data-app-chrome], [data-app-announcement], [data-bottom-tabs], [data-seat-hide]) { display: none; }
 /* The app header is sticky; screen headers that also stick (chat, help request) sit right under it. */
 :root { --chrome-h: 4rem; }
 html.seat { --chrome-h: 0px; }
 html:not(.seat) [data-seat-only] { display: none; }
-body:has([data-landing]) [data-app-chrome] { display: none; }
-/* One system: the app and the landing share one plain paper surface. No grid: it fought the text for attention. */
-body:not(:has([data-landing])) { background-color: var(--color-paper); }
+/* CommonGround canvas: a quiet technical grid connects the light and dark themes. */
+body:not(:has([data-landing])) {
+  --color-paper: oklch(97% 0.012 80);
+  --color-paper-2: oklch(99.2% 0.008 82);
+  --color-paper-3: oklch(93.5% 0.018 78);
+  --color-rule: oklch(88% 0.018 76);
+  --color-rule-2: oklch(77% 0.025 72);
+  --color-accent: oklch(39% 0.105 253);
+  --color-accent-ink: oklch(98% 0.006 80);
+  background-color: var(--color-paper);
+  background-image:
+    linear-gradient(oklch(39% 0.105 253 / 0.055) 1px, transparent 1px),
+    linear-gradient(90deg, oklch(39% 0.105 253 / 0.055) 1px, transparent 1px),
+    radial-gradient(circle at 8% 0%, oklch(92% 0.045 80 / 0.62), transparent 34rem),
+    radial-gradient(circle at 100% 18%, oklch(91% 0.035 245 / 0.52), transparent 30rem);
+  background-size: 32px 32px, 32px 32px, auto, auto;
+  background-attachment: fixed;
+}
+
+html[data-theme="dark"] { color-scheme: dark; }
+html[data-theme="dark"] body:not(:has([data-landing])) {
+  --color-paper: oklch(13.5% 0.012 255);
+  --color-paper-2: oklch(18% 0.014 255);
+  --color-paper-3: oklch(23% 0.018 255);
+  --color-ink: oklch(94.5% 0.008 250);
+  --color-ink-2: oklch(83% 0.012 250);
+  --color-muted: oklch(72% 0.018 252);
+  --color-rule: oklch(27.5% 0.02 255);
+  --color-rule-2: oklch(38% 0.035 254);
+  --color-accent: oklch(66% 0.16 255);
+  --color-accent-ink: oklch(98% 0.008 250);
+  --color-focus: oklch(72% 0.16 248);
+  --color-shadow: oklch(2% 0.006 258 / 0.62);
+  --color-guard-bg: oklch(23% 0.055 70);
+  --color-danger-bg: oklch(22% 0.055 27);
+  --color-success-bg: oklch(22% 0.055 152);
+  --color-hero-1: oklch(23% 0.065 250);
+  --color-hero-2: oklch(31% 0.11 252);
+  --color-hero-ink: oklch(97% 0.01 250);
+  --color-hero-muted: oklch(78% 0.035 250);
+  --color-hero-go: oklch(96% 0.01 250);
+  background-image:
+    linear-gradient(oklch(82% 0.025 250 / 0.045) 1px, transparent 1px),
+    linear-gradient(90deg, oklch(82% 0.025 250 / 0.045) 1px, transparent 1px),
+    radial-gradient(circle at 86% -4%, oklch(48% 0.12 257 / 0.16), transparent 32rem),
+    radial-gradient(circle at 4% 72%, oklch(33% 0.07 245 / 0.12), transparent 38rem);
+}
+
+/* Marketplace surfaces: restrained editorial warmth, durable responsive behavior. */
+.auth-shell { margin: auto; display: flex; width: 100%; max-width: 28rem; flex-direction: column; gap: 1.5rem; padding-block: clamp(2rem, 7vh, 5rem); }
+.auth-shell .tile { box-shadow: 0 22px 65px -48px var(--color-shadow); }
+.signup-shell { max-width: 58rem; }
+.signup-field { min-width: 0; }
+.signup-span { min-width: 0; }
+@media (min-width: 48rem) {
+  .signup-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; }
+  .signup-span { grid-column: 1 / -1; }
+}
+.eyebrow { font-size: var(--text-xs); font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--color-muted); }
+.storefront-hero { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: var(--space-lg); padding: clamp(1.25rem, 4vw, 2.5rem); border: 1px solid var(--color-rule); border-radius: var(--radius-card); background: color-mix(in oklab, var(--color-paper-2) 94%, transparent); box-shadow: 0 28px 80px -64px var(--color-shadow); }
+.market-card { display: block; min-width: 0; overflow: hidden; border: 1px solid var(--color-rule); border-radius: 20px; background: var(--color-paper-2); color: var(--color-ink); text-decoration: none; box-shadow: 0 18px 50px -46px var(--color-shadow); transition: border-color var(--dur-short) var(--ease-out), transform var(--dur-short) var(--ease-out); }
+.market-card:hover { border-color: var(--color-rule-2); }
+.empty-state { display: flex; min-height: 16rem; flex-direction: column; align-items: center; justify-content: center; gap: var(--space-sm); padding: var(--space-xl); border: 1px dashed var(--color-rule-2); border-radius: var(--radius-card); background: color-mix(in oklab, var(--color-paper-2) 70%, transparent); text-align: center; }
+.empty-state p { color: var(--color-muted); }
+.category-chip, .verified-badge { display: inline-flex; align-items: center; min-height: 2rem; padding-inline: 0.75rem; border-radius: var(--radius-pill); border: 1px solid var(--color-rule); background: var(--color-paper-2); font-size: var(--text-sm); font-weight: 600; }
+.verified-badge { color: var(--color-accent); }
+@media (max-width: 40rem) { .storefront-hero { grid-template-columns: minmax(0, 1fr); } }
+
+/* Theme control is a mode action, not a checkbox-style switch. */
+.theme-mode { display: flex; min-height: 2.75rem; width: 100%; align-items: center; gap: 0.7rem; border: 1px solid transparent; border-radius: var(--radius-field); background: transparent; padding: 0.3rem 0.5rem; color: var(--color-ink); font: 500 var(--text-sm)/1 var(--font-body); cursor: pointer; transition: background-color var(--dur-short) var(--ease-out), border-color var(--dur-short) var(--ease-out); }
+.theme-mode:hover { border-color: var(--color-rule); background: var(--color-paper-3); }
+.theme-mode-compact { width: 2.75rem; justify-content: center; padding: 0; border-color: var(--color-rule); border-radius: 999px; background: color-mix(in oklab, var(--color-paper-2) 92%, transparent); }
+.theme-mode-glyph { display: grid; width: 2rem; height: 2rem; flex: none; place-items: center; border-radius: 50%; background: var(--color-paper-3); color: var(--color-ink-2); }
+.theme-mode-glyph svg { width: 1.05rem; height: 1.05rem; }
+.theme-mode[aria-pressed="true"] .theme-mode-glyph { background: color-mix(in oklab, var(--color-accent) 20%, var(--color-paper-3)); color: var(--color-accent); }
+
+/* A single continuous chat surface removes the old hard seam beneath the listing header. */
+.chat-page { width: 100%; max-width: 64rem; margin-inline: auto; padding-inline: clamp(0rem, 2vw, 1rem); }
+.chat-header { margin-top: 0.75rem; padding: 0.9rem; border: 1px solid var(--color-rule); border-radius: 22px; background: color-mix(in oklab, var(--color-paper-2) 96%, transparent); box-shadow: 0 22px 60px -50px var(--color-shadow); backdrop-filter: blur(16px); }
+.chat-page > :not(.chat-header) { padding-inline: clamp(0.25rem, 1vw, 0.75rem); }
+@media (max-width: 40rem) { .chat-page { padding-inline: 0; } .chat-header { border-radius: 0 0 20px 20px; border-top: 0; margin-top: 0; } }
+
+/* Profile: progress is computed from real account fields, so the game layer stays honest. */
+.profile-hero { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(16rem, 0.75fr); gap: 1.5rem; padding: clamp(1.25rem, 3vw, 2rem); border: 1px solid var(--color-rule); border-radius: 26px; background: linear-gradient(135deg, color-mix(in oklab, var(--color-paper-2) 96%, transparent), color-mix(in oklab, var(--color-accent) 9%, var(--color-paper-2))); box-shadow: 0 28px 80px -64px var(--color-shadow); }
+.profile-avatar { box-shadow: 0 0 0 5px color-mix(in oklab, var(--color-accent) 18%, transparent); }
+.profile-progress { display: flex; flex-direction: column; justify-content: center; gap: 0.75rem; padding: 1rem; border: 1px solid var(--color-rule); border-radius: 18px; background: color-mix(in oklab, var(--color-paper-2) 88%, transparent); }
+.profile-progress-track { height: 0.55rem; overflow: hidden; border-radius: 999px; background: var(--color-paper-3); }
+.profile-progress-track > span { display: block; height: 100%; border-radius: inherit; background: var(--color-accent); }
+.profile-badge { display: inline-flex; min-height: 1.8rem; align-items: center; border: 1px solid var(--color-rule); border-radius: 999px; padding-inline: 0.65rem; background: var(--color-paper-2); font-size: 0.72rem; font-weight: 600; color: var(--color-ink-2); }
+.profile-panel { padding: clamp(1.25rem, 3vw, 2rem); border: 1px solid var(--color-rule); border-radius: 22px; background: color-mix(in oklab, var(--color-paper-2) 94%, transparent); }
+@media (max-width: 47.99rem) { .profile-hero { grid-template-columns: minmax(0, 1fr); } }
+
+/* Internal-page brand footer: slim single-line bar */
+.cg-footer {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: 100%;
+  min-height: 2.75rem;
+  overflow: hidden;
+  background: var(--color-paper);
+  border-top: 1px solid var(--color-rule);
+  color: var(--color-ink);
+  padding: 0 clamp(0.75rem, 3vw, 2rem);
+}
+/* Very subtle dual-blob wash — barely visible, no blue tint */
+.cg-footer::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at 92% 50%, oklch(90% 0.02 250 / 0.4) 0%, transparent 55%),
+    radial-gradient(ellipse at 8% 50%, oklch(92% 0.015 260 / 0.3) 0%, transparent 45%);
+  pointer-events: none;
+  z-index: 0;
+}
+.cg-footer::after { display: none; }
+html[data-theme="dark"] .cg-footer {
+  background: oklch(13% 0.012 262);
+  border-top-color: oklch(20% 0.012 262);
+}
+html[data-theme="dark"] .cg-footer::before { opacity: 0.15; }
+
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .cg-footer { animation: cg-footer-rise linear both; animation-timeline: view(); animation-range: entry 0% entry 80%; }
+  }
+}
+@keyframes cg-footer-rise { from { opacity: 0; transform: translateY(0.5rem); } to { opacity: 1; transform: none; } }
+@media (max-width: 38rem) {
+  .cg-footer { padding-inline: 0.75rem; }
+}
+/* Abstract SVG overlay — full-bleed, behind the type */
+.cg-footer-abstract {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  color: var(--color-ink);
+  pointer-events: none;
+  z-index: 0;
+}
+html[data-theme="dark"] .cg-footer-abstract { opacity: 0.4; }
+
+/* Meta row: brand · tagline + live clock */
+.cg-footer-inner {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+  gap: 1rem;
+}
+.cg-footer-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+.cg-footer-brand {
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-ink);
+}
+.cg-footer-divider {
+  color: var(--color-muted);
+  font-size: 0.75rem;
+  line-height: 1;
+}
+.cg-footer-tagline {
+  font-family: var(--font-body);
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+}
+.cg-footer-clock {
+  font-family: var(--font-body);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  color: var(--color-muted);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.account-card { transition: border-color var(--dur-short) var(--ease-out), background-color var(--dur-short) var(--ease-out); }
+.account-card:hover { border-color: var(--color-rule-2); background: var(--color-paper-3); }
+
+/* Nike-like hierarchy, CommonGrounds content: a slim announcement rail above campaign and discovery modules. */
+.announcement-rail { position: relative; width: 100%; overflow: hidden; border-bottom: 1px solid var(--color-rule); background: var(--color-ink); color: var(--color-paper-2); }
+.announcement-track { display: flex; width: max-content; min-height: 2.2rem; align-items: center; }
+.announcement-set { display: flex; flex: none; align-items: center; }
+.announcement-set > span { display: inline-flex; align-items: center; gap: 2rem; padding-right: 2rem; font-size: 0.72rem; font-weight: 600; letter-spacing: 0.09em; text-transform: uppercase; white-space: nowrap; }
+.announcement-set i { color: var(--color-accent); font-size: 0.55rem; font-style: normal; }
+.announcement-control { position: absolute; top: 50%; right: 0.45rem; min-width: 3.5rem; min-height: 1.7rem; translate: 0 -50%; border: 1px solid oklch(100% 0 0 / 0.22); border-radius: 999px; background: color-mix(in oklab, var(--color-ink) 90%, transparent); color: inherit; font-size: 0.66rem; font-weight: 600; cursor: pointer; }
+@media (prefers-reduced-motion: no-preference) { .announcement-track { animation: announcement-loop 34s linear infinite; } .announcement-rail:hover .announcement-track, .announcement-rail:focus-within .announcement-track, .announcement-rail.is-paused .announcement-track { animation-play-state: paused; } }
+@media (prefers-reduced-motion: reduce) { .announcement-control { display: none; } }
+@keyframes announcement-loop { to { transform: translateX(-50%); } }
+
+.home-campaign { position: relative; isolation: isolate; display: grid; min-height: clamp(18rem, 34vw, 28rem); grid-template-columns: minmax(0, 1.2fr) minmax(15rem, 0.8fr); overflow: hidden; border: 1px solid var(--color-rule); border-radius: 28px; background: var(--color-ink); color: var(--color-paper-2); }
+.home-campaign::before { content: ""; position: absolute; z-index: -1; inset: 0; background-image: linear-gradient(oklch(100% 0 0 / 0.08) 1px, transparent 1px), linear-gradient(90deg, oklch(100% 0 0 / 0.08) 1px, transparent 1px), radial-gradient(circle at 82% 18%, color-mix(in oklab, var(--color-accent) 60%, transparent), transparent 30%); background-size: 32px 32px, 32px 32px, auto; }
+.home-campaign-copy { display: flex; flex-direction: column; justify-content: flex-end; gap: 1rem; padding: clamp(1.5rem, 5vw, 4rem); }
+.home-campaign-copy h1 { max-width: 11ch; font-family: var(--font-display); font-size: clamp(3rem, 7vw, 6.5rem); font-weight: 400; letter-spacing: -0.04em; line-height: 0.9; }
+.home-campaign-copy p { max-width: 42ch; color: oklch(83% 0.015 250); }
+.home-campaign-aside { display: flex; flex-direction: column; justify-content: space-between; margin: 1rem; padding: clamp(1.25rem, 3vw, 2rem); border: 1px solid oklch(100% 0 0 / 0.18); border-radius: 22px; background: oklch(100% 0 0 / 0.08); backdrop-filter: blur(14px); }
+.home-campaign .btn-secondary { background: oklch(98% 0.006 250); color: oklch(15% 0.015 255); border-color: transparent; }
+.home-discovery { display: flex; flex-direction: column; gap: 1rem; padding-block: 1rem; }
+.home-discovery-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
+@media (min-width: 48rem) { .home-discovery-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+@media (max-width: 47.99rem) { .home-campaign { grid-template-columns: minmax(0, 1fr); } .home-campaign-aside { min-height: 12rem; } }
+
+/* Following: compact commerce cards plus Instagram-like seller discovery. */
+.following-head { position: relative; z-index: 20; display: grid; grid-template-columns: minmax(0, 1fr) minmax(18rem, 28rem); align-items: end; gap: 1.5rem; padding-bottom: 1.25rem; border-bottom: 1px solid var(--color-rule); }
+.seller-search-wrap { position: relative; }
+.seller-search { display: flex; min-height: 3rem; align-items: center; gap: 0.65rem; border: 1px solid var(--color-rule-2); border-radius: 999px; background: var(--color-paper-2); padding: 0 1rem; box-shadow: 0 16px 42px -36px var(--color-shadow); }
+.seller-search:focus-within { outline: 2px solid var(--color-focus); outline-offset: 2px; border-color: transparent; }
+.seller-search input { min-width: 0; flex: 1; border: 0; outline: 0; background: transparent; color: var(--color-ink); font: 400 var(--text-md)/1.2 var(--font-body); }
+.seller-search input::placeholder { color: var(--color-muted); }
+.seller-search-status { width: 0.85rem; height: 0.85rem; flex: none; border: 2px solid var(--color-rule-2); border-top-color: var(--color-accent); border-radius: 50%; animation: seller-spin 0.8s linear infinite; }
+@keyframes seller-spin { to { rotate: 1turn; } }
+.seller-results { position: absolute; z-index: var(--z-dropdown); top: calc(100% + 0.55rem); right: 0; width: 100%; max-height: min(28rem, 70dvh); overflow-y: auto; border: 1px solid var(--color-rule); border-radius: 20px; background: var(--color-paper-2); box-shadow: 0 28px 70px -32px var(--color-shadow); }
+.seller-result-row { display: flex; min-width: 0; align-items: center; gap: 0.75rem; padding: 0.7rem; }
+.seller-result-row + .seller-result-row { border-top: 1px solid var(--color-rule); }
+.seller-result-row:hover { background: var(--color-paper-3); }
+.seller-result-row .btn { min-height: 2.35rem; }
+.following-card { border-radius: 18px; }
+@media (max-width: 47.99rem) { .following-head { grid-template-columns: minmax(0, 1fr); align-items: stretch; } .seller-results { position: static; margin-top: 0.55rem; } }
+@media (prefers-reduced-motion: reduce) { .seller-search-status { animation: none; border-color: var(--color-accent); } }
 /* Wide screens (the agent console) widen the header with the page, so the wordmark lines up with the content. */
 
 /* Product screenshots are not photographs: no mono treatment. */

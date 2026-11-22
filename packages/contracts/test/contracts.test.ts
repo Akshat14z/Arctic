@@ -14,6 +14,8 @@ import {
   ListingDeleteResponseSchema,
   ChatCreateResponseSchema,
   ChatDetailResponseSchema,
+  SellerSearchQuerySchema,
+  SellerSearchResponseSchema,
 } from '../src/index.js';
 
 describe('Contracts Schema Validation', () => {
@@ -216,6 +218,20 @@ describe('Contracts Schema Validation', () => {
       createdAt: new Date().toISOString(),
     });
     expect(validDetail.success).toBe(true);
+  });
+
+  it('validates compact seller search inputs and public results', () => {
+    expect(SellerSearchQuerySchema.safeParse({ q: 'camera', limit: 10 }).success).toBe(true);
+    expect(SellerSearchQuerySchema.safeParse({ q: '' }).success).toBe(false);
+    expect(SellerSearchResponseSchema.safeParse({
+      items: [{
+        id: 'u_seller',
+        displayName: 'Camera House',
+        isVerified: true,
+        followerCount: 12,
+        activeListingCount: 4,
+      }],
+    }).success).toBe(true);
   });
 });
 

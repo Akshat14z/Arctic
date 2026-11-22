@@ -24,7 +24,7 @@ export function SealView() {
   const [check, setCheck] = useState<SealCheck | null>(null);
   const url = useSealUrl(code, seal?.proof);
 
-  // The signed summary in the link's #p= fragment, checked on this device with Handshake's public key.
+  // The signed summary in the link's #p= fragment, checked on this device with CommonGrounds' public key.
   useEffect(() => {
     const proof = proofFromHash(window.location.hash);
     if (proof) void checkSealToken(proof).then(setCheck);
@@ -54,10 +54,10 @@ export function SealView() {
   if (error) {
     return (
       <section className="flex flex-1 flex-col items-start justify-center gap-4">
-        <h1 className="page-title">{error.notFound ? "No Handshake Seal with this code" : "Couldn't check this seal"}</h1>
+        <h1 className="page-title">{error.notFound ? "No CommonGrounds Seal with this code" : "Couldn't check this seal"}</h1>
         <p className="max-w-prose text-muted">
           {error.notFound
-            ? "A seal only exists after both sides agree to a deal. Ask the other person to open the deal in their Handshake chat and show you its QR code."
+            ? "A seal only exists after both sides agree to a deal. Ask the other person to open the deal in their CommonGrounds chat and show you its QR code."
             : error.text}
         </p>
         {!error.notFound && (
@@ -87,7 +87,7 @@ export function SealView() {
           <svg aria-hidden="true" viewBox="0 0 20 20" className="size-6 shrink-0 text-success" fill="none" stroke="currentColor" strokeWidth="2.5">
             <path d="M4 10.5l4 4 8-9" strokeLinecap="square" />
           </svg>
-          Verified Handshake Seal
+          Verified CommonGrounds Seal
         </h1>
         <label className="flex flex-col gap-1 sm:w-48">
           <span className="label">Read in</span>
@@ -159,7 +159,7 @@ export function SealView() {
       <div className="note note-success flex items-start gap-4">
         <SealQr url={url} size={128} />
         <div className="flex min-w-0 flex-col items-start gap-2">
-          <p>Both people saw these exact terms in their own language and agreed to them on Handshake.</p>
+          <p>Both people saw these exact terms in their own language and agreed to them on CommonGrounds.</p>
           <button
             type="button"
             onClick={async () => {
@@ -176,12 +176,12 @@ export function SealView() {
       </div>
 
       <p className="meta max-w-prose">
-        The QR code carries Handshake&apos;s digital signature of these terms. Scanning it checks the signature on your own phone, so
+        The QR code carries CommonGrounds&apos;s digital signature of these terms. Scanning it checks the signature on your own phone, so
         the price and names can&apos;t be faked, even without internet. A screenshot of this page proves nothing; scan the code.
       </p>
 
       <Link href="/" className="link inline-flex min-h-tap items-center self-start text-sm">
-        What is Handshake?
+        What is CommonGrounds?
       </Link>
     </section>
   );
@@ -193,32 +193,32 @@ function ProofBanner({ check, mismatch }: { check: SealCheck | null; mismatch: b
   if (check.status === "valid" && !mismatch)
     return (
       <p role="status" className="note note-success">
-        <strong>Signed by Handshake.</strong> Checked on this device: these terms haven&apos;t been changed since both people agreed.
+        <strong>Signed by CommonGrounds.</strong> Checked on this device: these terms haven&apos;t been changed since both people agreed.
       </p>
     );
   if (check.status === "unsupported")
     return (
       <p role="status" className="note">
-        This browser can&apos;t check the signature itself. Handshake&apos;s server confirmed the seal below.
+        This browser can&apos;t check the signature itself. CommonGrounds&apos;s server confirmed the seal below.
       </p>
     );
   return (
     <p role="alert" className="note note-error">
-      <strong>Someone changed this link.</strong> The terms below come straight from Handshake and are the real ones. If you were shown a different
+      <strong>Someone changed this link.</strong> The terms below come straight from CommonGrounds and are the real ones. If you were shown a different
       price or item, don&apos;t go ahead.
     </p>
   );
 }
 
-/** Handshake's server can't be reached, but the link's signature holds: show the signed core terms. */
+/** CommonGrounds' server can't be reached, but the link's signature holds: show the signed core terms. */
 function OfflineSeal({ check }: { check: Extract<SealCheck, { status: "valid" }> }) {
   const p = check.payload;
   const when = (iso?: string) => (iso ? new Date(iso).toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" }) : null);
   return (
     <section className="flex flex-col gap-6">
       <ProofBanner check={check} mismatch={false} />
-      <h1 className="page-title">Verified Handshake Seal</h1>
-      <p className="meta">Handshake&apos;s server can&apos;t be reached right now, so these are the signed core terms carried in the link.</p>
+      <h1 className="page-title">Verified CommonGrounds Seal</h1>
+      <p className="meta">CommonGrounds&apos;s server can&apos;t be reached right now, so these are the signed core terms carried in the link.</p>
       <article aria-label="Agreed deal" className="tile gap-1">
         <h2 className="section-title break-words">{p.i}</h2>
         <p className="agate text-4xl leading-tight">

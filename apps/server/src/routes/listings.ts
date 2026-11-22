@@ -32,7 +32,7 @@ export const listingRoutes: FastifyPluginAsync = async (app) => {
   app.get('/api/listings', async (request, reply) => {
     const parsedQuery = ListingListQuerySchema.parse(request.query);
     const result = await getListings(parsedQuery);
-    return reply.status(200).send(result);
+    return reply.header('Cache-Control', 'public, max-age=5, stale-while-revalidate=30').status(200).send(result);
   });
 
   // 3. GET /api/listings/:id (Public, translated read)

@@ -787,3 +787,21 @@ const safe = (p: string) => (p.startsWith("/") && !p.startsWith("//") ? p : "/ho
 8. UI-19, UI-20 (polish).
 
 After all changes: run `pnpm -r run typecheck` and confirm 0 errors. No test suites to run.
+
+---
+
+### [x] REQUEST — CommonGrounds social-commerce frontend
+
+Platform contracts and endpoints are implemented in C7. Please implement the Experience-owned UI requested by the human:
+
+- Rebrand visible product copy from Handshake to **CommonGrounds [CG]** without changing the landing-page composition.
+- Remove all landing footer text/navigation while retaining the people/street and walking-person animation.
+- Fix text clipping/overlap, center the sign-in/sign-up experience, and add a restrained warm off-white page background.
+- Add optimistic Follow/Following controls with rollback to listing detail, seller storefront, and applicable buyer-side chat headers. Do not show the control for self.
+- Add `/sellers/[id]` and `/following` using C7 data and existing chat/call actions. Keep Watchlist actions out until a real Watchlist contract exists.
+- Add compact per-seller notification controls and the persistent in-app notification inbox; do not claim push/email delivery.
+- Do not display verification, trust scores, or reviews unless returned by the API. `isVerified` is false by default; `trustScore` is currently null.
+
+Design direction from the UI audit: preserve the editorial character, use warm stone surfaces, near-black text, restrained ochre/blue accents, 44px targets, visible focus, responsive image containers, and avoid blanket `overflow-hidden` where it clips content. Verify at 375/768/1024/1440 widths.
+
+Completed in the current working tree after the human granted an explicit `apps/web/**` ownership exception.

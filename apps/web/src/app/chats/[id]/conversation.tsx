@@ -12,6 +12,7 @@ import { ChatThread } from "@/components/chat-thread";
 import { GetHelp } from "@/components/get-help";
 import { CallButton } from "@/components/call-button";
 import { useT } from "@/lib/use-t";
+import { FollowButton } from "@/components/follow-button";
 
 export function Conversation() {
   const { id } = useParams<{ id: string }>();
@@ -72,9 +73,9 @@ export function Conversation() {
     );
 
   return (
-    <section className="-mt-4 -mb-24 flex min-h-[calc(100dvh-4rem)] flex-col md:-mb-8">
-      <header className="sticky top-[var(--chrome-h)] z-10 flex flex-col gap-2 border-b border-border bg-bg py-2">
-        <div className="flex items-center gap-2">
+    <section data-wide className="chat-page -mt-4 -mb-24 flex min-h-[calc(100dvh-4rem)] flex-col md:-mb-8">
+      <header className="chat-header sticky top-[var(--chrome-h)] z-10 flex flex-col gap-3">
+        <div className="flex flex-wrap items-center gap-2">
           <Link href="/chats" aria-label={t("chat.back")} className="btn btn-icon shrink-0 lg:hidden">
             <svg aria-hidden="true" viewBox="0 0 24 24" className="size-5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="square">
               <path d="M15 5l-7 7 7 7" />
@@ -82,7 +83,8 @@ export function Conversation() {
           </Link>
           <h1 className="min-w-0 flex-1 text-base leading-snug font-semibold break-words">{other.displayName}</h1>
           {/* Actions on the right: call, then help (or the open help request, shown as a status, not a button). */}
-          <div className="ml-auto flex shrink-0 items-center gap-2">
+          <div className="ml-auto flex min-w-0 flex-wrap items-center justify-end gap-2">
+            {chat.buyerId === me && <FollowButton sellerId={chat.sellerId} compact />}
             <CallButton peerId={other.id} peerName={other.displayName} myName={session.user.displayName} label={t("chat.call")} />
             {chat.openCaseId ? (
               <Link href={`/cases/${encodeURIComponent(chat.openCaseId)}`} className="link inline-flex min-h-tap items-center gap-1.5 px-1 text-sm">

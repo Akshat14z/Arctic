@@ -1,7 +1,7 @@
 {
   "name": "convocart",
   "private": true,
-  "description": "ConvoCart - Multilingual Conversation-First Marketplace",
+  "description": "CommonGrounds (CG) - Multilingual Social Commerce Marketplace",
   "engines": {
     "node": ">=20.0.0",
     "pnpm": ">=9.0.0"

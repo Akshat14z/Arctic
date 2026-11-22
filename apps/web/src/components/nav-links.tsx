@@ -3,11 +3,11 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef } from "react";
-import { LANGUAGES } from "@/lib/languages";
 import { signOut, useSession } from "@/lib/session";
 import { Icon, type IconName } from "./icons";
 import { useT } from "@/lib/use-t";
 import type { Key } from "@/lib/i18n";
+import { ThemeToggle } from "./theme-toggle";
 
 // Tab and menu labels in the reader's language (lib/i18n). Labels without a key stay as written.
 const LABEL_KEYS: Record<string, Key> = { Home: "nav.home", Browse: "nav.browse", Chats: "nav.chats", Selling: "nav.selling", "My chats": "nav.chats", "My Profile & Settings": "nav.profile" };
@@ -20,6 +20,7 @@ type Tab = { href: string; label: string; icon: IconName };
 const PEOPLE: Tab[] = [
   { href: "/home", label: "Home", icon: "home" },
   { href: "/listings", label: "Browse", icon: "browse" },
+  { href: "/following", label: "Following", icon: "follow" },
   { href: "/chats", label: "Chats", icon: "chats" },
   { href: "/selling", label: "Selling", icon: "sell" },
 ];
@@ -123,28 +124,26 @@ export function AccountMenu() {
   if (!session)
     return (
       <div className="flex shrink-0 items-center gap-1">
+        <ThemeToggle compact />
         <Link href="/signin" className="btn btn-quiet px-3">
           Sign in
         </Link>
-        <Link href="/signup" className="btn btn-primary px-4">
+        <Link href="/signup" className="btn btn-primary px-4 max-sm:hidden">
           Get started
         </Link>
       </div>
     );
 
   const { user, email } = session;
-  const lang = LANGUAGES.find((l) => l.code === user.language);
   const isAgent = user.role === "agent";
   const isGuest = !isAgent && !user.isDemo && !email;
   const links = isAgent
     ? [
         { href: "/agent", label: "Dispatch" },
-        { href: "/profile", label: "Profile & Settings" },
       ]
     : [
-        { href: "/profile", label: "My Profile & Settings" },
-        { href: "/chats", label: "My chats" },
-        { href: "/selling", label: "Selling" },
+        { href: "/watchlist", label: "Saved listings" },
+        { href: "/notifications", label: "Notifications" },
       ];
 
   return (
@@ -153,16 +152,24 @@ export function AccountMenu() {
         aria-label={`Account: ${user.displayName}`}
         className="grid size-11 cursor-pointer list-none place-items-center rounded-full bg-surface-2 font-semibold text-text transition-colors hover:bg-[var(--color-rule)] [&::-webkit-details-marker]:hidden"
       >
-        {user.displayName.trim().charAt(0).toUpperCase()}
+        {user.avatarUrl ? (
+          // eslint-disable-next-line @next/next/no-img-element -- user-managed public avatar URL
+          <img src={user.avatarUrl} alt="" className="size-full rounded-full object-cover" />
+        ) : user.displayName.trim().charAt(0).toUpperCase()}
       </summary>
-      <div className="absolute right-0 z-[var(--z-dropdown)] mt-2 flex w-72 max-w-[calc(100vw-1rem)] max-h-[min(28rem,80dvh)] overflow-y-auto flex-col gap-3 rounded-[20px] border border-border bg-surface p-4 shadow-[0_18px_40px_-18px_var(--color-shadow)]">
-        <div className="flex flex-col gap-0.5">
-          <p className="font-medium break-words">{user.displayName}</p>
-          <p className="meta break-all">{email ?? (user.isDemo ? "Demo account" : isAgent ? "Support agent" : "Guest account, on this device only")}</p>
-          <p className="meta">
-            {t("nav.reads")} <span lang={user.language}>{lang?.native}</span>
-          </p>
-        </div>
+      <div className="account-popover absolute right-0 z-[var(--z-dropdown)] mt-2 flex w-80 max-w-[calc(100vw-1rem)] max-h-[min(30rem,80dvh)] overflow-y-auto flex-col gap-3 rounded-[22px] border border-border bg-surface p-4 shadow-[0_24px_70px_-28px_var(--color-shadow)]">
+        <Link href="/profile" aria-label="Open profile and account settings" className="account-card flex gap-3 rounded-[16px] border border-border bg-surface-2 p-3 text-text no-underline">
+          <span aria-hidden className="grid size-11 shrink-0 place-items-center rounded-full bg-accent font-semibold text-[var(--color-accent-ink)]">
+            {user.avatarUrl ? (
+              // eslint-disable-next-line @next/next/no-img-element -- user-managed public avatar URL
+              <img src={user.avatarUrl} alt="" className="size-full rounded-full object-cover" />
+            ) : user.displayName.trim().charAt(0).toUpperCase()}
+          </span>
+          <div className="min-w-0 flex flex-col gap-0.5">
+            <p className="font-medium break-words">{user.displayName}</p>
+            <p className="meta break-all">{email ?? (user.isDemo ? "Demo account" : isAgent ? "Support agent" : "Guest account, on this device only")}</p>
+          </div>
+        </Link>
         {isGuest && (
           <Link href="/signup" className="btn btn-primary w-full">
             {t("nav.saveAccount")}
@@ -177,6 +184,7 @@ export function AccountMenu() {
             </li>
           ))}
         </ul>
+        <ThemeToggle />
         {user.isDemo && (
           <Link href="/try" className="btn btn-secondary w-full">
             {t("nav.switchDemo")}

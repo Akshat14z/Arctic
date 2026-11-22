@@ -42,19 +42,25 @@ function read(): AuthResponse | null {
 }
 
 function write(value: AuthResponse | null) {
+  const raw = value ? JSON.stringify(value) : null;
   try {
-    if (value) localStorage.setItem(key(), JSON.stringify(value));
+    if (raw) localStorage.setItem(key(), raw);
     else localStorage.removeItem(key());
   } catch {}
-  listeners.forEach((l) => l());
+  // Update the in-memory snapshot before notifying React. This makes the signed-in nav available on
+  // the same render as the client-side redirect, even when storage events are delayed or unavailable.
+  cache = { raw, value };
+  window.dispatchEvent(new Event("commongrounds:session"));
 }
 
 function subscribe(l: () => void) {
   listeners.add(l);
   window.addEventListener("storage", l); // sign-in/out in another tab
+  window.addEventListener("commongrounds:session", l);
   return () => {
     listeners.delete(l);
     window.removeEventListener("storage", l);
+    window.removeEventListener("commongrounds:session", l);
   };
 }
 

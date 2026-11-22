@@ -83,7 +83,7 @@ export function MessageBubble({ message, lang }: { message: ChatMessage; lang: L
       {/* Scam Warning Alert */}
       {scam && (
         <p role="alert" className="note note-error max-w-full text-xs">
-          <strong>Security Notice:</strong> This message asks to move off-platform. Off-platform deals lack Handshake Seal protection.
+          <strong>Security Notice:</strong> This message asks to move off-platform. Off-platform deals lack CommonGrounds Seal protection.
         </p>
       )}
 

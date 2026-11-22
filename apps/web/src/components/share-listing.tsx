@@ -16,7 +16,7 @@ export function ShareListing({ listing, lang, mine }: { listing: Listing; lang: 
   if (!origin) return null;
 
   const url = `${origin}/listings/${encodeURIComponent(listing.id)}`;
-  const text = `${listing.title} · ${formatPrice(listing.price, lang)}\nChat with the seller on Handshake. Each of you reads in your own language:`;
+  const text = `${listing.title} · ${formatPrice(listing.price, lang)}\nChat with the seller on CommonGrounds. Each of you reads in your own language:`;
 
   return (
     <section aria-label="Share this listing" className="flex flex-col gap-2">

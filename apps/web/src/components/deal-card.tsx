@@ -209,12 +209,12 @@ function StatusPill({ status, t }: { status: Deal["status"]; t: T }) {
   return <span className={`shrink-0 rounded-full px-2.5 py-1 text-xs font-semibold whitespace-nowrap ${tone}`}>{label}</span>;
 }
 
-/** Handshake Seal: show the QR at pickup; scanning it opens the verified deal. */
+/** CommonGrounds Seal: show the QR at pickup; scanning it opens the verified deal. */
 function SealBlock({ code, t }: { code: string; t: T }) {
   const proof = useSealProof(code);
   const url = useSealUrl(code, proof);
   return (
-    <section aria-label="Handshake Seal" className="mt-1 flex flex-wrap items-start gap-4 border-t border-border pt-4">
+    <section aria-label="CommonGrounds Seal" className="mt-1 flex flex-wrap items-start gap-4 border-t border-border pt-4">
       <SealQr url={url} size={112} />
       <div className="flex min-w-[12rem] flex-1 flex-col gap-1">
         <p className="text-sm font-semibold text-success">{t("deal.seal")}</p>

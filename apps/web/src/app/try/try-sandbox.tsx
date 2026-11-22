@@ -88,7 +88,7 @@ export function TrySandbox() {
       </p>
       <div data-seat-hide className="contents">
         <div className="flex flex-col gap-2">
-          <h1 className="page-title">Try Handshake</h1>
+          <h1 className="page-title">Try CommonGrounds</h1>
           <p className="text-muted">
             Pick a side of a real chat. These are demo accounts, marked Demo
             everywhere, with no sign-up.

@@ -18,6 +18,8 @@ export const ListingSchema = z.object({
   lang: LangCodeSchema,
   price: MoneySchema,
   imageUrl: z.string().url().optional(),
+  category: z.string().min(1).max(80).optional(),
+  isActive: z.boolean().default(true),
   isDemo: z.boolean().default(false),
   createdAt: z.string().datetime(),
 });
@@ -28,6 +30,7 @@ export const ListingCreateRequestSchema = z.object({
   description: z.string().min(1, 'Description is required').max(2000),
   price: MoneySchema,
   imageUrl: z.string().url().optional(),
+  category: z.string().trim().min(1).max(80).optional(),
 });
 export type ListingCreateRequest = z.infer<typeof ListingCreateRequestSchema>;
 
@@ -59,6 +62,8 @@ export const ListingUpdateRequestSchema = z.object({
   description: z.string().min(1, 'Description cannot be empty').max(2000).optional(),
   price: MoneySchema.optional(),
   imageUrl: z.string().url('Invalid image URL').optional().nullable(),
+  category: z.string().trim().min(1).max(80).optional().nullable(),
+  isActive: z.boolean().optional(),
 });
 export type ListingUpdateRequest = z.infer<typeof ListingUpdateRequestSchema>;
 
@@ -127,6 +132,9 @@ export const UpdateMeRequestSchema = z.object({
   email: z.string().email().optional(),
   currentPassword: z.string().optional(),
   newPassword: z.string().min(8, 'New password must be at least 8 characters').optional(),
+  avatarUrl: z.string().url().optional().nullable(),
+  bio: z.string().trim().max(280).optional().nullable(),
+  businessDescription: z.string().trim().max(1200).optional().nullable(),
 });
 export type UpdateMeRequest = z.infer<typeof UpdateMeRequestSchema>;
 

@@ -28,9 +28,3 @@
   .l-agent-shot img { border-radius: 16px; }
 }
 
-/* Footer: stack on phones */
-@media (max-width: 47.99rem) {
-  .l-footer { flex-direction: column; gap: var(--space-lg); }
-  .l-footer nav { flex-wrap: wrap; gap: var(--space-sm); }
-}
-

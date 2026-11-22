@@ -101,8 +101,6 @@ body:has([data-landing]) { background: var(--l-paper); padding: 0; }
 /* Close + footer: the page ends on a statement as big as its opening */
 .l-close .l-story { font-size: clamp(2.5rem, 7vw, 6.5rem); max-width: 18ch; line-height: 1; padding-block: 0; }
 .l-close { display: flex; flex-direction: column; align-items: center; text-align: center; gap: var(--space-lg); padding-block: var(--space-2xl) var(--space-3xl); }
-.l-footer { display: flex; flex-wrap: wrap; gap: var(--space-md) var(--space-xl); align-items: baseline; justify-content: space-between; padding-block: var(--space-xl); border-top: 1px solid var(--l-ink); font-size: var(--text-sm); color: var(--l-ink-2); }
-.l-footer nav { display: flex; flex-wrap: wrap; gap: 0 var(--space-lg); }
 
 /* ── Motion: all of it optional ── */
 @media (prefers-reduced-motion: no-preference) {
@@ -118,8 +116,7 @@ body:has([data-landing]) { background: var(--l-paper); padding: 0; }
 @keyframes l-float { from { transform: translate3d(0, 0, 0) rotate(-2deg); } to { transform: translate3d(14px, -18px, 0) rotate(3deg); } }
 @keyframes l-ink { to { color: var(--l-ink); } }
 
-/* ── The chapter (T16): one deal, pinned. Base CSS is the finished scene: every step, bubble, the deal,
-   the seal and Sarah are visible; LandingMotion plays them in order while the section is pinned. ── */
+/* ── The chapter (T16): one deal, pinned. LandingMotion plays each exchange in order. ── */
 .l-chapter { padding-block: var(--space-2xl); }
 .l-chapter-pin { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--space-xl); align-items: center; min-height: 100svh; padding-block: var(--space-xl); }
 @media (min-width: 64rem) { .l-chapter-pin { grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); } }
@@ -133,7 +130,6 @@ body:has([data-landing]) { background: var(--l-paper); padding: 0; }
 .l-person { position: absolute; bottom: -2%; height: 64%; width: auto; transform-origin: 50% 100%; }
 .l-person-priya { left: 4%; }
 .l-person-kenji { right: 4%; }
-.l-person-sarah { left: 50%; translate: -32% 0; height: 58%; z-index: 0; }
 .l-say { position: absolute; z-index: 2; max-width: 34%; padding: var(--space-xs) var(--space-md); border-radius: 18px; background: var(--l-card); box-shadow: inset 0 0 0 1px var(--l-grid), 0 10px 24px -14px var(--l-shadow); font-size: clamp(0.8rem, 1.15vw, 1rem); line-height: 1.35; color: var(--l-ink); }
 .l-say::after { content: ""; position: absolute; bottom: -5px; left: 20px; width: 10px; height: 10px; background: inherit; rotate: 45deg; }
 .l-say-right::after { left: auto; right: 20px; }
@@ -141,12 +137,9 @@ body:has([data-landing]) { background: var(--l-paper); padding: 0; }
 .l-say-left { left: 4%; top: 6%; }
 .l-say-right { right: 4%; top: 6%; text-align: right; }
 .l-say-low { top: 20%; }
-.l-say-sarah { left: 50%; top: 50%; translate: -110% 0; }
-.l-say-sarah::after { left: auto; right: 20px; }
 @media (min-width: 64rem) {
   .l-say-left, .l-say-right { top: 26%; }
   .l-say-low { top: 42%; }
-  .l-say-sarah { top: 60%; }
   .l-fly { top: 32%; }
   .l-fly-back { top: 48%; }
 }
@@ -167,15 +160,13 @@ body:has([data-landing]) { background: var(--l-paper); padding: 0; }
   .l-say-low { top: 23%; }
   .l-deal { top: 34%; min-width: 9rem; padding: var(--space-sm) var(--space-md); }
   .l-seal { width: 3.75rem; height: 3.75rem; left: -0.9rem; right: auto; top: -0.9rem; }
-  .l-say-sarah { display: none; }
   .l-person { height: 50%; }
-  .l-person-sarah { height: 40%; }
   [data-chapter].is-pinned .l-steps ol { min-height: 9rem; }
 }
 
 /* The street: people standing on the footer rule */
 /* Room above the heads for the speech bubbles (padding is inside the clip, so they are never cut). */
-.l-street { position: relative; display: flex; justify-content: center; align-items: flex-end; gap: clamp(var(--space-xs), 3vw, var(--space-xl)); height: calc(clamp(7rem, 14vw, 11rem) + 3rem); padding-top: 3rem; margin-top: var(--space-2xl); overflow: clip; }
+.l-street { position: relative; display: flex; width: 100%; justify-content: space-between; align-items: flex-end; gap: clamp(var(--space-2xs), 1.5vw, var(--space-lg)); height: calc(clamp(8rem, 15vw, 12rem) + 3rem); padding: 3rem clamp(0.5rem, 2vw, 2rem) 0; margin-top: var(--space-2xl); overflow: clip; }
 .l-peep { position: relative; display: flex; align-items: flex-end; height: 100%; transform-origin: 50% 100%; }
 .l-peep > img { height: 100%; width: auto; }
 .l-peep:nth-child(3n + 2) { height: 92%; }
@@ -189,7 +180,6 @@ body:has([data-landing]) { background: var(--l-paper); padding: 0; }
 .l-walker { position: absolute; left: 0; bottom: 0; z-index: 1; height: calc(100% - 3rem); aspect-ratio: 1200 / 2980; } /* minus the bubble room above the heads */
 .l-walker img { display: block; width: 100%; height: 100%; transform-origin: 50% 100%; }
 .l-walker-shadow { position: absolute; left: 15%; right: 15%; bottom: -3px; height: 6px; border-radius: 50%; background: var(--l-shadow); opacity: 0.6; }
-.l-footer { border-top-width: 1.5px; }
 
 /* Before GSAP takes over (script + motion only): the hero waits hidden instead of painting, blinking and
    replaying. A 2.5s failsafe shows it anyway if the script never arrives. */

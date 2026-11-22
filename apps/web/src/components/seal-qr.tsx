@@ -23,7 +23,7 @@ export function SealQr({ url, size = 112 }: { url: string; size?: number }) {
   return (
     <svg
       role="img"
-      aria-label="QR code for the Handshake Seal page"
+      aria-label="QR code for the CommonGrounds Seal page"
       viewBox={`0 0 ${n} ${n}`}
       width={size}
       height={size}
