@@ -234,7 +234,7 @@ export default function Home() {
         </div>
         <div className="l-agent-shot">
           {/* eslint-disable-next-line @next/next/no-img-element -- static product capture, sized explicitly */}
-          <img src="/screens/agent.png" alt="The agent console: each message in the original and in English, beside the case summary and the frozen deal" width={2512} height={1598} loading="lazy" />
+          <img src="/screens/agent.png" alt="The agent console: each message in the original and in English, beside the case summary and the frozen deal" width={2512} height={1616} loading="lazy" />
         </div>
       </section>
       </div>

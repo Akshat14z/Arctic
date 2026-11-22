@@ -1,131 +1,75 @@
-# Handshake — write-up (draft)
-
-> **Draft for the humans.** This becomes the submission PDF. Items marked **⟦TO FILL⟧** need facts we don't have yet. Screenshots in `docs/screenshots/` are from local development before the visual redesign: retake them on the deployed app before export.
+# CommonGrounds
 
 **Same deal, in both languages.**
-Nexconn Build Challenge 2026 · Track: **Marketplace & Support**
-Team: Dhrumil (experience) · Akshat (platform)
+
+Nexconn Build Challenge 2026 · Track: Marketplace & Support · Team: Dhrumil (experience) and Akshat (platform)
 
 | | |
 |---|---|
-| Live app | ⟦TO FILL: deployed URL⟧ |
-| Demo video | ⟦TO FILL: video link⟧ |
+| Live app | https://arctic-swart-six.vercel.app |
+| Try it in one click | https://arctic-swart-six.vercel.app/try |
 | Source code | https://github.com/Akshat14z/Arctic |
-| Nexconn App Key | ⟦TO FILL: production App Key (also in the submission form)⟧ |
+| Nexconn App Key | `tdrvipkstz5v5` |
 
----
+## The problem: translation creates disputes
 
-## 1. It works
+Cross-language marketplaces are not a niche. India alone trades across 22 scheduled languages: a Tamil-speaking seller and a Hindi-speaking buyer meet on the same college resale group every day. Machine translation gets their words across, but not always their deal. "2 lakh" can arrive as 200,000, as "2 lakh" or as 200. "Almost new" becomes "new". Each side walks away believing they agreed to something different, and when it goes wrong, a support agent has to reconstruct who said what, in which language.
 
-Handshake is a marketplace chat for a buyer and a seller who don't share a language. Every message is translated so each side reads their own language, with the original one tap away. A human support agent can step in at any time.
+Every competitor translates words. **CommonGrounds guarantees shared meaning**, and proves it.
 
-### The full flow (all three track requirements)
+## What we built
 
-1. **Sign in in seconds.** Guest sign-in: a name and a language, no forms, no password. Eight languages: English, Hindi, Tamil, Telugu, Kannada, Bengali, Marathi and Japanese.
-2. **Post or browse listings.** Listings show in the reader's language, labelled with the language they were written in.
-3. **1:1 buyer–seller chat, translated** *(track: buyer–seller 1-on-1 chat + multi-language translated chat).* Each side writes in their own language and reads the other's in theirs. **See original** shows exactly what was typed. History survives a refresh, and the chat shows a clear state while reconnecting.
-4. **Get help** *(track: human agent dispatch center).* Either party opens a case from the chat. It appears in the agent console queue.
-5. **The agent resolves it in a 3-way chat.** The agent sees the conversation in both languages, a case summary, the deal both sides agreed to (frozen when the case opened), and **what each side actually saw on screen**. Buyer, seller and agent then talk in one group chat, each reading their own language, and the agent marks the case resolved.
+CommonGrounds is a working marketplace with a 1:1 buyer-seller chat, a human support dispatch center and translated chat, the three track requirements, joined into one chain of trust:
 
-### What happens inside the chat
+1. **Every message, in your language.** Each side writes in their own language and reads the other in theirs. **See original** shows exactly what was typed; **Listen** reads it aloud in the reader's language. The interface itself (chat, deals, help, navigation, listings) follows the reader in Hindi, Japanese or English.
+2. **Meaning Guard, before you send.** Risky content is caught before it leaves: "I can pay 2 lakh" is held, and the sender is offered **₹2,00,000** so both sides see the same number. Tone Guard offers a softer version of a curt message; off-platform payment requests trigger a scam warning.
+3. **One deal, two languages.** An offer becomes a **Deal Card**: the same item, price and terms on both screens, each in its reader's language, agreed by both.
+4. **The CommonGrounds Seal.** An agreed deal becomes a QR receipt whose link carries an **Ed25519 signature**. Scanning it, the page verifies the signature on the scanner's own phone: "Signed by CommonGrounds". A changed price is flagged in red. It still verifies if our server is down.
+5. **Help that reads both sides.** Tap **Get help** and a case reaches the dispatch console. The agent sees an **AI summary** (the claim set against the agreed terms), the **Deal Card frozen** when help was requested, and **What each side saw**: the exact text each person had on screen, in each language. Buyer, seller and agent then talk in one room, each reading their own language. The agent needs to speak neither.
+6. **A seller's workspace.** A seller dashboard, public storefronts, following sellers, a watchlist and WhatsApp sharing bring buyers from where they already trade.
 
-- **Meaning Guard.** Before a message with an ambiguous amount is sent, the sender sees what the other side would read and can fix it in one tap: "I can pay 2 lakh" → **₹2,00,000**.
-  ![Meaning Guard](screenshots/meaning-guard.png)
-- **Scam warning.** Moving the chat off the platform ("let's continue on WhatsApp", "call me on +91…") or paying outside it (gift cards, crypto, wire transfer) warns the sender first. If they send anyway, the reader sees a warning too.
-- **Tone Guard.** "Hurry up" may read harsher in translation. The sender can send a softer version or send it as is. Never blocking.
-  ![Tone Guard](screenshots/tone-guard.png)
-- **Deal Card → Handshake Seal.** One tap turns the negotiation into structured terms (item, price, delivery, conditions). Both sides see the same card in their own language and agree. Once both agree it becomes a **Handshake Seal**: a code and a QR that opens a public page anyone can check, for example at pickup.
-  ![Sealed Deal Card](screenshots/deal-card-sealed.png) ![Public seal page in Japanese](screenshots/seal-page.png)
-- **Voice notes.** Record up to 60 seconds. The server transcribes it, and the transcript is translated and checked like typed text. The reader can play the original audio.
-- **Voice calls.** 1:1 audio calls from the chat header, using the Nexconn Call SDK. The call screen reminds both sides that voice isn't translated, so prices and terms belong in the chat. ⟦TO FILL: confirm calls connect once Call/VoIP is enabled for our App Key⟧
-- **Share on WhatsApp.** Sellers post a listing link to the groups where their buyers already are. The link shows a preview card, opens in the visitor's language, and leads to the chat after a guest sign-in.
-  ![Listing opened by a Hindi-speaking guest](screenshots/listing-share.png)
+![Priya reads Hindi](../apps/web/public/screens/chat-buyer.png)
+![Kenji reads Japanese](../apps/web/public/screens/chat-seller.png)
 
-### How to try it
+## Nexconn SDK: where and how we use it
 
-⟦TO FILL: live link⟧ → sign in as a guest, or use the one-click demo accounts (labelled "Demo"): Priya reads Hindi, Kenji reads Japanese, Sarah is the support agent. ⟦TO FILL: link to the one-click sandbox once it ships with the landing page⟧
+**Chat SDK (web, `@nexconn/chat` and `@nexconn/engine` 26.2.1)**
 
-### Reliability and polish
+- **Engine and connection:** `NCEngine.initialize` and `connect` with a per-user token from our server; connection-status handlers drive the reconnecting state.
+- **Group channels:** one per buyer and listing, so two listings with the same seller never share a conversation; a separate group channel per support case for the 3-way room.
+- **Text messages with a structured `extra` payload:** each message carries the original text, every translation, Meaning Guard results, Deal Cards and voice-note audio. One message, many readers, each sees their own language.
+- **Live delivery and history:** message handlers for real time; `createMessagesQuery` restores the conversation after a refresh.
 
-- **Chat never stalls on AI.** Translation runs on our server under a time budget. If it is slow, the original is sent, and the reader still gets the message.
-- **Every failure has a friendly state.** Loading, empty, offline, reconnecting, not found and permission states are all handled; no blank screens or raw errors.
-- **Mobile-first.** Built and tested at phone width, with 44 px tap targets.
-- **Tested end to end.** An automated Golden Path test (`pnpm smoke`) covers sign-in, listing, chat, message preparation, the Nexconn webhook, deal and seal, and case escalation to resolution. Server, contract and web unit tests run alongside it. We also tested every feature live with two browsers at once, against the production Nexconn app.
+**Server SDK (`@nexconn/server-sdk`)**
 
-### Features that use the Nexconn SDK
+- `issueAccessToken` for every user: guests, accounts, demo accounts and agents.
+- `createGroupChannel`, `joinGroupChannel` and `batchGetGroupChannelProfiles` for chat rooms and the support room; the agent joins on claim.
+- `sendGroupChannelMessage` for server-sent messages.
+- **Webhooks** with signature verification, anti-replay time windows and single-use nonces, recording every message for the agent's evidence view.
 
-**Nexconn Web SDK** (`@nexconn/chat`, `@nexconn/engine` 26.2.1)
-1. **Engine connection** with a per-user token from our server, with connection-status handling (reconnecting state, sign-out on an invalid token).
-2. **Direct channels** for the 1:1 buyer–seller chat.
-3. **Group channels** for the 3-way case chat between buyer, seller and agent.
-4. **Text messages with a structured `extra` payload** that carries the original text, every translation, Meaning Guard results, Deal Cards and voice-note audio links. One Nexconn message carries everything both sides need.
-5. **Real-time delivery** through message handlers, and **message history** when a chat is reopened.
+**Call SDK (optional, `@nexconn/call` 26.2.1):** 1:1 voice calls from the chat header, with incoming-call ringing on any page.
 
-**Nexconn Call SDK** (`@nexconn/call` 26.2.1)
-6. **1:1 audio calls** between buyer and seller, with incoming-call ringing on any page, mute and hang-up.
+![The agent console: each message in the original and in English, beside the summary and the frozen deal](../apps/web/public/screens/agent.png)
 
-**Nexconn Server SDK** (`@nexconn/server-sdk` 0.1.2)
-7. **User tokens** issued per signed-in user (User Management API).
-8. **Group channel creation** for each support case, and **adding the agent** as a member (Group Channel Management API).
-9. **`message:send` webhook** with signature verification and replay protection. It records which language each participant was shown, which powers the agent's "what each side saw" view.
+## Why this is new
 
-The Nexconn App Secret stays on our server; the browser only ever gets the App Key and a per-user token.
+- **Meaning, not just words.** Support tools translate the customer-to-agent conversation. Our agent gets the original buyer-seller conversation in both languages, plus what each side actually saw, plus the frozen deal.
+- **A receipt anyone can verify.** The Seal turns a chat agreement into evidence that survives screenshots, edits and even our own downtime.
+- **Prevention before resolution.** Meaning Guard stops the most expensive misunderstanding, a wrong number, before it is ever sent.
 
-### What existed before the challenge
+## Business and growth
 
-**Everything in this repository was built during the challenge (Oct 23 – Nov 22, 2026).** No code, design or data existed before it. We built it with AI coding assistants and document how in `docs/AI_USAGE.md`.
+- **Revenue:** a small fee per Deal Card both sides agree to (we never touch payment, so "agreed" is what we measure), and a paid seller plan (storefront, priority support, more listings).
+- **B2B:** Meaning Guard, the Seal and the dispatch console as a plug-in layer for existing marketplaces built on Nexconn.
+- **Go to market:** college and hostel buy-and-sell communities, where students from many states trade daily, then small local sellers we onboard personally. The WhatsApp share link opens a listing in the visitor's own language, one tap from a chat.
+- **Traction today, honestly:** the app is live and open to anyone. At submission our production Nexconn app has a small number of real users beyond our team and the three labelled demo accounts; we report exact numbers in the submission form and never create accounts to inflate them.
 
----
+## Built during the challenge
 
-## 2. Problem and idea
+Everything in this repository was designed and built during the Nexconn Build Challenge 2026: there is no prior work. We used AI coding assistants throughout (documented in `docs/AI_USAGE.md` in the repository).
 
-### The problem: translation creates disputes
+## Try it
 
-Translated chat is already common in marketplaces. Alibaba translates buyer–seller messages; eBay and Etsy translate listings. But translation helps people *talk*. It doesn't make sure they *agree to the same thing*.
+Open https://arctic-swart-six.vercel.app/try and tap **Watch both sides at once**: Priya (Hindi) and Kenji (Japanese) side by side, live. Type as Priya and watch Kenji read it in Japanese. Scan the Seal on the Deal Card with a phone. Then open the agent console as Sarah and see what each side saw.
 
-When a buyer and a seller negotiate through translation, the risky parts are exactly the ones that matter: amounts, units and conditions. "₹2 lakh" is a normal Indian amount that a reader in another language may not understand, or a system may render inconsistently. Research shows that translation systems make mistakes with numbers¹. When the two sides walk away believing different things, a support agent has to work out who said what, in which language, and usually can't read one side's.
-
-India alone is this market. It has 22 scheduled languages, so a Tamil-speaking seller and a Hindi-speaking buyer face this without leaving the country.
-
-### The idea: make the chat itself the trust layer
-
-Handshake guarantees **shared meaning**, not just translated words, in one chain:
-
-| Stage | Feature | Promise |
-|---|---|---|
-| Before sending | Meaning Guard + Tone Guard | What you say is what they read, and how you meant it |
-| Agreeing | Deal Card → Handshake Seal | What you agreed is written down, and anyone can verify it |
-| When it goes wrong | Three languages, one room | Disputes are settled on evidence, by an agent who doesn't need to speak either language |
-| Growth | WhatsApp-group launcher | Paste a link where your buyers already are |
-
-### Why it's new
-
-- **Marketplace translation** (Alibaba, eBay, Etsy) translates words. None of them checks meaning before sending, records agreed terms in both languages, or keeps evidence for disputes.
-- **Support translation tools** (for example Unbabel inside Zendesk or Intercom) translate the *customer ↔ agent* conversation. Our agent gets the *original buyer–seller* conversation in both languages, plus the frozen Deal Card and what each side saw.
-- **Indian language platforms** (Bhashini, Sarvam, multilingual shopping apps) translate screens, voice bots and support. None translates the conversation *between* a buyer and a seller.
-- **Scam research** agrees that moving the deal off-platform is the main sign of a purchase scam². Handshake catches it in the chat, before the message is sent.
-
-¹ Behavioural testing of commercial translation systems on numbers (2021), arXiv:2107.08357; numerical translation with LLMs (2025), arXiv:2501.04927. We don't claim an error rate for lakh/crore amounts specifically: we haven't measured one, so Meaning Guard is presented as *clarity*: both sides always see the same exact amount.
-² Sardine, *Off-platform payment abuse*.
-
----
-
-## 3. Traction and business
-
-### Real users on Nexconn
-
-⟦TO FILL after launch (Nov 10): active users on our Nexconn app (console screenshot), real listings, chats, deals agreed, cases opened and resolved, and a few user quotes (with permission).⟧
-
-**How we count, honestly:** demo accounts and listings have ids starting with `demo_` and are labelled "Demo" in the app. The judge sandbox reuses a small fixed set of them and never creates new Nexconn users. Every number above excludes `demo_` users. Automated tests mock Nexconn, so they never register users on our app.
-
-**Where users come from:** ⟦TO FILL: beachhead confirmed by H-04, e.g. college and hostel buy/sell groups with students from many states, and local sellers we onboard personally⟧. The **WhatsApp-group launcher** is the growth loop: a seller pastes a listing link into a group; each visitor opens it in their own language, signs in as a guest in seconds and is one tap from chat.
-
-### Business model
-
-- **A small fee per Deal Card both sides agree to.** We never handle payment, so an agreed deal is the unit we can measure and charge for.
-- **A paid seller plan:** verified badge, priority support, more listings.
-- **B2B:** license Meaning Guard, Deal Cards and the dispatch console as a layer for existing marketplaces built on Nexconn.
-
-### Path to a product
-
-⟦TO FILL with the humans: next 3 steps after the challenge, e.g. pilot with one campus marketplace, payment-provider integration for sealed deals, more Indian languages⟧
+**Same deal, in both languages.**
