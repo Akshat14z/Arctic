@@ -1,0 +1,12 @@
+{
+  "css.customData": [".vscode/tailwind.json"],
+  "css.lint.unknownAtRules": "ignore",
+  "editor.quickSuggestions": {
+    "strings": true
+  },
+  "tailwindCSS.experimental.classRegex": [],
+  "tailwindCSS.includeLanguages": {
+    "typescript": "javascript",
+    "typescriptreact": "javascript"
+  }
+}
