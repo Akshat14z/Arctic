@@ -1,3 +1,4 @@
+import type { LangCode } from '@convocart/contracts';
 import type { FastifyPluginAsync } from 'fastify';
 import { ChatCreateRequestSchema } from '@convocart/contracts';
 import { authenticate } from '../middleware/auth.js';
@@ -28,7 +29,7 @@ export const chatRoutes: FastifyPluginAsync = async (app) => {
       preHandler: [authenticate],
     },
     async (request, reply) => {
-      const result = await getChats(request.user!.id);
+      const result = await getChats(request.user!.id, request.user!.language as LangCode);
       return reply.status(200).send(result);
     }
   );
@@ -41,7 +42,7 @@ export const chatRoutes: FastifyPluginAsync = async (app) => {
     },
     async (request, reply) => {
       const { id } = request.params;
-      const chat = await getChatById(id, request.user!.id, request.user!.role);
+      const chat = await getChatById(id, request.user!.id, request.user!.role, request.user!.language as LangCode);
       return reply.status(200).send(chat);
     }
   );

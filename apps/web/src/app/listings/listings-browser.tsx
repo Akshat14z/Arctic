@@ -6,6 +6,7 @@ import { ListingListResponseSchema, type Listing } from "@convocart/contracts";
 import { api, friendlyMessage } from "@/lib/api/client";
 import { useSession } from "@/lib/session";
 import { ListingCard } from "@/components/listing-card";
+import { translator } from "@/lib/i18n";
 
 type Page = { items: Listing[]; nextCursor?: string };
 type SortOption = "newest" | "price-asc" | "price-desc";
@@ -15,6 +16,7 @@ export function ListingsBrowser() {
   const session = useSession();
   const hydrated = session !== undefined;
   const lang = session?.user.language ?? "en";
+  const t = translator(lang);
   const canSell = !!session && session.user.role !== "agent";
   const [draft, setDraft] = useState("");
   const [q, setQ] = useState("");
@@ -91,12 +93,12 @@ export function ListingsBrowser() {
     <section data-wide className="flex flex-col gap-6">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div className="flex flex-col gap-1">
-          <h1 className="page-title">Browse</h1>
-          <p className="text-muted">Every listing reads in your language. Chat with the seller in yours.</p>
+          <h1 className="page-title">{t("browse.title")}</h1>
+          <p className="text-muted">{t("browse.sub")}</p>
         </div>
         {canSell && (
           <Link href="/listings/new" className="btn btn-primary">
-            Sell something
+            {t("browse.sell")}
           </Link>
         )}
       </div>
@@ -111,40 +113,40 @@ export function ListingsBrowser() {
           className="flex min-w-[min(100%,18rem)] flex-1 gap-2"
         >
           <label className="relative min-w-0 flex-1">
-            <span className="sr-only">Search listings</span>
+            <span className="sr-only">{t("browse.search")}</span>
             <svg aria-hidden width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="pointer-events-none absolute top-1/2 left-3.5 -translate-y-1/2 text-muted">
               <circle cx="7" cy="7" r="4.5" />
               <path d="m10.5 10.5 3 3" />
             </svg>
-            <input type="search" value={draft} onChange={(e) => setDraft(e.target.value)} placeholder="Search listings" className="field pl-10" />
+            <input type="search" value={draft} onChange={(e) => setDraft(e.target.value)} placeholder={t("browse.search")} className="field pl-10" />
           </label>
           <button type="submit" className="btn btn-secondary shrink-0">
-            Search
+            {t("browse.searchBtn")}
           </button>
         </form>
         {session && (
           <div role="group" aria-label="Show" className="seg">
             <button type="button" aria-pressed={!mine} onClick={() => showMine(false)}>
-              All
+              {t("browse.all")}
             </button>
             <button type="button" aria-pressed={mine} onClick={() => showMine(true)}>
-              Mine
+              {t("browse.mine")}
             </button>
           </div>
         )}
         <label className="flex items-center gap-2">
-          <span className="meta">Sort</span>
+          <span className="meta">{t("browse.sort")}</span>
           <select value={sortBy} onChange={(e) => setSortBy(e.target.value as SortOption)} className="field w-auto cursor-pointer">
-            <option value="newest">Newest</option>
-            <option value="price-asc">Price, low to high</option>
-            <option value="price-desc">Price, high to low</option>
+            <option value="newest">{t("browse.newest")}</option>
+            <option value="price-asc">{t("browse.priceLow")}</option>
+            <option value="price-desc">{t("browse.priceHigh")}</option>
           </select>
         </label>
       </div>
 
       {items && q && (
         <p className="meta flex flex-wrap items-center gap-x-3">
-          {items.length} {items.length === 1 ? "result" : "results"} for &ldquo;{q}&rdquo;
+          {items.length === 1 ? t("browse.result1", { q }) : t("browse.results", { n: items.length, q })}
           <button
             type="button"
             onClick={() => {
@@ -153,7 +155,7 @@ export function ListingsBrowser() {
             }}
             className="hit link"
           >
-            Clear search
+            {t("browse.clear")}
           </button>
         </p>
       )}
@@ -163,7 +165,7 @@ export function ListingsBrowser() {
         <div role="alert" className="note note-error flex flex-wrap items-center justify-between gap-3">
           <span>{error}</span>
           <button type="button" onClick={() => setAttempt((n) => n + 1)} className="btn btn-quiet shrink-0">
-            Try again
+            {t("common.tryAgain")}
           </button>
         </div>
       )}
@@ -184,11 +186,11 @@ export function ListingsBrowser() {
 
       {items && items.length === 0 && (
         <div className="flex flex-col items-start gap-3 border-y border-border py-10">
-          <h2 className="text-lg font-semibold">{mine ? "You haven't listed anything yet" : q ? `Nothing matches “${q}”` : "No listings yet"}</h2>
-          <p className="text-muted">{mine ? "Post an item and buyers can make offers in their own language." : q ? "Try a shorter word, or clear the search." : "Be the first to sell something."}</p>
+          <h2 className="text-lg font-semibold">{mine ? t("browse.emptyMine") : q ? t("browse.emptyQ", { q }) : t("browse.empty")}</h2>
+          <p className="text-muted">{mine ? t("browse.emptyMineBody") : q ? t("browse.emptyQBody") : t("browse.emptyBody")}</p>
           {canSell && (
             <Link href="/listings/new" className="btn btn-primary">
-              Sell something
+              {t("browse.sell")}
             </Link>
           )}
         </div>
@@ -214,7 +216,7 @@ export function ListingsBrowser() {
           aria-busy={loadingMore}
           className="btn btn-secondary self-center px-6 mt-4 font-medium"
         >
-          {loadingMore ? "Loading…" : "Show more"}
+          {loadingMore ? t("browse.loading") : t("browse.more")}
         </button>
       )}
     </section>

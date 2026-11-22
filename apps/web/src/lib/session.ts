@@ -60,6 +60,14 @@ function subscribe(l: () => void) {
 
 export const saveSession = (s: AuthResponse) => write(s);
 export const clearSession = () => write(null);
+/**
+ * The Sign out button: forget the session, then a full page load to the home page. The reload also closes this
+ * page's Nexconn connection, so the next person to sign in on this tab never inherits the previous user's chat.
+ */
+export function signOut() {
+  write(null);
+  window.location.assign("/");
+}
 export const getSession = read;
 
 /** `undefined` while hydrating on the client, `null` when signed out. */

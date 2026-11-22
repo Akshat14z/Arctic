@@ -20,7 +20,11 @@ const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 export function SignupForm() {
   const router = useRouter();
   const session = useSession();
-  const isGuest = !!session && session.user.role === "user" && !session.user.isDemo && !session.email;
+  const isGuest =
+    !!session &&
+    session.user.role === "user" &&
+    !session.user.isDemo &&
+    !session.email;
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -80,7 +84,11 @@ export function SignupForm() {
     setBusy("guest");
     setError(null);
     try {
-      const res = await api("/api/auth/guest", { method: "POST", body: { displayName, language }, schema: AuthResponseSchema });
+      const res = await api("/api/auth/guest", {
+        method: "POST",
+        body: { displayName, language },
+        schema: AuthResponseSchema,
+      });
       saveSession(res);
       router.replace(nextPath());
     } catch (err) {
@@ -94,7 +102,9 @@ export function SignupForm() {
   return (
     <div className="mx-auto flex w-full max-w-lg flex-col gap-6 py-6 sm:py-2">
       <div className="flex flex-col gap-2">
-        <h1 className="page-title">{isGuest ? "Save your account" : "Create your account"}</h1>
+        <h1 className="page-title">
+          {isGuest ? "Save your account" : "Create your account"}
+        </h1>
         <p className="text-muted">
           {isGuest
             ? "Add an email and password to keep your chats and listings, and to sign in on any device."
@@ -115,10 +125,41 @@ export function SignupForm() {
             aria-describedby="name-hint"
             className="field"
           />
-          <span id="name-hint" className={show("name") ? "hint text-danger" : "hint"}>
+          <span
+            id="name-hint"
+            className={show("name") ? "hint text-danger" : "hint"}
+          >
             {show("name") || "Shown to the people you chat with."}
           </span>
         </label>
+
+        <LanguagePicker value={language} onChange={setLanguage} />
+
+        {/* New visitors: a guest needs only a name and a language, so that path comes first (Golden Path: in within seconds). */}
+        {!isGuest && (
+          <>
+            <button
+              type="button"
+              onClick={continueAsGuest}
+              disabled={!!busy}
+              aria-busy={busy === "guest"}
+              className="btn btn-primary w-full"
+            >
+              {busy === "guest" ? "Starting…" : "Start now as a guest"}
+            </button>
+            <p className="hint -mt-2 text-center">
+              Stays on this device. Add an email any time.
+            </p>
+            <div
+              className="flex items-center gap-3 text-sm text-muted"
+              aria-hidden
+            >
+              <span className="h-px flex-1 bg-border" />
+              or save it with an email
+              <span className="h-px flex-1 bg-border" />
+            </div>
+          </>
+        )}
 
         <label className="flex flex-col gap-2">
           <span className="label">Email</span>
@@ -144,13 +185,21 @@ export function SignupForm() {
           <label htmlFor="signup-password" className="label">
             Password
           </label>
-          <PasswordField id="signup-password" value={password} onChange={setPassword} autoComplete="new-password" invalid={!!show("password")} describedBy="password-hint" />
-          <span id="password-hint" className={show("password") ? "hint text-danger" : "hint"}>
+          <PasswordField
+            id="signup-password"
+            value={password}
+            onChange={setPassword}
+            autoComplete="new-password"
+            invalid={!!show("password")}
+            describedBy="password-hint"
+          />
+          <span
+            id="password-hint"
+            className={show("password") ? "hint text-danger" : "hint"}
+          >
             {show("password") || "At least 8 characters."}
           </span>
         </div>
-
-        <LanguagePicker value={language} onChange={setLanguage} />
 
         {error && (
           <p role="alert" className="note note-error">
@@ -158,25 +207,20 @@ export function SignupForm() {
           </p>
         )}
 
-        <button type="submit" disabled={!!busy} aria-busy={busy === "account"} className="btn btn-primary w-full py-3 font-semibold shadow-xs">
-          {busy === "account" ? "Creating your account…" : isGuest ? "Save my account" : "Create account"}
+        <button
+          type="submit"
+          disabled={!!busy}
+          aria-busy={busy === "account"}
+          className={`btn w-full ${isGuest ? "btn-primary" : "btn-secondary"}`}
+        >
+          {busy === "account"
+            ? "Creating your account…"
+            : isGuest
+              ? "Save my account"
+              : "Create account"}
         </button>
 
         <p className="meta text-center">Free. No card needed.</p>
-
-        {!isGuest && (
-          <>
-            <div className="flex items-center gap-3 text-sm text-muted" aria-hidden>
-              <span className="h-px flex-1 bg-border" />
-              or
-              <span className="h-px flex-1 bg-border" />
-            </div>
-            <button type="button" onClick={continueAsGuest} disabled={!!busy} aria-busy={busy === "guest"} className="btn btn-secondary w-full">
-              {busy === "guest" ? "Starting…" : "Continue as a guest"}
-            </button>
-            <p className="hint -mt-2 text-center">A guest account stays on this device. You can add an email later.</p>
-          </>
-        )}
       </form>
 
       <p className="text-center text-sm">

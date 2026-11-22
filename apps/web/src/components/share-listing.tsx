@@ -3,6 +3,7 @@
 import { useState, useSyncExternalStore } from "react";
 import type { LangCode, Listing } from "@convocart/contracts";
 import { formatPrice } from "@/lib/format";
+import { translator } from "@/lib/i18n";
 
 const noop = () => () => {};
 
@@ -11,6 +12,7 @@ export function ShareListing({ listing, lang, mine }: { listing: Listing; lang: 
   const origin = useSyncExternalStore(noop, () => location.origin, () => "");
   const canShare = useSyncExternalStore(noop, () => typeof navigator.share === "function", () => false);
   const [copied, setCopied] = useState(false);
+  const t = translator(lang);
   if (!origin) return null;
 
   const url = `${origin}/listings/${encodeURIComponent(listing.id)}`;
@@ -18,7 +20,7 @@ export function ShareListing({ listing, lang, mine }: { listing: Listing; lang: 
 
   return (
     <section aria-label="Share this listing" className="flex flex-col gap-2">
-      <p className="meta">{mine ? "Post it to your WhatsApp groups. Buyers open it in their own language." : "Know someone who wants this?"}</p>
+      <p className="meta">{mine ? t("share.mine") : t("share.ask")}</p>
       <div className="-ms-[var(--space-xs)] flex flex-wrap gap-x-4 gap-y-1">
         <a
           href={`https://wa.me/?text=${encodeURIComponent(`${text} ${url}`)}`}
@@ -26,7 +28,7 @@ export function ShareListing({ listing, lang, mine }: { listing: Listing; lang: 
           rel="noopener noreferrer"
           className="btn btn-quiet"
         >
-          Share on WhatsApp
+          {t("share.whatsapp")}
         </a>
         {canShare && (
           <button
@@ -34,7 +36,7 @@ export function ShareListing({ listing, lang, mine }: { listing: Listing; lang: 
             onClick={() => navigator.share({ title: listing.title, text, url }).catch(() => {})}
             className="btn btn-quiet"
           >
-            Share…
+            {t("share.more")}
           </button>
         )}
         <button
@@ -47,7 +49,7 @@ export function ShareListing({ listing, lang, mine }: { listing: Listing; lang: 
           }}
           className="btn btn-quiet"
         >
-          {copied ? "Link copied" : "Copy link"}
+          {copied ? t("share.copied") : t("share.copy")}
         </button>
       </div>
     </section>

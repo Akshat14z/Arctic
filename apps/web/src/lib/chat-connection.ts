@@ -4,7 +4,7 @@ import { useSyncExternalStore } from "react";
 import { MeResponseSchema, type AuthResponse } from "@convocart/contracts";
 import { api, ApiError } from "./api/client";
 import { connect, getConnectionState, onConnectionState } from "./nexconn";
-import { clearSession, saveSession } from "./session";
+import { clearSession, getSession, saveSession } from "./session";
 
 // One Nexconn connection per page load, shared by every chat screen.
 let started: Promise<string> | null = null;
@@ -18,6 +18,8 @@ export function ensureConnected(session: AuthResponse): Promise<string> {
   started ??= (async () => {
     try {
       const me = await api("/api/me", { token: session.sessionToken, schema: MeResponseSchema });
+      // Signed out (or switched account) while this was in flight: don't bring the old session back.
+      if (getSession()?.sessionToken !== session.sessionToken) throw new ApiError("SIGNED_OUT", false);
       saveSession({ ...session, user: me.user, nexconn: me.nexconn, ...(me.email ? { email: me.email } : {}) });
       return await connect(me.nexconn);
     } catch (e) {

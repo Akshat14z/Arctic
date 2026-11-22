@@ -86,20 +86,21 @@ export function Queue() {
       </header>
 
       {items && (
-        <div data-stagger className="grid grid-cols-3 gap-3">
+        // A plain figure strip, not metric cards: the queue below is the real content.
+        <dl className="flex flex-wrap gap-x-10 gap-y-3 border-y border-border py-4">
           {(
             [
-              ["Open", items.filter((c) => c.status === "open").length],
-              ["Overdue", items.filter((c) => c.status === "open" && Date.parse(c.slaDueAt) < now).length],
-              ["Yours", items.filter((c) => c.agent?.id === me.id).length],
+              ["Open", items.filter((c) => c.status === "open").length, false],
+              ["Overdue", items.filter((c) => c.status === "open" && Date.parse(c.slaDueAt) < now).length, true],
+              ["Yours", items.filter((c) => c.agent?.id === me.id).length, false],
             ] as const
-          ).map(([label, n], i) => (
-            <div key={label} className={`tile gap-2 ${i === 0 ? "tile-hero" : ""}`}>
-              <p className="text-sm font-medium">{label}</p>
-              <p className="figure">{n}</p>
+          ).map(([label, n, alarm]) => (
+            <div key={label} className="flex flex-col">
+              <dt className="meta">{label}</dt>
+              <dd className={`agate text-2xl font-semibold ${alarm && n > 0 ? "text-danger" : ""}`}>{n}</dd>
             </div>
           ))}
-        </div>
+        </dl>
       )}
 
       {items && items.length > 0 && (

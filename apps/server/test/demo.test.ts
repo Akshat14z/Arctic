@@ -108,5 +108,28 @@ describe('Demo Sandbox Sessions (AKSHAT-T13, D-015)', { timeout: 35000 }, () => 
     expect(afterCount).toBeLessThanOrEqual(3);
     expect(afterCount).toBe(beforeCount);
   });
-});
 
+  it('demo accounts are read-only: no rename, language change or password (DHRUMIL-030)', async () => {
+    const res = await app.inject({ method: 'POST', url: '/api/demo/session', payload: { as: 'buyer' } });
+    const { sessionToken } = res.json();
+    for (const payload of [{ displayName: 'Hacked' }, { language: 'en' }, { email: 'x@example.test', newPassword: 'longenough1' }]) {
+      const patch = await app.inject({ method: 'PATCH', url: '/api/me', headers: { authorization: `Bearer ${sessionToken}` }, payload });
+      expect(patch.statusCode).toBe(403);
+      expect(patch.json().error.code).toBe('DEMO_READ_ONLY');
+    }
+    const me = await prisma.user.findUniqueOrThrow({ where: { id: 'demo_u_buyer' } });
+    expect(me.displayName).toContain('Priya');
+    expect(me.language).toBe('hi');
+    expect(me.email).toBeNull();
+  });
+
+  it('seeded demo listings cannot be edited or deleted, even by the demo seller', async () => {
+    const res = await app.inject({ method: 'POST', url: '/api/demo/session', payload: { as: 'seller' } });
+    const auth = { authorization: `Bearer ${res.json().sessionToken}` };
+    const patch = await app.inject({ method: 'PATCH', url: '/api/listings/demo_l_vintage_watch', headers: auth, payload: { price: { amount: 1, currency: 'INR' } } });
+    expect(patch.statusCode).toBe(403);
+    const del = await app.inject({ method: 'DELETE', url: '/api/listings/demo_l_vintage_watch', headers: auth });
+    expect(del.statusCode).toBe(403);
+    expect(await prisma.listing.count({ where: { id: 'demo_l_vintage_watch' } })).toBe(1);
+  });
+});

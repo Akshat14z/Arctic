@@ -187,6 +187,10 @@ export async function updateListing(
   if (!existing) {
     throw new AppError('LISTING_NOT_FOUND', `Listing with ID ${id} not found`, 404, false);
   }
+  // Seeded demo listings are shared by every judge and visitor: they stay exactly as seeded.
+  if (existing.isDemo) {
+    throw new AppError('DEMO_READ_ONLY', "Demo listings can't be changed", 403, false);
+  }
 
   // Authorization check: User can only update their own listings
   if (existing.sellerId !== currentUserId) {
@@ -232,6 +236,10 @@ export async function deleteListing(
 
   if (!existing) {
     throw new AppError('LISTING_NOT_FOUND', `Listing with ID ${id} not found`, 404, false);
+  }
+  // Seeded demo listings are shared by every judge and visitor: they stay exactly as seeded.
+  if (existing.isDemo) {
+    throw new AppError('DEMO_READ_ONLY', "Demo listings can't be changed", 403, false);
   }
 
   // Authorization check: User can only delete their own listings

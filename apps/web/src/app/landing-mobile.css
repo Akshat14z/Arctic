@@ -1,10 +1,5 @@
 /* ── Landing page mobile overrides ── */
 
-/* Narrow phones: tighter grid squares */
-@media (max-width: 24.375rem) {
-  [data-landing] { background-size: 48px 48px; }
-}
-
 /* Hero: clip drift words that overflow on small screens */
 @media (max-width: 47.99rem) {
   .l-hero { overflow-x: clip; }

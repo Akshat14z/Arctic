@@ -5,10 +5,12 @@ import { useRouter } from "next/navigation";
 import { CaseResponseSchema, type CaseReason } from "@convocart/contracts";
 import { api, friendlyMessage } from "@/lib/api/client";
 import { REASONS } from "@/lib/cases";
+import { useT } from "@/lib/use-t";
 
 /** "Get help" in a chat: pick a reason, optionally explain, and a support agent joins (C6). */
 export function GetHelp({ channelId, token }: { channelId: string; token: string }) {
   const router = useRouter();
+  const t = useT();
   const dialog = useRef<HTMLDialogElement>(null);
   const [reason, setReason] = useState<CaseReason | null>(null);
   const [note, setNote] = useState("");
@@ -42,7 +44,7 @@ export function GetHelp({ channelId, token }: { channelId: string; token: string
         onClick={() => dialog.current?.showModal()}
         className="btn btn-secondary shrink-0 text-sm"
       >
-        Get help
+        {t("help.button")}
       </button>
 
       <dialog
@@ -53,16 +55,16 @@ export function GetHelp({ channelId, token }: { channelId: string; token: string
         <form onSubmit={submit} className="flex flex-col gap-4 p-5">
           <div className="flex flex-col gap-1">
             <h2 id="get-help-title" className="section-title">
-              Get help from Handshake
+              {t("help.title")}
             </h2>
             <p className="meta">
-              A support agent joins this chat and sees the whole conversation in both languages.
+              {t("help.body")}
             </p>
           </div>
           <hr className="rule-double" />
 
           <fieldset className="flex flex-col">
-            <legend className="label mb-2">What&apos;s wrong?</legend>
+            <legend className="label mb-2">{t("help.whatsWrong")}</legend>
             {REASONS.map((r) => (
               <label
                 key={r.value}
@@ -76,14 +78,14 @@ export function GetHelp({ channelId, token }: { channelId: string; token: string
                   onChange={() => setReason(r.value)}
                   className="size-4 shrink-0 accent-text"
                 />
-                {r.label}
+                {t(`help.reason.${r.value}`)}
               </label>
             ))}
           </fieldset>
 
           <label className="flex flex-col gap-2">
             <span className="label">
-              Anything the agent should know? <span className="hint">(optional)</span>
+              {t("help.note")} <span className="hint">{t("help.optional")}</span>
             </span>
             <textarea
               rows={3}
@@ -106,7 +108,7 @@ export function GetHelp({ channelId, token }: { channelId: string; token: string
               onClick={() => dialog.current?.close()}
               className="btn btn-secondary flex-1"
             >
-              Cancel
+              {t("chat.cancel")}
             </button>
             <button
               type="submit"
@@ -114,7 +116,7 @@ export function GetHelp({ channelId, token }: { channelId: string; token: string
               aria-busy={busy}
               className="btn btn-primary flex-1"
             >
-              {busy ? "Asking…" : "Ask for help"}
+              {busy ? t("help.asking") : t("help.ask")}
             </button>
           </div>
         </form>
