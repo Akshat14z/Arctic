@@ -153,3 +153,19 @@ describe('Self-proving seal (DHRUMIL-T22)', () => {
     }
   });
 });
+
+describe('Amounts in thousands (DHRUMIL-T32)', () => {
+  for (const text of ['I can pay 17k', 'I can pay 17 thousand', 'मैं 17 हज़ार दूँगी']) {
+    it(`flags "${text}" once, suggesting ₹17,000`, () => {
+      const r = analyzeMessageGuard(text, 'en');
+      const cur = r.issues.filter((i) => i.kind === 'currency');
+      expect(cur).toHaveLength(1);
+      expect(cur[0].suggestion).toBe('₹17,000');
+      expect(r.blocking).toBe(true);
+    });
+  }
+  it('bare numbers and lakh keep one issue each', () => {
+    expect(analyzeMessageGuard('I can pay 17000', 'en').issues.filter((i) => i.kind === 'currency')).toHaveLength(1);
+    expect(analyzeMessageGuard('I can pay 15 lakh', 'en').issues.filter((i) => i.kind === 'currency').map((i) => i.span)).toEqual(['15 lakh']);
+  });
+});

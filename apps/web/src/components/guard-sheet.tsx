@@ -3,7 +3,7 @@
 import { useEffect, useRef } from "react";
 import type { GuardIssue, LangCode } from "@convocart/contracts";
 import { formatPrice } from "@/lib/format";
-import { indianAmount } from "@/lib/guard";
+import { amountFix } from "@/lib/guard";
 
 const TITLES: Partial<Record<GuardIssue["kind"], string>> = {
   scam_signal: "This could put you at risk",
@@ -76,11 +76,12 @@ export function GuardSheet({ voice, text, issues, blocking, lang, onEdit, onUseS
 
         <ul className="flex flex-col gap-3">
           {issues.map((issue, i) => {
-            const amount = issue.kind === "currency" ? indianAmount(issue.span) : null;
-            // "Use …" replaces the flagged words, so only offer it where the suggestion is replacement text (amounts).
-            // "2 lakh" → "₹2,00,000": exact, and free of the word the rule flags (the server's "₹2 lakh" is flagged again).
+            // "Use …" replaces the flagged words, so it must be the whole replacement: only the amount is rewritten
+            // ("pay 17000" → "pay ₹17,000", "2 lakh" → "₹2,00,000", "17k" → "₹17,000"), never the verb around it.
+            const fix = issue.kind === "currency" ? amountFix(issue.span, (n) => formatPrice({ amount: n, currency: "INR" }, lang)) : null;
+            const amount = fix?.amount ?? null;
             const replaceable = issue.kind === "currency" || issue.kind === "number_format";
-            const suggestion = voice ? undefined : amount !== null ? formatPrice({ amount, currency: "INR" }, lang) : replaceable ? issue.suggestion : undefined;
+            const suggestion = voice ? undefined : fix ? fix.replacement : replaceable ? issue.suggestion : undefined;
             const danger = issue.kind === "scam_signal";
             return (
               <li key={`${issue.kind}-${i}`} className={`note ${danger ? "note-error" : "note-guard"}`}>

@@ -75,9 +75,23 @@ const RULES: RuleDefinition[] = [
     }),
     getSuggestion: (match) => `₹${match[0]}`,
   },
+  // "17k", "17 thousand", "17 हज़ार": translation turns these into the reader's currency (seen live: "17k" → "17000円").
+  // Added by Dhrumil with the humans' approval (DHRUMIL-T32).
   {
     kind: 'currency',
-    regex: /\b(?:price|offer|give|pay|take|cost|total|final|rate|for)\s+(?:is\s+)?(\d{2,7})\b/i,
+    regex: /(\d+(?:\.\d+)?)\s*(?:k\b|thousand\b|हज़ार|हजार)/i,
+    isBlocking: true,
+    explanation: makeExplanation({
+      en: 'Amount in thousands without a currency symbol. Translation can turn it into another currency: write it out with ₹.',
+      hi: 'हज़ारों में राशि, बिना मुद्रा प्रतीक के। अनुवाद इसे दूसरी मुद्रा बना सकता है: ₹ के साथ पूरी राशि लिखें।',
+      ja: '通貨記号のない「千」単位の金額です。翻訳で別の通貨に変わることがあります。₹を付けて金額を書いてください。',
+    }),
+    getSuggestion: (match) => `₹${Math.round(Number(match[1]) * 1000).toLocaleString('en-IN')}`,
+  },
+  {
+    kind: 'currency',
+    // Not when a unit follows ("pay 17 thousand", "pay 15 lakh"): those rules own the whole amount.
+    regex: /\b(?:price|offer|give|pay|take|cost|total|final|rate|for)\s+(?:is\s+)?(\d{2,7})\b(?!\s*(?:k\b|thousand|lakhs?|lacs?|crores?|cr\b|हज़ार|हजार))/i,
     isBlocking: true,
     explanation: makeExplanation({
       en: 'Price or payment amount detected without standard currency symbol. Specify the currency (e.g. ₹, $, ¥).',
