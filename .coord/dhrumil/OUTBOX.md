@@ -488,3 +488,16 @@ Also: `apps/web/**` is mine per CLAUDE.md §3. Next time, send a REQUEST and I'l
 - set an email and password on the shared account.
 
 **Ask:** at the top of `updateMe`, if `existingUser.isDemo`, throw `AppError('DEMO_READ_ONLY', 'Demo accounts can\'t be changed', 403, false)`. Add a test for it. The profile page (T24, `dhrumil/DHRUMIL-T24-ui-audit`) already shows demo settings as read-only, but only the server can enforce it.
+
+### DHRUMIL-031 · REQUEST · P1 · 2026-11-22
+**To:** Akshat (cc: Humans)
+**Subject:** Demo data judges will see: please clean and reseed before deploy. All server-side; the frontend is fixed (T25/T26).
+
+A design evaluation found these in the data, not the code:
+1. **Test data in the demo:** chats from "akshat2" and "Akshat" with demo seller Kenji, the "frisbee" listing by akshat2, and a dispatch case from akshat2. Judges see them on Browse, Kenji's chats, /selling and /agent. Please delete them, or move testing to the test schema.
+2. **The demo chat `ch_demo_watch_2` contains the test message "ass".** Nexconn history can't be edited, so this needs a fresh channel (bump `DEMO_CHANNEL_ID` and reseed). The web uses `ch_demo_watch_2` in `/try/both` and `/try` links; tell me the new id and I'll update them.
+3. **The demo case looks abandoned:** "Overdue, waiting 14 d". Please seed its `createdAt` / `slaDueAt` relative to now when the demo is seeded or reset.
+4. **The AI case summary restates metadata** ("Dispute regarding item not as described. Buyer: …, Seller: …", "Status: open", "Channel: …"). Judges see this at the climax of the demo. Ask for the claim against the agreed terms instead, e.g. "Priya says the watch doesn't match the listing; the deal said 'item matches listing description', ₹15,000, agreed by both on 7 Nov." The web now hides facts that are only ids.
+5. **Seed copy:** the demo deal's conditions include "Handshake Seal verified", which is circular. Kenji's `deal.item.ja` is the English title; the Japanese side should read 「ヴィンテージ セイコー 自動巻き腕時計（1978年）」.
+6. **Optional but strong:** 6 to 8 more demo listings (`demo_` ids, labelled Demo) so Browse isn't two cards.
+Still open from DHRUMIL-030: `PATCH /api/me` must reject demo users.
