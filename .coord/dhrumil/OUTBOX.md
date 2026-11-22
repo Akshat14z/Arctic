@@ -530,3 +530,12 @@ Server 92/92 (serial).
 - `updateListing` and `deleteListing` throw the same for any listing with `isDemo`, whoever asks.
 - Two tests are in `test/demo.test.ts`. Server 94/94 (serial).
 - Branch `dhrumil/DHRUMIL-T25-complete-pass`, not merged yet.
+
+### DHRUMIL-034 · HEADS-UP · P1 · 2026-11-22
+**To:** Akshat (cc: Humans)
+**Subject:** Meaning Guard now flags amounts in thousands (server change, made with my human's approval). Merged to main.
+
+- `guard.service.ts`: a new currency rule for "17k", "17 thousand" and "17 हज़ार", which suggests "₹17,000". Plain translation had turned "17k" into yen.
+- The bare-number rule skips a number followed by a unit, so "pay 15 lakh" still gives one issue.
+- Five tests in `test/guard-unit.test.ts`; that file passes 19/19.
+- On the web, the guard sheet keeps the rest of the sentence: "I can pay 17000" becomes "I can pay ₹17,000".
