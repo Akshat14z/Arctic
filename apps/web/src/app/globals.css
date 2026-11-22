@@ -262,15 +262,47 @@ html[data-theme="dark"] .cg-footer-abstract { opacity: 0.4; }
 @media (prefers-reduced-motion: reduce) { .announcement-control { display: none; } }
 @keyframes announcement-loop { to { transform: translateX(-50%); } }
 
-.home-campaign { --campaign-bg: oklch(16% 0.026 258); --campaign-panel: oklch(100% 0 0 / 0.075); --campaign-ink: oklch(97% 0.008 250); --campaign-muted: oklch(82% 0.025 250); --campaign-eyebrow: oklch(78% 0.11 252); position: relative; isolation: isolate; display: grid; min-height: clamp(18rem, 34vw, 28rem); grid-template-columns: minmax(0, 1.2fr) minmax(15rem, 0.8fr); overflow: hidden; border: 1px solid color-mix(in oklab, var(--campaign-bg) 78%, white); border-radius: 28px; background: var(--campaign-bg); color: var(--campaign-ink); }
-.home-campaign::before { content: ""; position: absolute; z-index: -1; inset: 0; background-image: linear-gradient(oklch(100% 0 0 / 0.08) 1px, transparent 1px), linear-gradient(90deg, oklch(100% 0 0 / 0.08) 1px, transparent 1px), radial-gradient(circle at 82% 18%, color-mix(in oklab, var(--color-accent) 60%, transparent), transparent 30%); background-size: 32px 32px, 32px 32px, auto; }
+.home-campaign {
+  /* Light mode: clean light card — white paper, dark ink */
+  --campaign-bg: var(--color-paper-2);
+  --campaign-panel: var(--color-paper-3);
+  --campaign-ink: var(--color-ink);
+  --campaign-muted: var(--color-ink-2);
+  --campaign-eyebrow: var(--color-accent);
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  min-height: clamp(18rem, 34vw, 28rem);
+  grid-template-columns: minmax(0, 1.2fr) minmax(15rem, 0.8fr);
+  overflow: hidden;
+  border: 1px solid var(--color-rule);
+  border-radius: 28px;
+  background: var(--campaign-bg);
+  color: var(--campaign-ink);
+}
+/* Dark mode: go fully deep */
+html[data-theme="dark"] .home-campaign {
+  --campaign-bg: oklch(16% 0.026 258);
+  --campaign-panel: oklch(100% 0 0 / 0.075);
+  --campaign-ink: oklch(97% 0.008 250);
+  --campaign-muted: oklch(82% 0.025 250);
+  --campaign-eyebrow: oklch(78% 0.11 252);
+  border-color: oklch(28% 0.03 258 / 0.8);
+}
+/* Grid overlay — lighter in light mode so it doesn't punch through */
+.home-campaign::before { content: ""; position: absolute; z-index: -1; inset: 0; background-image: linear-gradient(var(--color-rule) 1px, transparent 1px), linear-gradient(90deg, var(--color-rule) 1px, transparent 1px), radial-gradient(circle at 82% 18%, color-mix(in oklab, var(--color-accent) 30%, transparent), transparent 30%); background-size: 32px 32px, 32px 32px, auto; opacity: 0.5; }
+html[data-theme="dark"] .home-campaign::before { background-image: linear-gradient(oklch(100% 0 0 / 0.08) 1px, transparent 1px), linear-gradient(90deg, oklch(100% 0 0 / 0.08) 1px, transparent 1px), radial-gradient(circle at 82% 18%, color-mix(in oklab, var(--color-accent) 60%, transparent), transparent 30%); opacity: 1; }
 .home-campaign-copy { display: flex; flex-direction: column; justify-content: flex-end; gap: 1rem; padding: clamp(1.5rem, 5vw, 4rem); }
 .home-campaign-copy h1 { max-width: 11ch; font-family: var(--font-display); font-size: clamp(3rem, 7vw, 6.5rem); font-weight: 400; letter-spacing: -0.04em; line-height: 0.9; }
 .home-campaign-copy p { max-width: 42ch; color: var(--campaign-muted); }
 .home-campaign .eyebrow { color: var(--campaign-eyebrow); }
-.home-campaign-aside { display: flex; flex-direction: column; justify-content: space-between; margin: 1rem; padding: clamp(1.25rem, 3vw, 2rem); border: 1px solid oklch(100% 0 0 / 0.18); border-radius: 22px; background: var(--campaign-panel); backdrop-filter: blur(14px); }
+/* Aside panel — border adapts to mode */
+.home-campaign-aside { display: flex; flex-direction: column; justify-content: space-between; margin: 1rem; padding: clamp(1.25rem, 3vw, 2rem); border: 1px solid var(--color-rule); border-radius: 22px; background: var(--campaign-panel); backdrop-filter: blur(14px); }
+html[data-theme="dark"] .home-campaign-aside { border-color: oklch(100% 0 0 / 0.18); }
 .home-campaign-aside-copy { color: var(--campaign-muted); }
-.home-campaign .btn-secondary { background: oklch(98% 0.006 250); color: oklch(15% 0.015 255); border-color: transparent; }
+/* Buttons inside campaign — keep contrast in both modes */
+.home-campaign .btn-secondary { background: var(--color-paper-2); color: var(--color-ink); border-color: var(--color-rule-2); }
+html[data-theme="dark"] .home-campaign .btn-secondary { background: oklch(98% 0.006 250); color: oklch(15% 0.015 255); border-color: transparent; }
 .home-discovery { display: flex; flex-direction: column; gap: 1rem; padding-block: 1rem; }
 .home-discovery-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
 @media (min-width: 48rem) { .home-discovery-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
