@@ -367,8 +367,14 @@ export async function seedDemoEnvironment(): Promise<void> {
     },
   });
 
-  // 6. Keep the demo help case looking like it was just opened: judges arrive days after it was seeded, and
-  // "waiting 14 d" reads as broken support. Only an open case older than an hour is moved.
+  await refreshDemoCase();
+}
+
+/**
+ * Keep the demo help case looking like it was just opened: judges arrive days after it was seeded, and
+ * "waiting 14 d" reads as broken support. Only an open case older than an hour is moved.
+ */
+async function refreshDemoCase(): Promise<void> {
   const now = Date.now();
   await prisma.case.updateMany({
     where: {
@@ -383,6 +389,21 @@ export async function seedDemoEnvironment(): Promise<void> {
   });
 }
 
+// Speed (deployed API): every query is several round trips to the database, so seeding on each demo sign-in cost
+// about 15 s. The seed runs once per server process (shared by concurrent sign-ins, retried if it fails); demo
+// users are cached (they are read-only, DHRUMIL-030); the help-case refresh runs in the background at most every
+// 10 minutes. A sign-in is then one session write plus the Nexconn token, in parallel.
+let seeding: Promise<void> | null = null;
+export function ensureDemoSeeded(): Promise<void> {
+  seeding ??= seedDemoEnvironment().catch((err) => {
+    seeding = null;
+    throw err;
+  });
+  return seeding;
+}
+const demoUserCache = new Map<string, Awaited<ReturnType<typeof prisma.user.findUniqueOrThrow>>>();
+let lastCaseRefresh = Date.now();
+
 /**
  * Creates or reuses a demo session for the judge sandbox (D-015).
  */
@@ -390,27 +411,28 @@ export async function createDemoSession(roleTarget: 'buyer' | 'seller' | 'agent'
   const config = getConfig();
   const def = DEMO_USERS[roleTarget];
 
-  // Seed / ensure data exists
-  await seedDemoEnvironment();
+  await ensureDemoSeeded();
+  if (Date.now() - lastCaseRefresh > 10 * 60_000) {
+    lastCaseRefresh = Date.now();
+    void refreshDemoCase().catch((err) => console.warn('[demo] case refresh failed', err));
+  }
 
-  const user = await prisma.user.findUniqueOrThrow({
-    where: { id: def.id },
-  });
+  let user = demoUserCache.get(def.id);
+  if (!user) {
+    user = await prisma.user.findUniqueOrThrow({ where: { id: def.id } });
+    demoUserCache.set(def.id, user);
+  }
 
   // Create session
   const sessionToken = generateSessionToken();
   const tokenHash = hashToken(sessionToken);
   const expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000); // 30 days
 
-  await prisma.session.create({
-    data: {
-      tokenHash,
-      userId: user.id,
-      expiresAt,
-    },
-  });
-
-  const nexconnToken = await obtainNexconnToken(user.id, user.displayName);
+  // The session write and the Nexconn token don't depend on each other.
+  const [, nexconnToken] = await Promise.all([
+    prisma.session.create({ data: { tokenHash, userId: user.id, expiresAt } }),
+    obtainNexconnToken(user.id, user.displayName),
+  ]);
 
   return {
     sessionToken,

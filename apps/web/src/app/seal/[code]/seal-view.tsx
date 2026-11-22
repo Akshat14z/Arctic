@@ -199,7 +199,7 @@ function ProofBanner({ check, mismatch }: { check: SealCheck | null; mismatch: b
   if (check.status === "unsupported")
     return (
       <p role="status" className="note">
-        This browser can&apos;t check the signature itself. CommonGrounds&apos;s server confirmed the seal below.
+        This browser can&apos;t check the signature itself. The CommonGrounds server confirmed the seal below.
       </p>
     );
   return (
