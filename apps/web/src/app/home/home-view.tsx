@@ -77,7 +77,7 @@ export function HomeView() {
     <section data-wide className="flex flex-col gap-8">
       <section className="home-campaign" aria-labelledby="home-campaign-title">
         <div className="home-campaign-copy">
-          <p className="eyebrow !text-[oklch(78%_0.08_255)]">CommonGrounds marketplace</p>
+          <p className="eyebrow">CommonGrounds marketplace</p>
           <h1 id="home-campaign-title">{t("home.hi", { name: user.displayName.split(" ")[0] })}</h1>
           <p>Find the right item, follow sellers you trust, and agree on every detail in your own language.</p>
           <div className="flex flex-wrap gap-2">
@@ -87,9 +87,9 @@ export function HomeView() {
         </div>
         <aside className="home-campaign-aside">
           <div>
-            <p className="eyebrow !text-[oklch(78%_0.08_255)]">Marketplace update</p>
+            <p className="eyebrow">Marketplace update</p>
             <h2 className="mt-2 text-2xl font-semibold">Your seller network, in one feed.</h2>
-            <p className="mt-3 text-sm text-[oklch(83%_0.015_250)]">Search sellers, follow their storefronts, and see their newest listings chronologically.</p>
+            <p className="home-campaign-aside-copy mt-3 text-sm">Search sellers, follow their storefronts, and see their newest listings chronologically.</p>
           </div>
           <Link href="/following" className="btn btn-secondary self-start">Explore following</Link>
         </aside>
