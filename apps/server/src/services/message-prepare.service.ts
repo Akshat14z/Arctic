@@ -22,31 +22,32 @@ export async function prepareMessage(
   senderId: string,
   input: PrepareMessageRequest
 ): Promise<PreparedMessage> {
-  // 1. Look up the chat conversation and its participants
+  // 1. Find the room: a 1:1 chat, or a case's 3-way support room (DHRUMIL-T35, approved by the humans: the support
+  //    room used to 404 here, so messages in it went out untranslated).
   const chat = await prisma.chat.findUnique({
     where: { channelId: input.channelId },
-    include: {
-      buyer: true,
-      seller: true,
-    },
+    include: { buyer: true, seller: true },
   });
+  const room = chat
+    ? null
+    : await prisma.case.findFirst({
+        where: { groupChannelId: input.channelId },
+        include: { buyer: true, seller: true, agent: true },
+      });
 
-  if (!chat) {
+  if (!chat && !room) {
     throw new AppError('CHAT_NOT_FOUND', `Chat conversation '${input.channelId}' not found`, 404, false);
   }
 
   // 2. Enforce participant authorization
-  const isBuyer = chat.buyerId === senderId;
-  const isSeller = chat.sellerId === senderId;
-
-  if (!isBuyer && !isSeller) {
+  const members = chat ? [chat.buyer, chat.seller] : [room!.buyer, room!.seller, ...(room!.agent ? [room!.agent] : [])];
+  if (!members.some((m) => m.id === senderId)) {
     throw new AppError('FORBIDDEN', 'You are not an authorized participant in this conversation', 403, false);
   }
 
-  // 3. Resolve recipient languages across the channel (D-021: Three languages, one room)
-  // In a direct chat, the recipient is the other party.
-  const otherMembers = [chat.buyer, chat.seller].filter((m) => m.id !== senderId);
-  const recipientLangs: LangCode[] = otherMembers.map((m) => m.language as LangCode);
+  // 3. Resolve recipient languages across the room (D-021: Three languages, one room)
+  const otherMembers = members.filter((m) => m.id !== senderId);
+  const recipientLangs: LangCode[] = Array.from(new Set(otherMembers.map((m) => m.language as LangCode)));
 
   // If no other members or sender matches, default to sender's own language
   if (recipientLangs.length === 0) {
