@@ -44,7 +44,9 @@ export async function geminiGenerate(
 ): Promise<string> {
   const { LLM_API_KEY, LLM_MODEL } = getConfig();
   if (!LLM_API_KEY) throw new Error('LLM_API_KEY not set');
-  const models = Array.from(new Set([LLM_MODEL, ...FALLBACK_MODELS].filter(Boolean))) as string[];
+  // Fastest model first (approved by the humans): on 2026-11-22 gemini-flash-lite-latest answered in ~1 s while
+  // gemini-3.5-flash took 13-24 s. LLM_MODEL still runs, as the hedge.
+  const models = Array.from(new Set([...FALLBACK_MODELS, LLM_MODEL].filter(Boolean))) as string[];
 
   return new Promise<string>((resolve, reject) => {
     let next = 0;
