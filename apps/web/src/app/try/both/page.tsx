@@ -3,7 +3,7 @@ export const metadata = {
   description: "Watch Priya (Hindi) and Kenji (Japanese) in the same Handshake chat, side by side. Demo accounts, no sign-up.",
 };
 
-const CHAT = "/chats/ch_demo_watch_2";
+const CHAT = "/chats/ch_demo_watch_5";
 // Each frame's name gives it its own sign-in (lib/session.ts seatName), so the two people never overwrite each other.
 const SEATS = [
   { seat: "buyer", who: "Priya, the buyer", reads: "हिन्दी", lang: "hi" },

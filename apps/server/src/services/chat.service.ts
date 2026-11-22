@@ -1,3 +1,4 @@
+import type { LangCode } from '@convocart/contracts';
 import type {
   ChatCreateRequest,
   ChatCreateResponse,
@@ -118,7 +119,8 @@ export async function createOrGetChat(
   }
 }
 
-export async function getChats(currentUserId: string): Promise<ChatListResponse> {
+/** `lang`: the reader, so listing titles arrive in their language (stored translations; the original otherwise). */
+export async function getChats(currentUserId: string, lang?: LangCode): Promise<ChatListResponse> {
   const chats = await prisma.chat.findMany({
     relationLoadStrategy: 'join',
     where: {
@@ -148,11 +150,12 @@ export async function getChats(currentUserId: string): Promise<ChatListResponse>
 
     return {
       channelId: chat.channelId,
-      listing: formatListing(chat.listing),
+      listing: formatListing(chat.listing, lang),
       otherUser: formatUser(otherUser),
       lastMessage: lastTranscript
         ? {
-            text: lastTranscript.origText,
+            // The reader's translation when one was stored, like the chat itself shows it.
+            text: (lang && lastTranscript.origLang !== lang && (lastTranscript.tr as Record<string, string> | null)?.[lang]) || lastTranscript.origText,
             at: lastTranscript.at.toISOString(),
           }
         : undefined,
@@ -166,7 +169,8 @@ export async function getChats(currentUserId: string): Promise<ChatListResponse>
 export async function getChatById(
   channelId: string,
   currentUserId: string,
-  currentUserRole: string
+  currentUserRole: string,
+  lang?: LangCode
 ): Promise<ChatDetailResponse> {
   const chat = await prisma.chat.findUnique({
     relationLoadStrategy: 'join',
@@ -211,7 +215,7 @@ export async function getChatById(
     sellerId: chat.sellerId,
     buyer: formatUser(chat.buyer),
     seller: formatUser(chat.seller),
-    listing: formatListing(chat.listing),
+    listing: formatListing(chat.listing, lang),
     openCaseId: openCase?.id,
     createdAt: chat.createdAt.toISOString(),
   };

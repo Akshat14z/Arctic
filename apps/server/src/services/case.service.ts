@@ -16,6 +16,7 @@ import { prisma } from '../db/prisma.js';
 import { AppError } from '../errors.js';
 import { getConfig } from '../config.js';
 import { createEscalationGroupChannel, addMemberToGroupChannel } from '../nexconn/channels.js';
+import { summarizeCase } from './case-summary.js';
 
 type UserRecord = {
   id: string;
@@ -388,18 +389,20 @@ export async function getCaseDetail(
     shownTo: (l.shownTo as Record<string, ShownToDetail>) ?? {},
   }));
 
-  const reasonLabel = c.reason.replace(/_/g, ' ');
-  const summary: CaseSummary = {
-    lang: currentUser.language as LangCode,
-    text: `Dispute regarding ${reasonLabel}. Buyer: ${c.buyer.displayName}, Seller: ${c.seller.displayName}.${c.resolution ? ` Resolution: ${c.resolution}` : ''}`,
-    keyFacts: [
-      `Reason: ${reasonLabel}`,
-      `Status: ${c.status}`,
-      `Channel: ${c.channelId}`,
-      ...(c.resolution ? [`Resolution: ${c.resolution}`] : []),
-    ],
-    deal: (c.dealSnapshot as Deal) ?? undefined,
-  };
+  const lang = currentUser.language as LangCode;
+  const deal = (c.dealSnapshot as Deal) ?? undefined;
+  const written = await summarizeCase({
+    caseId: c.id,
+    reason: c.reason as CaseReason,
+    status: c.status,
+    resolution: c.resolution,
+    buyer: c.buyer,
+    seller: c.seller,
+    deal,
+    lines: lines.filter((l) => l.channelId === c.channelId).map((l) => ({ from: l.fromId, origLang: l.origLang, origText: l.origText, tr: (l.tr as Partial<Record<LangCode, string>>) ?? {} })),
+    lang,
+  });
+  const summary: CaseSummary = { lang, ...written, deal };
 
   return {
     case: formatCase(c),
