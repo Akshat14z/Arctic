@@ -186,6 +186,26 @@ describe('Nexconn Webhooks & Transcript Audit (AKSHAT-T08)', { timeout: 35000 },
       });
     });
 
+    it('ingests the documented Nexconn envelope {type, id, time, data: [...]} (DHRUMIL-T37)', async () => {
+      const { buyer, seller, chat } = await createTestChat();
+      const messageId = `msg_doc_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
+      const extra = { v: 1, kind: 'text', orig: { lang: 'en', text: 'Still available?' }, tr: { hi: 'क्या अभी भी उपलब्ध है?' } };
+      const res = await app.inject({
+        method: 'POST',
+        url: '/api/webhooks/nexconn',
+        headers: makeWebhookHeaders(`nonce_doc_${Date.now()}`, String(Date.now())),
+        payload: {
+          type: 'message:send', id: 'evt_1', time: Date.now(),
+          data: [{ userId: buyer.user.id, channelId: chat.channelId, messageType: 'RC:TxtMsg', content: JSON.stringify({ content: 'Still available?', extra: JSON.stringify(extra) }), channelType: 3, time: Date.now(), messageId, os: 'Websocket' }],
+        },
+      });
+      expect(res.statusCode).toBe(200);
+      expect(res.json().stored).toBe(1);
+      const row = await prisma.transcriptLine.findUnique({ where: { nexconnMessageId: messageId } });
+      expect(row?.origText).toBe('Still available?');
+      expect((row?.shownTo as any)[seller.user.id]).toEqual({ lang: 'hi', text: 'क्या अभी भी उपलब्ध है?', translated: true });
+    });
+
     it('handles duplicate delivery idempotently without creating duplicate transcript rows', async () => {
       const { buyer, chat } = await createTestChat();
 

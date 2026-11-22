@@ -130,6 +130,8 @@ export async function processNexconnMessageEvent(
       const parsed = JSON.parse(payload.content);
       if (parsed && typeof parsed === 'object') {
         if (parsed.text) messageText = parsed.text;
+        // RC:TxtMsg content is {"content": "…", "extra": "…"} (docs.nexconn.ai, message:send example).
+        else if (typeof parsed.content === 'string') messageText = parsed.content;
         if (parsed.extra) extraObj = parsed.extra;
       }
     } catch {
