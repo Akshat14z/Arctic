@@ -10,10 +10,13 @@ import { LANGUAGES, preferredLanguage } from "@/lib/languages";
 import { useSession } from "@/lib/session";
 import { DemoBadge, ListingImage } from "@/components/listing-card";
 import { ShareListing } from "@/components/share-listing";
+import { translator } from "@/lib/i18n";
+import { useT } from "@/lib/use-t";
 
 /** Opens (or reuses) the buyer's chat for this listing. Guests sign in first and come back here. */
 function ChatWithSeller({ listingId }: { listingId: string }) {
   const session = useSession();
+  const t = useT();
   const router = useRouter();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -48,7 +51,7 @@ function ChatWithSeller({ listingId }: { listingId: string }) {
         aria-busy={busy}
         className="btn btn-primary w-full py-3.5 text-base font-semibold shadow-md"
       >
-        {busy ? "Opening the chat…" : "Chat with the seller"}
+        {busy ? t("listing.opening") : t("listing.chat")}
       </button>
       {error && (
         <p role="alert" className="note note-error text-xs">
@@ -65,6 +68,7 @@ export function ListingDetail() {
   const [guestLang, setGuestLang] = useState<LangCode | null>(null);
   useEffect(() => setGuestLang(preferredLanguage(navigator.languages)), []);
   const lang = session?.user.language ?? guestLang ?? "en";
+  const t = translator(lang);
   const [listing, setListing] = useState<Listing | null>(null);
   const [error, setError] = useState<{ text: string; notFound: boolean } | null>(null);
   const [attempt, setAttempt] = useState(0);
@@ -128,7 +132,7 @@ export function ListingDetail() {
         <svg aria-hidden width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.5">
           <path d="M8.5 3 4.5 7l4 4" />
         </svg>
-        Browse
+        {t("browse.title")}
       </Link>
 
       <div className="grid grid-cols-1 items-start gap-8 md:grid-cols-2">
@@ -141,7 +145,7 @@ export function ListingDetail() {
             {(listing.isDemo || original) && (
               <div className="flex flex-wrap items-center gap-2">
                 {listing.isDemo && <DemoBadge />}
-                {original && <span className="meta">Written in {original.native}, shown in your language</span>}
+                {original && <span className="meta">{t("listing.writtenIn", { lang: original.native })}</span>}
               </div>
             )}
             <h1 lang={textLang} className="text-2xl font-semibold tracking-tight break-words sm:text-3xl">
@@ -151,14 +155,14 @@ export function ListingDetail() {
           </div>
 
           {mine ? (
-            <p className="note">This is your listing. Buyers&apos; messages show up in Chats.</p>
+            <p className="note">{t("listing.mine")}</p>
           ) : (
             <ChatWithSeller listingId={listing.id} />
           )}
 
           {listing.description && (
             <section className="flex flex-col gap-2 border-t border-border pt-6">
-              <h2 className="text-base font-semibold">About this item</h2>
+              <h2 className="text-base font-semibold">{t("listing.about")}</h2>
               <p lang={textLang} className="max-w-[65ch] whitespace-pre-line break-words text-ink-2">
                 {listing.description}
               </p>
@@ -173,11 +177,11 @@ export function ListingDetail() {
                 </span>
                 <div className="min-w-0">
                   <p className="font-medium break-words">{listing.seller.displayName}</p>
-                  <p className="meta">Seller</p>
+                  <p className="meta">{t("listing.seller")}</p>
                 </div>
               </div>
               <time dateTime={listing.createdAt} className="meta">
-                Listed {new Date(listing.createdAt).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}
+                {t("listing.listed", { date: new Date(listing.createdAt).toLocaleDateString(lang === "en" ? "en-IN" : lang, { day: "numeric", month: "short", year: "numeric" }) })}
               </time>
             </section>
           )}

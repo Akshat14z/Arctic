@@ -195,3 +195,28 @@ body:has([data-landing]) { background: var(--l-paper); padding: 0; }
    replaying. A 2.5s failsafe shows it anyway if the script never arrives. */
 html.js [data-landing]:not(.is-live) :is(.l-title, .l-sub, .l-actions, .l-cutouts, .l-drift) { visibility: hidden; animation: l-failsafe 0s 2.5s forwards; }
 @keyframes l-failsafe { to { visibility: visible; } }
+
+/* ── Depth without a pattern behind text (T28) ─────────────────────────────────
+   Tonal bands give the page rhythm; the close is drenched in the brand blue; guilloche rosettes (the seal motif)
+   sit only in empty corners. Every rosette is hidden where the layout would bring it near text. */
+[data-landing] { --l-tint: oklch(94% 0.022 252); }
+.l-band-tint { background: var(--l-tint); }
+.l-agent { padding-block: var(--space-3xl); }
+.l-band-blue { position: relative; overflow: clip; background: var(--l-blue); color: var(--l-blue-ink); --l-ink: var(--l-blue-ink); --l-faint: color-mix(in oklab, var(--l-blue-ink) 50%, var(--l-blue)); }
+.l-band-blue .l-close { position: relative; z-index: 1; padding-block: var(--space-3xl); }
+.l-band-blue .l-btn { background: var(--l-blue-ink); color: var(--l-blue); }
+.l-band-blue .l-btn:hover { background: color-mix(in oklab, var(--l-blue-ink) 88%, var(--l-blue)); }
+.l-band-blue :focus-visible { outline-color: var(--l-blue-ink); }
+.l-street { margin-top: var(--space-xl); }
+
+.l-rosette { position: absolute; z-index: 0; pointer-events: none; width: clamp(16rem, 24vw, 26rem); aspect-ratio: 1; color: var(--l-blue); opacity: 0.22; }
+.l-band-blue .l-rosette { color: var(--l-blue-ink); opacity: 0.18; top: 50%; }
+.l-rosette-c { left: 0; translate: -58% -50%; }
+.l-rosette-d { right: 0; translate: 58% -50%; }
+@media (prefers-reduced-motion: no-preference) {
+  .l-rosette { animation: l-turn 120s linear infinite; }
+  .l-rosette-d { animation-direction: reverse; }
+}
+@keyframes l-turn { to { rotate: 1turn; } }
+/* Narrower screens widen the closing line: no room beside the text, so no rosettes. */
+@media (max-width: 79.99rem) { .l-band-blue .l-rosette { display: none; } }

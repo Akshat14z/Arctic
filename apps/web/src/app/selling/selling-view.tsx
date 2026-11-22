@@ -15,6 +15,7 @@ import { api, friendlyMessage } from "@/lib/api/client";
 import { formatPrice, localeFor } from "@/lib/format";
 import { useRequireSession } from "@/lib/use-require-session";
 import { DemoBadge, ListingImage } from "@/components/listing-card";
+import { translator } from "@/lib/i18n";
 
 /**
  * Seller dashboard: your listings (edit, delete) and every buyer talking to you about them.
@@ -25,10 +26,7 @@ export function SellingView() {
   if (!session) return <div aria-busy className="skeleton h-80" />;
   if (session.user.role === "agent")
     return (
-      <p className="note">
-        Support agents don&apos;t sell. Open the dispatch console to answer help
-        requests.
-      </p>
+      <p className="note">{translator(session.user.language)("selling.agents")}</p>
     );
   return <Dashboard session={session} />;
 }
@@ -54,6 +52,7 @@ async function myListings(userId: string): Promise<Listing[]> {
 
 function Dashboard({ session }: { session: AuthResponse }) {
   const { user } = session;
+  const t = translator(user.language);
   const [data, setData] = useState<Data | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [attempt, setAttempt] = useState(0);
@@ -100,21 +99,18 @@ function Dashboard({ session }: { session: AuthResponse }) {
     <section data-wide className="flex flex-col gap-10">
       <header className="flex flex-wrap items-end justify-between gap-4">
         <div className="flex flex-col gap-1">
-          <h1 className="page-title">Selling</h1>
+          <h1 className="page-title">{t("nav.selling")}</h1>
           <p className="text-muted">
-            Your listings and the buyers talking to you about them.
+            {t("selling.sub")}
           </p>
         </div>
         <Link href="/listings/new" className="btn btn-primary">
-          List an item
+          {t("selling.list")}
         </Link>
       </header>
 
       {user.isDemo && (
-        <p className="note">
-          This demo seller is shared by everyone trying Handshake, so its
-          listings can&apos;t be edited or deleted here.
-        </p>
+        <p className="note">{t("selling.demo")}</p>
       )}
 
       {error && (
@@ -128,7 +124,7 @@ function Dashboard({ session }: { session: AuthResponse }) {
             onClick={() => setAttempt((n) => n + 1)}
             className="btn btn-quiet"
           >
-            Try again
+            {t("common.tryAgain")}
           </button>
         </div>
       )}
@@ -144,9 +140,9 @@ function Dashboard({ session }: { session: AuthResponse }) {
       {data && (
         <>
           <dl className="flex flex-wrap gap-x-10 gap-y-3 border-y border-border py-4">
-            <Figure label="Listings" value={data.listings.length} />
-            <Figure label="Buyer chats" value={data.chats.length} />
-            <Figure label="Unread" value={unread} />
+            <Figure label={t("selling.listings")} value={data.listings.length} />
+            <Figure label={t("selling.buyerChats")} value={data.chats.length} />
+            <Figure label={t("selling.unread")} value={unread} />
           </dl>
 
           <section
@@ -154,16 +150,16 @@ function Dashboard({ session }: { session: AuthResponse }) {
             className="flex flex-col gap-4"
           >
             <h2 id="listings-title" className="text-lg font-semibold">
-              Your listings
+              {t("home.listings")}
             </h2>
             {data.listings.length === 0 ? (
               <div className="flex flex-col items-start gap-3 rounded-[var(--radius-card)] border border-dashed border-border p-6">
-                <p className="font-medium">Nothing listed yet</p>
+                <p className="font-medium">{t("selling.nothing")}</p>
                 <p className="text-muted">
-                  Write it in your language. Buyers read it in theirs.
+                  {t("selling.nothingBody")}
                 </p>
                 <Link href="/listings/new" className="btn btn-secondary">
-                  List an item
+                  {t("selling.list")}
                 </Link>
               </div>
             ) : (
@@ -190,12 +186,11 @@ function Dashboard({ session }: { session: AuthResponse }) {
             className="flex flex-col gap-4"
           >
             <h2 id="buyers-title" className="text-lg font-semibold">
-              Buyers talking to you
+              {t("selling.buyers")}
             </h2>
             {data.chats.length === 0 ? (
               <p className="text-muted">
-                No buyer has messaged you yet. Share a listing to get the first
-                one.
+                {t("selling.noBuyers")}
               </p>
             ) : (
               <ul className="flex flex-col divide-y divide-border border-y border-border">
@@ -229,7 +224,7 @@ function Dashboard({ session }: { session: AuthResponse }) {
                           )}
                         </span>
                         <span className="meta break-words">
-                          About {c.listing.title}
+                          {t("selling.about", { title: c.listing.title })}
                         </span>
                         {c.lastMessage && (
                           <span className="line-clamp-2 text-sm break-words">
@@ -240,7 +235,7 @@ function Dashboard({ session }: { session: AuthResponse }) {
                       {c.unreadCount > 0 && (
                         <span className="agate shrink-0 rounded-full bg-accent px-2 py-0.5 text-xs font-semibold text-[var(--color-accent-ink)]">
                           {c.unreadCount}
-                          <span className="sr-only"> unread</span>
+                          <span className="sr-only"> {t("selling.unreadSr")}</span>
                         </span>
                       )}
                     </Link>
@@ -273,6 +268,8 @@ function ListingRow(props: {
   onDeleted: (id: string) => void;
 }) {
   const { listing, chats, locked, session, onSaved, onDeleted } = props;
+  const lang = session.user.language;
+  const t = translator(lang);
   const [mode, setMode] = useState<"view" | "edit" | "delete">("view");
   const [title, setTitle] = useState(listing.title);
   const [price, setPrice] = useState(String(listing.price.amount));
@@ -284,7 +281,7 @@ function ListingRow(props: {
     e.preventDefault();
     const amount = Number(price);
     if (!Number.isFinite(amount) || amount <= 0)
-      return setError("Enter a price above zero.");
+      return setError(t("offer.priceInvalid"));
     setBusy(true);
     setError(null);
     try {
@@ -337,7 +334,7 @@ function ListingRow(props: {
             <Link
               href={`/listings/${listing.id}`}
               lang={listing.lang}
-              className="font-medium break-words"
+              className="hit font-medium break-words"
             >
               {listing.title}
             </Link>
@@ -346,17 +343,13 @@ function ListingRow(props: {
           <p className="agate font-semibold">
             {formatPrice(listing.price, listing.lang)}
           </p>
-          <p className="meta">
-            {chats === 0
-              ? "No buyers yet"
-              : chats === 1
-                ? "1 buyer interested"
-                : `${chats} buyers interested`}{" "}
-            · Listed{" "}
-            {new Date(listing.createdAt).toLocaleDateString(
-              "en-IN",
-              { day: "numeric", month: "short", year: "numeric" },
-            )}
+          <p className="meta flex flex-wrap gap-x-3">
+            <span>{chats === 0 ? t("selling.noBuyersYet") : chats === 1 ? t("selling.oneBuyer") : t("selling.nBuyers", { n: chats })}</span>
+            <span>
+              {t("listing.listed", {
+                date: new Date(listing.createdAt).toLocaleDateString(lang === "en" ? "en-IN" : lang, { day: "numeric", month: "short", year: "numeric" }),
+              })}
+            </span>
           </p>
         </div>
         {!locked && mode === "view" && (
@@ -366,7 +359,7 @@ function ListingRow(props: {
               onClick={() => setMode("edit")}
               className="btn btn-secondary"
             >
-              Edit
+              {t("selling.edit")}
             </button>
             {/* The server deletes a listing's chats, deals, Seals and help cases with it, so only empty listings can go. */}
             {chats === 0 && (
@@ -375,7 +368,7 @@ function ListingRow(props: {
                 onClick={() => setMode("delete")}
                 className="btn btn-quiet text-danger"
               >
-                Delete
+                {t("selling.delete")}
               </button>
             )}
           </div>
@@ -388,7 +381,7 @@ function ListingRow(props: {
           className="flex flex-col gap-4 rounded-[var(--radius-card)] border border-border bg-surface p-4"
         >
           <label className="flex flex-col gap-1.5">
-            <span className="label">Title</span>
+            <span className="label">{t("selling.fieldTitle")}</span>
             <input
               required
               maxLength={150}
@@ -398,7 +391,7 @@ function ListingRow(props: {
             />
           </label>
           <label className="flex flex-col gap-1.5">
-            <span className="label">Price ({listing.price.currency})</span>
+            <span className="label">{t("selling.fieldPrice", { cur: listing.price.currency })}</span>
             <input
               required
               type="number"
@@ -411,7 +404,7 @@ function ListingRow(props: {
             />
           </label>
           <label className="flex flex-col gap-1.5">
-            <span className="label">Description</span>
+            <span className="label">{t("selling.fieldDescription")}</span>
             <textarea
               required
               maxLength={2000}
@@ -433,7 +426,7 @@ function ListingRow(props: {
               aria-busy={busy}
               className="btn btn-primary"
             >
-              {busy ? "Saving…" : "Save changes"}
+              {busy ? t("selling.saving") : t("selling.save")}
             </button>
             <button
               type="button"
@@ -441,7 +434,7 @@ function ListingRow(props: {
               onClick={() => setMode("view")}
               className="btn btn-quiet"
             >
-              Cancel
+              {t("chat.cancel")}
             </button>
           </div>
         </form>
@@ -450,10 +443,10 @@ function ListingRow(props: {
       {mode === "delete" && (
         <div
           role="alertdialog"
-          aria-label="Delete this listing?"
+          aria-label={t("selling.deleteAsk")}
           className="note note-error flex flex-wrap items-center justify-between gap-3"
         >
-          <span>Delete this listing? This can&apos;t be undone.</span>
+          <span>{t("selling.deleteAsk")}</span>
           <span className="flex gap-2">
             <button
               type="button"
@@ -462,7 +455,7 @@ function ListingRow(props: {
               aria-busy={busy}
               className="btn btn-primary"
             >
-              {busy ? "Deleting…" : "Delete"}
+              {busy ? t("selling.deleting") : t("selling.delete")}
             </button>
             <button
               type="button"
@@ -470,7 +463,7 @@ function ListingRow(props: {
               onClick={() => setMode("view")}
               className="btn btn-quiet"
             >
-              Keep it
+              {t("selling.keep")}
             </button>
           </span>
           {error && <span className="basis-full">{error}</span>}

@@ -13,6 +13,7 @@ const MESSAGES: Record<string, string> = {
   NETWORK: "We couldn't reach Handshake. Check your connection and try again.",
   NEXCONN_TOKEN_ERROR: "Chat is having trouble starting. Please try again in a moment.",
   UNAUTHORIZED: "Your session ended. Please sign in again.",
+  DEMO_READ_ONLY: "Demo accounts and demo listings are shared by everyone trying Handshake, so they can't be changed. Create your own account to try this.",
   VALIDATION_ERROR: "Something in the form isn't right. Please check it and try again.",
   LISTING_NOT_FOUND: "This listing isn't available any more.",
   FORBIDDEN: "You can't change this. It belongs to someone else.",

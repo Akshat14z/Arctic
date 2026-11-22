@@ -9,6 +9,7 @@ import { api, friendlyMessage } from "@/lib/api/client";
 import { formatPrice, localeFor } from "@/lib/format";
 import { LANGUAGES } from "@/lib/languages";
 import { useRequireSession } from "@/lib/use-require-session";
+import { translator } from "@/lib/i18n";
 
 /** A tile's round ↗ (the whole tile's destination, named for screen readers). */
 function Go({ href, label }: { href: string; label: string }) {
@@ -57,19 +58,20 @@ export function HomeView() {
   const { user } = session;
   const lang = user.language;
   const native = LANGUAGES.find((l) => l.code === lang)?.native ?? lang;
+  const t = translator(lang);
   const latest = chats?.[0];
   const loading = !chats && !error;
   const loadingMine = !mine && !error;
 
   return (
     <section data-wide className="flex flex-col gap-4">
-      <h1 className="page-title">Hi, {user.displayName.split(" ")[0]}</h1>
+      <h1 className="page-title">{t("home.hi", { name: user.displayName.split(" ")[0] })}</h1>
 
       {error && (
         <div role="alert" className="note note-error flex items-center justify-between gap-3">
           <span>{error}</span>
           <button type="button" onClick={() => setAttempt((n) => n + 1)} className="btn btn-quiet shrink-0">
-            Try again
+            {t("common.tryAgain")}
           </button>
         </div>
       )}
@@ -81,41 +83,41 @@ export function HomeView() {
         ) : latest ? (
           <article className="tile min-h-56 justify-between border-accent sm:col-span-2">
             <div>
-              <h2 className="tile-title">Continue with {latest.otherUser.displayName}</h2>
+              <h2 className="tile-title">{t("home.continue", { name: latest.otherUser.displayName })}</h2>
               <p lang={latest.listing.lang} className="meta break-words">
                 {latest.listing.title}
               </p>
             </div>
             <p className="figure">{formatPrice(latest.listing.price, lang)}</p>
             {latest.lastMessage && <p className="line-clamp-2 text-sm break-words">{latest.lastMessage.text}</p>}
-            <Go href={`/chats/${encodeURIComponent(latest.channelId)}`} label={`Open the chat with ${latest.otherUser.displayName}`} />
+            <Go href={`/chats/${encodeURIComponent(latest.channelId)}`} label={t("home.openChat", { name: latest.otherUser.displayName })} />
           </article>
         ) : (
           <article className="tile min-h-56 justify-between border-accent sm:col-span-2">
             <div>
-              <h2 className="tile-title">Find something to buy</h2>
-              <p className="meta">Chat with any seller. You read every message in {native}.</p>
+              <h2 className="tile-title">{t("home.find")}</h2>
+              <p className="meta">{t("home.findBody", { lang: native })}</p>
             </div>
             <Link href="/listings" className="btn btn-primary self-start">
-              Browse listings
+              {t("home.browse")}
             </Link>
-            <Go href="/listings" label="Browse listings" />
+            <Go href="/listings" label={t("home.browse")} />
           </article>
         )}
 
         {/* What makes this work: your language */}
         <article className="tile justify-between">
-          <h2 className="tile-title">You read in</h2>
+          <h2 className="tile-title">{t("home.readIn")}</h2>
           <p lang={lang} className="figure">
             {native}
           </p>
-          <p className="meta">Every message arrives in {native}. Tap See original for the sender&apos;s own words.</p>
+          <p className="meta">{t("home.readInBody", { lang: native })}</p>
         </article>
 
         {/* Chats */}
         <article className="tile sm:col-span-2">
-          <h2 className="tile-title">Chats</h2>
-          <Go href="/chats" label="All chats" />
+          <h2 className="tile-title">{t("nav.chats")}</h2>
+          <Go href="/chats" label={t("home.allChats")} />
           {loading ? (
             <div className="skeleton h-32" />
           ) : chats && chats.length > 0 ? (
@@ -140,14 +142,14 @@ export function HomeView() {
               ))}
             </ul>
           ) : (
-            <p className="meta">No chats yet. Open a listing and tap Chat with seller.</p>
+            <p className="meta">{t("home.noChats")}</p>
           )}
         </article>
 
         {/* Your listings, or the way to start one */}
         <article className="tile">
-          <h2 className="tile-title">Your listings</h2>
-          <Go href="/selling" label="Open your seller dashboard" />
+          <h2 className="tile-title">{t("home.listings")}</h2>
+          <Go href="/selling" label={t("home.dashboard")} />
           {loadingMine ? (
             <div className="skeleton h-24" />
           ) : mine && mine.length > 0 ? (
@@ -165,9 +167,9 @@ export function HomeView() {
             </ul>
           ) : (
             <>
-              <p className="meta">Write in {native}. Buyers read it in their own language.</p>
+              <p className="meta">{t("home.writeIn", { lang: native })}</p>
               <Link href="/listings/new" className="btn btn-secondary mt-auto self-start">
-                Sell something
+                {t("browse.sell")}
               </Link>
             </>
           )}

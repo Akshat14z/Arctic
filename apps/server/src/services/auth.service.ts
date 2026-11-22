@@ -313,6 +313,11 @@ export async function updateMe(userId: string, input: UpdateMeRequest): Promise<
   if (!existingUser) {
     throw new AppError('USER_NOT_FOUND', 'User record not found', 404, false);
   }
+  // Demo accounts are shared by everyone trying Handshake (/try hands out their sessions): nobody may rename them,
+  // change their language or put an email and password on them (DHRUMIL-030).
+  if (existingUser.isDemo) {
+    throw new AppError('DEMO_READ_ONLY', "Demo accounts can't be changed", 403, false);
+  }
 
   const dataToUpdate: { displayName?: string; language?: string; email?: string; passwordHash?: string } = {};
 

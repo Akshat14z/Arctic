@@ -4,6 +4,7 @@ import { VelocityMarquee } from "@/components/bits/velocity-marquee";
 import { LandingMotion } from "@/components/landing/landing-motion";
 import { HomeActions } from "./home-actions";
 import "./landing.css";
+import { Rosette } from "@/components/landing/rosette";
 
 /* The landing page (DHRUMIL-T14, motion T16). Editorial on grid paper; every picture is the real app
    (public/screens), every drifting word and speech bubble comes from the real demo chat, and the people are
@@ -126,7 +127,7 @@ export default function Home() {
       </div>
 
       {/* The story, pinned: Priya and Kenji make one deal across two languages */}
-      <section data-chapter className="l-chapter" aria-labelledby="chapter-title">
+      <section data-chapter className="l-chapter l-band-tint" aria-labelledby="chapter-title">
         <div className="l-chapter-pin l-wrap">
           <div className="l-steps">
             <h2 id="chapter-title" className="sr-only">
@@ -229,7 +230,8 @@ export default function Home() {
         />
       </div>
 
-      {/* Support */}
+      {/* Support, on a pale band */}
+      <div className="l-band-tint">
       <section className="l-wrap l-agent">
         <div className="l-agent-head">
           <h2 className="l-h2 max-w-[16ch]">Help that reads both sides.</h2>
@@ -240,8 +242,12 @@ export default function Home() {
           <img src="/screens/agent.png" alt="The agent console: each message in the original and in English, beside the case summary and the frozen deal" width={2512} height={1598} loading="lazy" />
         </div>
       </section>
+      </div>
 
-      {/* Close */}
+      {/* Close, drenched in the brand blue, with the seal at its edges */}
+      <div className="l-band-blue">
+      <Rosette className="l-rosette-c" />
+      <Rosette className="l-rosette-d" />
       <section className="l-wrap l-close">
         <p className="l-story">
           <Ink>When both sides read the same deal, nothing gets lost in translation.</Ink>
@@ -250,6 +256,7 @@ export default function Home() {
           Try both sides of a chat
         </Link>
       </section>
+      </div>
 
       {/* The street: everyone who might trade here, standing on the footer rule */}
       <div className="l-wrap l-street" aria-hidden>
@@ -282,7 +289,7 @@ export default function Home() {
           <Link href="/listings/new" className="l-link">Sell</Link>
           <a href="https://github.com/Akshat14z/Arctic" className="l-link">Source code</a>
         </nav>
-        <p className="basis-full">Built for the Nexconn Build Challenge 2026. Demo accounts are marked Demo. People drawn from Open Peeps by Pablo Stanley (CC0). Demo watch photo by Lucas D. on Unsplash.</p>
+        <p className="basis-full">Built for the Nexconn Build Challenge 2026. Demo accounts are marked Demo. People drawn from Open Peeps by Pablo Stanley (CC0). Demo listing photos on Unsplash by Lucas D., Ethan Hoover, Charlie Schroeder, Cooker King, Thorium, Mohit Tomar, Beau Carpenter and Goashape Studio.</p>
       </footer>
     </div>
   );
