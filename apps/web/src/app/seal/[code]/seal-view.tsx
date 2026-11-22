@@ -78,17 +78,23 @@ export function SealView() {
 
   // The signed summary must match the live record: same code and price.
   const mismatch = check?.status === "valid" && (check.payload.c !== code || check.payload.p !== deal.price.amount || check.payload.cur !== deal.price.currency);
+  // A changed link never sits under a green "Verified" heading (same condition as ProofBanner's red state).
+  const tampered = !!check && check.status !== "unsupported" && (check.status !== "valid" || !!mismatch);
 
   return (
     <section className="flex flex-col gap-6">
       <ProofBanner check={check} mismatch={!!mismatch} />
       <header className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-        <h1 className="page-title flex items-center gap-2">
-          <svg aria-hidden="true" viewBox="0 0 20 20" className="size-6 shrink-0 text-success" fill="none" stroke="currentColor" strokeWidth="2.5">
-            <path d="M4 10.5l4 4 8-9" strokeLinecap="square" />
-          </svg>
-          Verified CommonGrounds Seal
-        </h1>
+        {tampered ? (
+          <h1 className="page-title">The real terms of this deal</h1>
+        ) : (
+          <h1 className="page-title flex items-center gap-2">
+            <svg aria-hidden="true" viewBox="0 0 20 20" className="size-6 shrink-0 text-success" fill="none" stroke="currentColor" strokeWidth="2.5">
+              <path d="M4 10.5l4 4 8-9" strokeLinecap="square" />
+            </svg>
+            Verified CommonGrounds Seal
+          </h1>
+        )}
         <label className="flex flex-col gap-1 sm:w-48">
           <span className="label">Read in</span>
           <select value={lang} onChange={(e) => setLang(e.target.value as LangCode)} className="field">
