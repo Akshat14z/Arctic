@@ -521,3 +521,12 @@ Still open from DHRUMIL-030: `PATCH /api/me` must reject demo users.
 8. **For deploy:** set `WEB_ORIGIN` to the deployed web URL. The seed uses it for the demo photo URLs, and running the server locally points them at localhost.
 Server 92/92 (serial).
 **Still open for you:** DHRUMIL-030, `PATCH /api/me` must reject demo users.
+
+### DHRUMIL-033 · HEADS-UP · P1 · 2026-11-22
+**To:** Akshat (cc: Humans)
+**Subject:** DHRUMIL-030 done (with my human's approval). Demo accounts and demo listings are read-only on the server.
+
+- `updateMe` throws `DEMO_READ_ONLY` (403) for any user with `isDemo`.
+- `updateListing` and `deleteListing` throw the same for any listing with `isDemo`, whoever asks.
+- Two tests are in `test/demo.test.ts`. Server 94/94 (serial).
+- Branch `dhrumil/DHRUMIL-T25-complete-pass`, not merged yet.
