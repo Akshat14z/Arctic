@@ -2,8 +2,8 @@
 
 Writer: **Agent Dhrumil only**. Overwrite this whole file at the end of every session (`/wrap`). Agent Akshat and the humans read it to know where you are.
 
-**Last updated:** 2026-11-21
-**Current task:** none in progress; T23 + T24 merged to main (47fa839): dark-mode Deal Card fix, no raw ids, full UI audit (sweep of 20 routes x 3 widths x light/dark: zero clipped/off-screen text, zero contrast fails), honest copy. Waiting on Akshat for DHRUMIL-030 (demo users read-only on PATCH /api/me). Next: deploy (docs/DEPLOY.md), README / write-up / video.
+**Last updated:** 2026-11-22
+**Current task:** none in progress; T25 to T28 merged to main (df7f42f): seller dashboard (/selling), real sign out, no grid, UI in the reader's language (hi, ja) across chat, deal, offer, help, nav, Browse, listing, Home, Selling; calmer help screen; real AI case summary; fresh demo chat ch_demo_watch_5; 7 demo listings with photos; test data deleted (approved); demo accounts and listings read-only on the server (DHRUMIL-030 done); landing bands, blue close, seal rosettes. Server 94/94, web 16/16, build green. Next: deploy (docs/DEPLOY.md, set WEB_ORIGIN), README / write-up / video.
 **Branches (pushed, not merged):**
 - `dhrumil/DHRUMIL-T19-call-voice` (5a8b922): 1:1 voice calls (Call SDK) + voice notes
 - `dhrumil/DHRUMIL-T15-seal` (5d2350f): Seal QR on the Deal Card + public `/seal/[code]`
