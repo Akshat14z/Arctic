@@ -8,6 +8,7 @@ import { localeFor } from "@/lib/format";
 import { parseExtra, pickDisplay } from "@/lib/render";
 import { apiUrl } from "@/lib/api/client";
 import { useSpeech } from "@/lib/speak";
+import { translator } from "@/lib/i18n";
 
 export function MessageBubble({ message, lang }: { message: ChatMessage; lang: LangCode }) {
   const [showOriginal, setShowOriginal] = useState(false);
@@ -19,6 +20,7 @@ export function MessageBubble({ message, lang }: { message: ChatMessage; lang: L
   const shown = pickDisplay(extra, message.text, lang, showOriginal);
   const origName = extra && LANGUAGES.find((l) => l.code === extra.orig.lang)?.native;
   const targetName = LANGUAGES.find((l) => l.code === lang)?.native ?? lang.toUpperCase();
+  const t = translator(lang);
 
   // Read aloud in the language actually shown (the reader's translation, or the original when toggled).
   const speech = useSpeech(message.id, shown.lang ?? lang);
@@ -97,7 +99,7 @@ export function MessageBubble({ message, lang }: { message: ChatMessage; lang: L
           onClick={handleCopy}
           className="hit text-muted transition-colors hover:text-text"
         >
-          {copied ? "Copied" : "Copy"}
+          {copied ? t("chat.copied") : t("chat.copy")}
         </button>
 
         {/* Speech Read-Aloud */}
@@ -111,7 +113,7 @@ export function MessageBubble({ message, lang }: { message: ChatMessage; lang: L
             <svg aria-hidden width="12" height="12" viewBox="0 0 12 12" fill="currentColor">
               {speech.active ? <rect x="2.5" y="2.5" width="7" height="7" rx="1" /> : <path d="M1.5 4.5h2l3-2.5v8l-3-2.5h-2zM8.5 3.5a3.5 3.5 0 0 1 0 5" stroke="currentColor" strokeWidth="1.2" fill="none" />}
             </svg>
-            {speech.active ? "Stop" : "Listen"}
+            {speech.active ? t("chat.stop") : t("chat.listen")}
           </button>
         )}
 
@@ -124,9 +126,9 @@ export function MessageBubble({ message, lang }: { message: ChatMessage; lang: L
             aria-pressed={showOriginal}
           >
             {showOriginal ? (
-              `Show ${targetName} translation`
+              t("chat.showTranslation", { lang: targetName })
             ) : (
-              <>See original ({origName ?? extra?.orig.lang})</>
+              t("chat.seeOriginal", { lang: origName ?? extra?.orig.lang ?? "" })
             )}
           </button>
         )}

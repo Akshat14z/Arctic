@@ -18,6 +18,7 @@ import { Composer } from "./composer";
 import { DealCard, dealSummary, type DealRole } from "./deal-card";
 import { MessageBubble } from "./message-bubble";
 import { OfferModal } from "./offer-modal";
+import { translator } from "@/lib/i18n";
 
 /** Adds messages, dropping duplicates (history reloads, our own echo), oldest first. */
 function merge(current: ChatMessage[], incoming: ChatMessage[]) {
@@ -59,6 +60,7 @@ export function ChatThread({
   const [counterPrice, setCounterPrice] = useState<number | undefined>();
   const endRef = useRef<HTMLDivElement>(null);
   const lang = session.user.language;
+  const t = translator(lang);
 
   // Connect once per page load. `session` is left out on purpose: ensureConnected saves a refreshed
   // session, which would re-run this.
@@ -73,7 +75,7 @@ export function ChatThread({
     setError(null);
     loadHistory(channel).then(
       (h) => live && setMessages((m) => merge(m, h)),
-      () => live && setError("We couldn't load earlier messages."),
+      () => live && setError(t("chat.historyFailed")),
     );
     const off = onMessages((incoming) => setMessages((m) => merge(m, incoming.filter((x) => sameChannel(x.channel, channel)))));
     return () => {
@@ -138,7 +140,7 @@ export function ChatThread({
     <>
       {state !== "connected" && (
         <p role="status" className="note note-guard mt-3">
-          {state === "disconnected" ? "Chat is offline. Reconnecting…" : "Connecting to chat…"}
+          {state === "disconnected" ? t("chat.offline") : t("chat.connecting")}
         </p>
       )}
       {error && (
@@ -185,7 +187,7 @@ export function ChatThread({
           <>
             {deals?.canPropose && deals.myRole && !hasAgreedDeal && (
               <div className="mb-2 flex flex-wrap items-center justify-between gap-x-3 gap-y-1 border-t border-border pt-2">
-                <p className="meta">Agreed on a price? Put it in writing.</p>
+                <p className="meta">{t("chat.offerPrompt")}</p>
                 <button
                   type="button"
                   onClick={() => {
@@ -195,7 +197,7 @@ export function ChatThread({
                   disabled={state !== "connected"}
                   className="btn btn-secondary"
                 >
-                  Make an offer
+                  {t("chat.makeOffer")}
                 </button>
               </div>
             )}

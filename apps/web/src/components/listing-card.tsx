@@ -43,9 +43,9 @@ export function ListingCard({ listing, lang }: { listing: Listing; lang: LangCod
         )}
       </div>
       <div className="flex min-w-0 flex-col gap-1">
-        <h3 lang={listing.lang} className="text-sm font-semibold break-words group-hover:underline">
+        <h2 lang={listing.lang} className="text-sm font-semibold break-words group-hover:underline">
           {listing.title}
-        </h3>
+        </h2>
         <p className="agate text-base font-semibold">{formatPrice(listing.price, lang)}</p>
         <p className="meta text-xs break-words">{listing.seller?.displayName ?? "Seller"}</p>
       </div>

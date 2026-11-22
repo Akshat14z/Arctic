@@ -208,6 +208,8 @@ export function AgentCase() {
   const lang = session.user.language;
   const mine = c.agent?.id === session.user.id;
   const deal = c.dealSnapshot ?? summary.deal;
+  // Internal ids (channel, case, user) mean nothing to an agent reading a dispute: drop facts that are only ids.
+  const facts = summary.keyFacts.filter((f) => !/^\s*(channel|case|chat|user)\s*(id)?\s*:/i.test(f) && !/\b(ch|grp|c|u|d|l)_[a-z0-9_]{6,}\b/i.test(f));
 
   return (
     <section data-wide className="flex flex-col gap-6">
@@ -243,15 +245,16 @@ export function AgentCase() {
           <Transcript detail={detail} lang={lang} />
         </div>
 
-        <aside className="well flex flex-col gap-4 px-4 py-4 lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:self-start">
+        {/* Phones: the verdict material (summary, frozen deal, actions) comes before the evidence. */}
+        <aside className="well flex flex-col gap-4 px-4 py-4 max-lg:order-first lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:self-start">
           <section className="flex flex-col gap-2">
             <h2 className="item-title">Summary</h2>
             {summary.text ? (
               <>
                 <p lang={summary.lang}>{summary.text}</p>
-                {summary.keyFacts.length > 0 && (
+                {facts.length > 0 && (
                   <ul className="list-disc pl-5 text-sm [overflow-wrap:anywhere]">
-                    {summary.keyFacts.map((f) => (
+                    {facts.map((f) => (
                       <li key={f}>{f}</li>
                     ))}
                   </ul>

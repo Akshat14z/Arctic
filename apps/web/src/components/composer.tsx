@@ -11,6 +11,7 @@ import { api } from "@/lib/api/client";
 import { sendText, type ChannelRef, type ChatMessage } from "@/lib/nexconn";
 import { useVoiceRecorder, type Recording } from "@/lib/use-voice-recorder";
 import { GuardSheet, softerText } from "./guard-sheet";
+import { translator } from "@/lib/i18n";
 
 // `extra` must stay under ~8 KB (DHRUMIL-006); Indic text is ~3 bytes/char and `tr` repeats it per language.
 const MAX = 1000;
@@ -28,7 +29,6 @@ const VOICE_LABEL: Record<LangCode, string> = {
   mr: "व्हॉइस मेसेज",
   ja: "音声メッセージ",
 };
-const SEND_FAILED = "Couldn't send. Check your connection and tap Send again.";
 
 type Props = {
   channel: ChannelRef;
@@ -71,6 +71,7 @@ const toDataUrl = (blob: Blob) =>
 const clock = (s: number) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
 
 export function Composer({ channel, channelId, lang, token, disabled, onSent }: Props) {
+  const t = translator(lang);
   const [draft, setDraft] = useState("");
   const [sending, setSending] = useState(false);
   const [failed, setFailed] = useState<string | null>(null);
@@ -83,7 +84,7 @@ export function Composer({ channel, channelId, lang, token, disabled, onSent }: 
       onSent(await sendText(channel, prepared.messageText, JSON.stringify(extra)));
       if (extra.kind !== "voice_note") setDraft("");
     } catch {
-      setFailed(SEND_FAILED); // keep the draft so nothing is lost
+      setFailed(t("chat.sendFailed")); // keep the draft so nothing is lost
     }
   }
 
@@ -168,13 +169,13 @@ export function Composer({ channel, channelId, lang, token, disabled, onSent }: 
         <div className="note note-error flex min-h-tap items-center gap-2 py-1 pr-1" role="group" aria-label="Recording a voice note">
           <span aria-hidden="true" className="size-2.5 shrink-0 bg-danger motion-safe:animate-pulse" />
           <p className="agate flex-1 text-sm" aria-live="off">
-            Recording {clock(recorder.seconds ?? 0)} / {clock(MAX_VOICE_SEC)}
+            {t("chat.recording")} {clock(recorder.seconds ?? 0)} / {clock(MAX_VOICE_SEC)}
           </p>
           <button type="button" onClick={() => void recorder.cancel()} className="btn btn-quiet">
-            Cancel
+            {t("chat.cancel")}
           </button>
           <button type="button" autoFocus onClick={() => void recorder.stop()} className="btn btn-primary">
-            Send
+            {t("chat.send")}
           </button>
         </div>
       ) : (
@@ -193,8 +194,8 @@ export function Composer({ channel, channelId, lang, token, disabled, onSent }: 
             const problem = await recorder.start();
             if (problem) setFailed(problem);
           }}
-          aria-label="Record a voice note"
-          title="Record a voice note"
+          aria-label={t("chat.recordVoice")}
+          title={t("chat.recordVoice")}
           className="btn btn-icon shrink-0"
         >
           <svg aria-hidden="true" viewBox="0 0 24 24" className="size-5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round">
@@ -215,7 +216,7 @@ export function Composer({ channel, channelId, lang, token, disabled, onSent }: 
             }
           }}
           aria-label="Message"
-          placeholder={disabled ? "Connecting…" : "Write a message"}
+          placeholder={disabled ? t("chat.connecting") : t("chat.write")}
           className="field max-h-32 resize-none [field-sizing:content]"
         />
         <button
@@ -224,7 +225,7 @@ export function Composer({ channel, channelId, lang, token, disabled, onSent }: 
           aria-busy={sending}
           className="btn btn-primary shrink-0"
         >
-          {sending ? "Sending…" : "Send"}
+          {sending ? t("chat.sending") : t("chat.send")}
         </button>
       </form>
       )}

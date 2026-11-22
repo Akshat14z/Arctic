@@ -16,7 +16,7 @@ export default function BothSidesPage() {
     <section data-wide className="flex flex-col gap-4">
       <div className="flex flex-col gap-1">
         <h1 className="page-title">Both sides at once</h1>
-        <p className="text-muted">Type as Priya on the left. Kenji reads it in Japanese on the right, live. Then reply.</p>
+        <p className="text-muted">Type as Priya, who reads Hindi. Kenji gets it in Japanese, live. Then reply as Kenji.</p>
       </div>
       <div className="grid gap-4 md:grid-cols-2">
         {SEATS.map((s) => (

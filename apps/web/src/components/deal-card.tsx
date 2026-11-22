@@ -7,6 +7,9 @@ import { formatPrice, localeFor } from "@/lib/format";
 import { SealQr, useSealUrl } from "./seal-qr";
 import { SealDetailResponseSchema } from "@convocart/contracts";
 import { api } from "@/lib/api/client";
+import { translator } from "@/lib/i18n";
+
+type T = ReturnType<typeof translator>;
 
 export type DealRole = "buyer" | "seller";
 
@@ -61,6 +64,7 @@ export function DealCard({ deal, lang, myRole, names, onAgree, onReject, onCount
   const canCounter = myRole && onCounter && pending;
 
   const conditions = pick(deal.conditions, lang) ?? [];
+  const t = translator(lang);
 
   async function handleAgree() {
     if (!onAgree || busy || rejecting) return;
@@ -69,7 +73,7 @@ export function DealCard({ deal, lang, myRole, names, onAgree, onReject, onCount
     try {
       await onAgree(deal);
     } catch {
-      setFailed("Couldn't record agreement. Please try again.");
+      setFailed(t("deal.agreeFailed"));
     } finally {
       setBusy(false);
     }
@@ -82,19 +86,20 @@ export function DealCard({ deal, lang, myRole, names, onAgree, onReject, onCount
     try {
       await onReject(deal);
     } catch {
-      setFailed("Couldn't decline offer. Please try again.");
+      setFailed(t("deal.declineFailed"));
     } finally {
       setRejecting(false);
     }
   }
 
   const other: DealRole | undefined = deal.offeredBy === "buyer" ? "seller" : deal.offeredBy === "seller" ? "buyer" : undefined;
+  const otherName = other ? names[other] : t("deal.otherSide");
   const fromLine = isCreator
-    ? `You sent this to ${other ? names[other] : "the other side"}`
+    ? t("deal.youSent", { name: otherName })
     : deal.offeredBy && myRole
-    ? `${names[deal.offeredBy]} sent you this offer`
+    ? t("deal.sentYou", { name: names[deal.offeredBy] })
     : deal.offeredBy && other
-    ? `${names[deal.offeredBy]} offered this to ${names[other]}`
+    ? t("deal.offeredTo", { a: names[deal.offeredBy], b: names[other] })
     : null;
   const signed = (deal.agreedBy.buyer ? 1 : 0) + (deal.agreedBy.seller ? 1 : 0);
 
@@ -105,10 +110,10 @@ export function DealCard({ deal, lang, myRole, names, onAgree, onReject, onCount
     >
       <header className="flex flex-wrap items-start justify-between gap-x-3 gap-y-2">
         <div className="flex min-w-0 flex-col gap-0.5">
-          <h3 className="text-base font-semibold break-words">{deal.offeredByName ? `Offer from ${deal.offeredByName}` : "Offer"}</h3>
+          <h3 className="text-base font-semibold break-words">{agreed ? t("deal.deal") : deal.offeredByName ? t("deal.offerFrom", { name: deal.offeredByName }) : t("deal.offer")}</h3>
           {fromLine && <p className="meta break-words">{fromLine}</p>}
         </div>
-        <StatusPill status={deal.status} />
+        <StatusPill status={deal.status} t={t} />
       </header>
 
       <div className="flex flex-col gap-1 py-4">
@@ -121,7 +126,7 @@ export function DealCard({ deal, lang, myRole, names, onAgree, onReject, onCount
         </p>
         {deal.delivery && (
           <p className="text-sm text-muted">
-            {deal.delivery.method === "pickup" ? "Pickup in person" : "Delivery"}
+            {deal.delivery.method === "pickup" ? t("deal.pickup") : t("deal.delivery")}
             {deal.delivery.date && <span className="agate"> · {deal.delivery.date}</span>}
           </p>
         )}
@@ -134,9 +139,9 @@ export function DealCard({ deal, lang, myRole, names, onAgree, onReject, onCount
             <svg aria-hidden width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.5" className="transition-transform group-open:rotate-90">
               <path d="M4.5 2.5 8 6l-3.5 3.5" />
             </svg>
-            Terms and who agreed
+            {t("deal.terms")}
           </span>
-          <span className="agate text-xs">{signed} of 2 agreed</span>
+          <span className="agate text-xs">{t("deal.countAgreed", { n: signed })}</span>
         </summary>
 
         {conditions.length > 0 && (
@@ -151,10 +156,10 @@ export function DealCard({ deal, lang, myRole, names, onAgree, onReject, onCount
           {(["buyer", "seller"] as const).map((r) => (
             <li key={r} className="flex flex-wrap items-center justify-between gap-x-3 gap-y-0.5 py-2">
               <span className="min-w-0 break-words">
-                {names[r]} {r === myRole && <span className="text-muted">(you)</span>}
+                {names[r]} {r === myRole && <span className="text-muted">{t("deal.you")}</span>}
               </span>
               <span className={`agate text-xs ${deal.agreedBy[r] ? "text-success" : "text-muted"}`}>
-                {deal.agreedBy[r] ? `Agreed ${when(deal.agreedBy[r]!)}` : "Not yet"}
+                {deal.agreedBy[r] ? t("deal.agreedAt", { when: when(deal.agreedBy[r]!) }) : t("deal.notYet")}
               </span>
             </li>
           ))}
@@ -164,23 +169,23 @@ export function DealCard({ deal, lang, myRole, names, onAgree, onReject, onCount
       {canAgree && (
         <div className="flex flex-wrap items-center gap-2 border-t border-border pt-4">
           <button type="button" onClick={handleAgree} disabled={busy || rejecting} aria-busy={busy} className="btn btn-primary flex-1">
-            {busy ? "Agreeing…" : "Agree to this deal"}
+            {busy ? t("deal.agreeing") : t("deal.agree")}
           </button>
           {canCounter && (
             <button type="button" onClick={() => onCounter(deal)} disabled={busy || rejecting} className="btn btn-secondary">
-              Counter
+              {t("deal.counter")}
             </button>
           )}
           {canReject && (
             <button type="button" onClick={handleReject} disabled={busy || rejecting} aria-busy={rejecting} className="btn btn-quiet text-danger">
-              {rejecting ? "Declining…" : "Decline"}
+              {rejecting ? t("deal.declining") : t("deal.decline")}
             </button>
           )}
         </div>
       )}
 
       {isCreator && pending && (
-        <p className="meta border-t border-border pt-3">Waiting for {other ? names[other] : "the other side"} to agree or counter.</p>
+        <p className="meta border-t border-border pt-3">{t("deal.waitingFor", { name: otherName })}</p>
       )}
 
       {failed && (
@@ -189,33 +194,33 @@ export function DealCard({ deal, lang, myRole, names, onAgree, onReject, onCount
         </p>
       )}
 
-      {agreed && deal.sealCode && <SealBlock code={deal.sealCode} />}
+      {agreed && deal.sealCode && <SealBlock code={deal.sealCode} t={t} />}
     </article>
   );
 }
 
-function StatusPill({ status }: { status: Deal["status"] }) {
+function StatusPill({ status, t }: { status: Deal["status"]; t: T }) {
   const [label, tone] =
     status === "agreed"
-      ? ["Agreed by both", "bg-success-bg text-success"]
+      ? [t("deal.agreedByBoth"), "bg-success-bg text-success"]
       : status === "rejected"
-      ? ["Declined", "bg-danger-bg text-danger"]
-      : ["Waiting", "bg-guard-bg text-ink-2"];
+      ? [t("deal.declined"), "bg-danger-bg text-danger"]
+      : [t("deal.waiting"), "bg-guard-bg text-ink-2"];
   return <span className={`shrink-0 rounded-full px-2.5 py-1 text-xs font-semibold whitespace-nowrap ${tone}`}>{label}</span>;
 }
 
 /** Handshake Seal: show the QR at pickup; scanning it opens the verified deal. */
-function SealBlock({ code }: { code: string }) {
+function SealBlock({ code, t }: { code: string; t: T }) {
   const proof = useSealProof(code);
   const url = useSealUrl(code, proof);
   return (
     <section aria-label="Handshake Seal" className="mt-1 flex flex-wrap items-start gap-4 border-t border-border pt-4">
       <SealQr url={url} size={112} />
       <div className="flex min-w-[12rem] flex-1 flex-col gap-1">
-        <p className="text-sm font-semibold text-success">Handshake Seal</p>
-        <p className="text-sm text-ink-2">Both sides agreed to exactly this. Show the code at pickup: scanning it opens the verified deal.</p>
-        <Link href={`/seal/${encodeURIComponent(code)}${proof ? `#p=${proof}` : ""}`} className="link mt-1 inline-flex min-h-tap items-center text-sm break-all">
-          Open the seal <span className="agate ml-1">{code}</span>
+        <p className="text-sm font-semibold text-success">{t("deal.seal")}</p>
+        <p className="text-sm text-ink-2">{t("deal.sealBody")}</p>
+        <Link href={`/seal/${encodeURIComponent(code)}${proof ? `#p=${proof}` : ""}`} className="link mt-1 inline-flex min-h-tap items-center self-start text-sm">
+          {t("deal.openSeal")}
         </Link>
       </div>
     </section>

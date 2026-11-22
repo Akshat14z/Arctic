@@ -79,7 +79,7 @@ export function HomeView() {
         {loading ? (
           <div className="skeleton h-56 sm:col-span-2" />
         ) : latest ? (
-          <article className="tile tile-hero min-h-56 justify-between sm:col-span-2">
+          <article className="tile min-h-56 justify-between border-accent sm:col-span-2">
             <div>
               <h2 className="tile-title">Continue with {latest.otherUser.displayName}</h2>
               <p lang={latest.listing.lang} className="meta break-words">
@@ -91,7 +91,7 @@ export function HomeView() {
             <Go href={`/chats/${encodeURIComponent(latest.channelId)}`} label={`Open the chat with ${latest.otherUser.displayName}`} />
           </article>
         ) : (
-          <article className="tile tile-hero min-h-56 justify-between sm:col-span-2">
+          <article className="tile min-h-56 justify-between border-accent sm:col-span-2">
             <div>
               <h2 className="tile-title">Find something to buy</h2>
               <p className="meta">Chat with any seller. You read every message in {native}.</p>

@@ -11,10 +11,12 @@ import { useRequireSession } from "@/lib/use-require-session";
 import { ChatThread } from "@/components/chat-thread";
 import { GetHelp } from "@/components/get-help";
 import { CallButton } from "@/components/call-button";
+import { useT } from "@/lib/use-t";
 
 export function Conversation() {
   const { id } = useParams<{ id: string }>();
   const session = useRequireSession();
+  const t = useT();
   const token = session?.sessionToken;
   const [chat, setChat] = useState<ChatDetailResponse | null>(null);
   const [error, setError] = useState<{ text: string; notFound: boolean } | null>(null);
@@ -71,22 +73,26 @@ export function Conversation() {
 
   return (
     <section className="-mt-4 -mb-24 flex min-h-[calc(100dvh-4rem)] flex-col md:-mb-8">
-      <header className="sticky top-0 z-10 flex flex-col gap-2 border-b border-border bg-bg py-2">
+      <header className="sticky top-[var(--chrome-h)] z-10 flex flex-col gap-2 border-b border-border bg-bg py-2">
         <div className="flex items-center gap-2">
-          <Link href="/chats" aria-label="Back to chats" className="btn btn-icon shrink-0 lg:hidden">
+          <Link href="/chats" aria-label={t("chat.back")} className="btn btn-icon shrink-0 lg:hidden">
             <svg aria-hidden="true" viewBox="0 0 24 24" className="size-5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="square">
               <path d="M15 5l-7 7 7 7" />
             </svg>
           </Link>
           <h1 className="min-w-0 flex-1 text-base leading-snug font-semibold break-words">{other.displayName}</h1>
-          <CallButton peerId={other.id} peerName={other.displayName} myName={session.user.displayName} />
-          {chat.openCaseId ? (
-            <Link href={`/cases/${encodeURIComponent(chat.openCaseId)}`} className="btn btn-secondary shrink-0 px-3 text-sm">
-              Help requested
-            </Link>
-          ) : (
-            <GetHelp channelId={chat.channelId} token={session.sessionToken} />
-          )}
+          {/* Actions on the right: call, then help (or the open help request, shown as a status, not a button). */}
+          <div className="ml-auto flex shrink-0 items-center gap-2">
+            <CallButton peerId={other.id} peerName={other.displayName} myName={session.user.displayName} label={t("chat.call")} />
+            {chat.openCaseId ? (
+              <Link href={`/cases/${encodeURIComponent(chat.openCaseId)}`} className="link inline-flex min-h-tap items-center gap-1.5 px-1 text-sm">
+                <span aria-hidden className="size-2 rounded-full bg-guard" />
+                {t("chat.helpOnTheWay")}
+              </Link>
+            ) : (
+              <GetHelp channelId={chat.channelId} token={session.sessionToken} />
+            )}
+          </div>
         </div>
         {/* The listing this chat is about, pinned on top (Vinted, Carousell). */}
         <Link href={`/listings/${chat.listing.id}`} className="group flex items-center gap-3 rounded-[var(--radius-field)] border border-border bg-surface p-2 text-text no-underline hover:border-[var(--color-rule-2)]">
@@ -104,7 +110,7 @@ export function Conversation() {
             </span>
             <span className="agate text-sm font-semibold">{formatPrice(chat.listing.price, session.user.language)}</span>
           </span>
-          <span className="meta shrink-0 pr-1 max-sm:hidden">View listing</span>
+          <span className="meta shrink-0 pr-1 max-sm:hidden">{t("chat.viewListing")}</span>
         </Link>
       </header>
 
@@ -114,7 +120,7 @@ export function Conversation() {
         channelId={chat.channelId}
         listingTitle={chat.listing.title}
         originalPrice={chat.listing.price}
-        emptyText={`Say hello. ${other.displayName} reads your messages in their own language.`}
+        emptyText={t("chat.empty", { name: other.displayName })}
         deals={{
           myRole: chat.buyerId === me ? "buyer" : "seller",
           names: { buyer: chat.buyer.displayName, seller: chat.seller.displayName },

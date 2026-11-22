@@ -52,6 +52,9 @@
 
 /* The landing page brings its own masthead. A judge-mode seat (/try/both) shows only the page. */
 html.seat :is([data-app-chrome], [data-bottom-tabs], [data-seat-hide]) { display: none; }
+/* The app header is sticky; screen headers that also stick (chat, help request) sit right under it. */
+:root { --chrome-h: 4rem; }
+html.seat { --chrome-h: 0px; }
 html:not(.seat) [data-seat-only] { display: none; }
 body:has([data-landing]) [data-app-chrome] { display: none; }
 /* One system: the app and the landing share one plain paper surface. No grid: it fought the text for attention. */

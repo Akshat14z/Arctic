@@ -6,6 +6,15 @@ import { useEffect, useRef } from "react";
 import { LANGUAGES } from "@/lib/languages";
 import { signOut, useSession } from "@/lib/session";
 import { Icon, type IconName } from "./icons";
+import { useT } from "@/lib/use-t";
+import type { Key } from "@/lib/i18n";
+
+// Tab and menu labels in the reader's language (lib/i18n). Labels without a key stay as written.
+const LABEL_KEYS: Record<string, Key> = { Home: "nav.home", Browse: "nav.browse", Chats: "nav.chats", Selling: "nav.selling", "My chats": "nav.chats", "My Profile & Settings": "nav.profile" };
+function useLabel() {
+  const t = useT();
+  return (label: string) => (LABEL_KEYS[label] ? t(LABEL_KEYS[label]) : label);
+}
 
 type Tab = { href: string; label: string; icon: IconName };
 const PEOPLE: Tab[] = [
@@ -39,12 +48,13 @@ function useTabs() {
 export function NavTabs() {
   const path = usePathname();
   const tabs = useTabs();
+  const label = useLabel();
   return (
     <nav aria-label="Main" className="seg max-md:hidden">
       {tabs.map((t) => (
         <Link key={t.href} href={t.href} aria-current={isHere(path, t.href) ? "page" : undefined} className="gap-2">
           <Icon name={t.icon} className="size-4" />
-          {t.label}
+          {label(t.label)}
         </Link>
       ))}
     </nav>
@@ -56,6 +66,7 @@ export function BottomTabs() {
   const path = usePathname();
   const tabs = useTabs();
   const session = useSession();
+  const label = useLabel();
   if (!session || /^\/(chats|cases|agent\/cases)\/./.test(path)) return null;
   return (
     <nav data-bottom-tabs aria-label="Main" className="fixed inset-x-0 bottom-0 z-[var(--z-sticky-nav)] border-t border-border bg-bg/95 pb-[env(safe-area-inset-bottom)] backdrop-blur md:hidden">
@@ -72,7 +83,7 @@ export function BottomTabs() {
                 <span className={`grid h-7 w-12 place-items-center rounded-full ${here ? "bg-accent text-[var(--color-accent-ink)]" : ""}`}>
                   <Icon name={t.icon} className="size-[18px]" />
                 </span>
-                {t.label}
+                {label(t.label)}
               </Link>
             </li>
           );
@@ -87,6 +98,8 @@ export function AccountMenu() {
   const session = useSession();
   const box = useRef<HTMLDetailsElement>(null);
   const path = usePathname();
+  const t = useT();
+  const label = useLabel();
 
   // A native disclosure (no script menu to break), closed on navigation and on a click or Escape outside it.
   useEffect(() => {
@@ -130,7 +143,6 @@ export function AccountMenu() {
       ]
     : [
         { href: "/profile", label: "My Profile & Settings" },
-        { href: "/home", label: "Home" },
         { href: "/chats", label: "My chats" },
         { href: "/selling", label: "Selling" },
       ];
@@ -148,30 +160,30 @@ export function AccountMenu() {
           <p className="font-medium break-words">{user.displayName}</p>
           <p className="meta break-all">{email ?? (user.isDemo ? "Demo account" : isAgent ? "Support agent" : "Guest account, on this device only")}</p>
           <p className="meta">
-            Reads <span lang={user.language}>{lang?.native}</span>
+            {t("nav.reads")} <span lang={user.language}>{lang?.native}</span>
           </p>
         </div>
         {isGuest && (
           <Link href="/signup" className="btn btn-primary w-full">
-            Save your account
+            {t("nav.saveAccount")}
           </Link>
         )}
         <ul className="-mx-2 flex flex-col">
           {links.map((l) => (
             <li key={l.href}>
               <Link href={l.href} className="flex min-h-tap items-center rounded-[var(--radius-field)] px-2 text-sm font-medium no-underline hover:bg-surface-2">
-                {l.label}
+                {label(l.label)}
               </Link>
             </li>
           ))}
         </ul>
         {user.isDemo && (
           <Link href="/try" className="btn btn-secondary w-full">
-            Switch demo account
+            {t("nav.switchDemo")}
           </Link>
         )}
         <button type="button" onClick={signOut} className="btn btn-quiet self-start px-0">
-          Sign out
+          {t("nav.signOut")}
         </button>
       </div>
     </details>
