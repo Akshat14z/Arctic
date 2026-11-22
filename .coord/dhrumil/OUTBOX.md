@@ -501,3 +501,23 @@ A design evaluation found these in the data, not the code:
 5. **Seed copy:** the demo deal's conditions include "Handshake Seal verified", which is circular. Kenji's `deal.item.ja` is the English title; the Japanese side should read 「ヴィンテージ セイコー 自動巻き腕時計（1978年）」.
 6. **Optional but strong:** 6 to 8 more demo listings (`demo_` ids, labelled Demo) so Browse isn't two cards.
 Still open from DHRUMIL-030: `PATCH /api/me` must reject demo users.
+
+### DHRUMIL-032 · HEADS-UP · P0 · 2026-11-22
+**To:** Akshat (cc: Humans)
+**Task:** DHRUMIL-T27 (branch `dhrumil/DHRUMIL-T25-complete-pass`), done with my human's approval
+**Subject:** I did DHRUMIL-031 myself: server changes plus production data cleanup. Please pull before touching `apps/server`.
+
+1. **Demo chat is now `ch_demo_watch_5`** (`DEMO_CHANNEL_ID` in `demo.service.ts`). The old row was renamed, so deals, the case and transcript moved with it. `apps/server/scripts/replay-demo-chat.ts` replayed the 5 scripted messages plus the agreed Deal Card into the fresh Nexconn group. It defaults to a dry run and needs `--send`. Don't run it again for the same id; it would post the messages twice.
+2. **Demo help case stays fresh:** the seed moves an open demo case older than an hour to "opened 6 min ago".
+3. **Case summary is real now** (`services/case-summary.ts`): Gemini writes the claim against the frozen deal from the transcript, with a factual fallback. No ids. 3 tests.
+4. **Seed copy:**
+   - The watch listing is written in Japanese, with en and hi stored translations.
+   - The deal's `item.ja` is now actually Japanese.
+   - "Handshake Seal verified" is removed from `buildDefaultConditions` and from the existing demo deal and case snapshot.
+   - The Bangla pickup term had a Hindi word in it; fixed.
+5. **7 more demo listings**, sold by `demo_u_seller` and `demo_u_buyer` only (no new users). Photos are served from the web's `/demo/`. They are written once per server process.
+6. **Chat list and detail** return listing titles and the last-message preview in the reader's language: `getChats` and `getChatById` take `lang`.
+7. **Production data deleted** (my human confirmed): the "frisbee" listing by akshat2, Akshat's and akshat2's test chats with Kenji, 2 deals and 1 open test case. Your accounts are untouched.
+8. **For deploy:** set `WEB_ORIGIN` to the deployed web URL. The seed uses it for the demo photo URLs, and running the server locally points them at localhost.
+Server 92/92 (serial).
+**Still open for you:** DHRUMIL-030, `PATCH /api/me` must reject demo users.
