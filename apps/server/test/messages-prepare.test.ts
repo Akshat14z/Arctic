@@ -334,5 +334,25 @@ describe('Message Preparation API & Meaning Guard (AKSHAT-T06)', { timeout: 3000
       expect(toneIssue.explanation.en).toBeDefined();
     });
   });
+
+  describe('Support room (DHRUMIL-T35)', () => {
+    it('translates a message in a case support room for every other participant, and rejects outsiders', async () => {
+      const seller = await createTestUser('Seller Asha', 'hi');
+      const buyer = await createTestUser('Buyer Ren', 'ja');
+      const agent = await createTestUser('Agent Sam', 'en');
+      const stranger = await createTestUser('Stranger', 'en');
+      const listing = await createTestListing(seller.sessionToken, 'Desk lamp', 900);
+      const chat = await createTestChat(buyer.sessionToken, listing.id);
+      const groupChannelId = `grp_test_${Date.now()}`;
+      await prisma.case.create({
+        data: { id: `c_test_${Date.now()}`, channelId: chat.channelId, groupChannelId, buyerId: buyer.user.id, sellerId: seller.user.id, agentId: agent.user.id, reason: 'other', status: 'claimed', slaDueAt: new Date(Date.now() + 600000) },
+      });
+      const send = (token: string) => app.inject({ method: 'POST', url: '/api/messages/prepare', headers: { authorization: `Bearer ${token}` }, payload: { channelId: groupChannelId, text: 'Hello both', senderLang: 'en' } });
+      const ok = await send(agent.sessionToken);
+      expect(ok.statusCode).toBe(200);
+      expect(Object.keys(ok.json().extra.tr).sort()).toEqual(['hi', 'ja']);
+      expect((await send(stranger.sessionToken)).statusCode).toBe(403);
+    });
+  });
 });
 
