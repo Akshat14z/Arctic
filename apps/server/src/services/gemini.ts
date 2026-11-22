@@ -49,7 +49,8 @@ export async function geminiGenerate(
   const models = Array.from(new Set([...FALLBACK_MODELS, LLM_MODEL].filter(Boolean))) as string[];
 
   return new Promise<string>((resolve, reject) => {
-    let next = 0;
+    const queue = models.map((model) => ({ model, delay: 0 }));
+    let retried = false;
     let pending = 0;
     let done = false;
     let hedge: ReturnType<typeof setTimeout> | undefined;
@@ -58,18 +59,30 @@ export async function geminiGenerate(
     const launch = () => {
       clearTimeout(hedge);
       if (done) return;
-      if (next >= models.length) {
+      const job = queue.shift();
+      if (!job) {
         if (pending === 0) finish(() => reject(new Error('Every Gemini model failed or returned nothing')));
         return;
       }
-      const model = models[next++];
       const controller = new AbortController();
       controllers.push(controller);
-      const timer = setTimeout(() => controller.abort(), opts.timeoutMs);
+      let timer: ReturnType<typeof setTimeout> | undefined;
       pending++;
-      callModel(model, parts, opts, LLM_API_KEY, controller.signal)
+      const run = async () => {
+        if (job.delay) await new Promise((r) => setTimeout(r, job.delay));
+        if (done) throw new Error('already answered');
+        timer = setTimeout(() => controller.abort(), opts.timeoutMs);
+        return callModel(job.model, parts, opts, LLM_API_KEY, controller.signal);
+      };
+      run()
         .then((text) => { if (!done) finish(() => resolve(text)); })
-        .catch((err) => { if (!done) console.warn(`[Gemini] ${model} failed:`, err instanceof Error ? err.message : err); })
+        .catch((err) => {
+          if (done) return;
+          console.warn(`[Gemini] ${job.model} failed:`, err instanceof Error ? err.message : err);
+          // A fast refusal (429 rate limit, 503 overloaded) usually clears in a moment: give the fast model one more try
+          // before the slow one (approved by the humans, DHRUMIL-T34).
+          if (!retried && !controller.signal.aborted) { retried = true; queue.unshift({ model: models[0], delay: 300 }); }
+        })
         .finally(() => { clearTimeout(timer); pending--; if (!done) launch(); });
       hedge = setTimeout(launch, HEDGE_MS);
     };
