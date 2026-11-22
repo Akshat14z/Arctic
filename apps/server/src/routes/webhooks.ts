@@ -51,6 +51,32 @@ export const webhookRoutes: FastifyPluginAsync = async (app) => {
         await consumeWebhookNonce(nonce);
       }
 
+      // Documented Nexconn format (docs.nexconn.ai webhook overview, message:send): {type, id, time, data: [...]},
+      // each item with userId, channelId, messageType, content, channelType, time, messageId.
+      // DHRUMIL-T37, approved by the humans: the flat format below never matched what Nexconn sends.
+      const body = request.body as { type?: string; data?: unknown };
+      if (Array.isArray(body?.data)) {
+        if (body.type !== 'message:send') return reply.status(200).send({ success: true, ignored: body.type ?? 'unknown' });
+        let stored = 0;
+        for (const m of body.data as Record<string, any>[]) {
+          try {
+            const r = await processNexconnMessageEvent({
+              messageId: m.messageId,
+              channelId: m.channelId,
+              fromUserId: m.userId,
+              channelType: m.channelType,
+              msgTimestamp: m.time,
+              content: m.content,
+            });
+            if (r.stored) stored++;
+          } catch (err) {
+            // One bad item must not fail the batch: a non-2xx makes Nexconn retry every message in it.
+            request.log.warn({ err, messageId: m?.messageId }, '[Webhook] message not recorded');
+          }
+        }
+        return reply.status(200).send({ success: true, events: body.data.length, stored });
+      }
+
       const payload = request.body as NexconnWebhookPayload;
       const result = await processNexconnMessageEvent(payload);
 
