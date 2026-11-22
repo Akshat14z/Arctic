@@ -10,7 +10,7 @@ import type { Key } from "@/lib/i18n";
 import { ThemeToggle } from "./theme-toggle";
 
 // Tab and menu labels in the reader's language (lib/i18n). Labels without a key stay as written.
-const LABEL_KEYS: Record<string, Key> = { Home: "nav.home", Browse: "nav.browse", Chats: "nav.chats", Selling: "nav.selling", "My chats": "nav.chats", "My Profile & Settings": "nav.profile" };
+const LABEL_KEYS: Record<string, Key> = { Home: "nav.home", Browse: "nav.browse", Chats: "nav.chats", Selling: "nav.selling", Following: "nav.following", "My chats": "nav.chats", "My Profile & Settings": "nav.profile" };
 function useLabel() {
   const t = useT();
   return (label: string) => (LABEL_KEYS[label] ? t(LABEL_KEYS[label]) : label);
