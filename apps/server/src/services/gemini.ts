@@ -12,43 +12,65 @@ const supportsThinkingConfig = (model: string) => /gemini-(2\.5|3)/.test(model);
 
 type Part = { text: string } | { inlineData: { mimeType: string; data: string } };
 
+// Hedged requests (DHRUMIL-T34, approved by the humans): if a model hasn't answered within HEDGE_MS, the next one
+// starts in parallel and the first non-empty answer wins. Measured 2026-11-22: gemini-3.5-flash timed out at 3.5 s
+// on Hindi→Japanese 3 times in 3, so a sequential chain left Japanese readers with the untranslated original.
+const HEDGE_MS = 1500;
+
+async function callModel(model: string, parts: Part[], opts: { maxOutputTokens: number; temperature?: number }, key: string, signal: AbortSignal): Promise<string> {
+  const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${key}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    signal,
+    body: JSON.stringify({
+      contents: [{ parts }],
+      generationConfig: {
+        temperature: opts.temperature ?? 0.2,
+        maxOutputTokens: opts.maxOutputTokens,
+        ...(supportsThinkingConfig(model) && { thinkingConfig: { thinkingBudget: 0 } }),
+      },
+    }),
+  });
+  if (!res.ok) throw new Error(`returned ${res.status}`);
+  const data = (await res.json()) as { candidates?: { content?: { parts?: { text?: string }[] } }[] };
+  const text = data.candidates?.[0]?.content?.parts?.map((p) => p.text ?? '').join('').trim();
+  if (!text) throw new Error('returned nothing');
+  return text;
+}
+
 export async function geminiGenerate(
   parts: Part[],
   opts: { maxOutputTokens: number; timeoutMs: number; temperature?: number }
 ): Promise<string> {
   const { LLM_API_KEY, LLM_MODEL } = getConfig();
   if (!LLM_API_KEY) throw new Error('LLM_API_KEY not set');
-  const models = Array.from(new Set([LLM_MODEL, ...FALLBACK_MODELS].filter(Boolean)));
+  const models = Array.from(new Set([LLM_MODEL, ...FALLBACK_MODELS].filter(Boolean))) as string[];
 
-  for (const model of models) {
-    const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), opts.timeoutMs);
-    try {
-      const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${LLM_API_KEY}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        signal: controller.signal,
-        body: JSON.stringify({
-          contents: [{ parts }],
-          generationConfig: {
-            temperature: opts.temperature ?? 0.2,
-            maxOutputTokens: opts.maxOutputTokens,
-            ...(supportsThinkingConfig(model) && { thinkingConfig: { thinkingBudget: 0 } }),
-          },
-        }),
-      });
-      if (!res.ok) {
-        console.warn(`[Gemini] ${model} returned ${res.status}; trying the next model`);
-        continue;
+  return new Promise<string>((resolve, reject) => {
+    let next = 0;
+    let pending = 0;
+    let done = false;
+    let hedge: ReturnType<typeof setTimeout> | undefined;
+    const controllers: AbortController[] = [];
+    const finish = (fn: () => void) => { done = true; clearTimeout(hedge); controllers.forEach((c) => c.abort()); fn(); };
+    const launch = () => {
+      clearTimeout(hedge);
+      if (done) return;
+      if (next >= models.length) {
+        if (pending === 0) finish(() => reject(new Error('Every Gemini model failed or returned nothing')));
+        return;
       }
-      const data = (await res.json()) as { candidates?: { content?: { parts?: { text?: string }[] } }[] };
-      const text = data.candidates?.[0]?.content?.parts?.map((p) => p.text ?? '').join('').trim();
-      if (text) return text;
-    } catch (err) {
-      console.warn(`[Gemini] ${model} failed:`, err instanceof Error ? err.message : err);
-    } finally {
-      clearTimeout(timer);
-    }
-  }
-  throw new Error('Every Gemini model failed or returned nothing');
+      const model = models[next++];
+      const controller = new AbortController();
+      controllers.push(controller);
+      const timer = setTimeout(() => controller.abort(), opts.timeoutMs);
+      pending++;
+      callModel(model, parts, opts, LLM_API_KEY, controller.signal)
+        .then((text) => { if (!done) finish(() => resolve(text)); })
+        .catch((err) => { if (!done) console.warn(`[Gemini] ${model} failed:`, err instanceof Error ? err.message : err); })
+        .finally(() => { clearTimeout(timer); pending--; if (!done) launch(); });
+      hedge = setTimeout(launch, HEDGE_MS);
+    };
+    launch();
+  });
 }
